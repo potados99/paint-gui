@@ -6,7 +6,7 @@ TARGET_INITIAL	:= free-draw
 TARGET		:= $(TARGET_INITIAL)
 
 CC		:= gcc
-CFLAGS		:= -Wall
+CFLAGS		:= -Wall -Ofast
 LIB		:=
 
 TARGET_DIR	:= bin

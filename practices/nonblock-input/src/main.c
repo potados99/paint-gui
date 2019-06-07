@@ -12,7 +12,7 @@
 #include "touch.h"
 
 int main(int argc, const char * argv[]) {
-	puts("Practice: touch-input");
+	puts("Practice: nonblock-input");
 	
 	int 			fd = 0;
 	int 			read = 0;

@@ -22,7 +22,7 @@ int main(int argc, const char * argv[]) {
 	struct pollfd 		p;
 	int			pread;
 
-	fd = open(EVENTPATH, O_RDONLY);
+	fd = open(EVENTPATH, O_RDONLY | O_NONBLOCK);
 	if (fd == -1) {	
 		perror("open failed.\n");
 		exit(1);

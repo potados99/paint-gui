@@ -1,6 +1,7 @@
 #include "input.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/input.h>
@@ -129,7 +130,7 @@ void input::start_loop() {
 	// TODO: replace this test code.
 
 	int 		read = 0;
-	int 		line_num = 0;
+	unsigned long 	line_num = 0;
 	touch_event 	te;
 	
 	bool 		touched = 0;
@@ -141,7 +142,7 @@ void input::start_loop() {
 		  * Poll successful + fd ready + has event
 		  */
 		
-		read = touch_read(fd, &te, NULL); /* read with fd, to te, no correction. */
+		read = touch_read(fd_, &te, NULL); /* read with fd, to te, no correction. */
 	
 		if (read == 0) {
 			/**

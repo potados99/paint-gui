@@ -15,7 +15,6 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 	int			nread = 0;
 	int 			x = 0;
 	int 			y = 0;
-	int 			p = 0;
 
 	/**
 	 * Clean touch_event struct
@@ -63,7 +62,7 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 					break;
 
 				case ABS_PRESSURE:
-					event->pressure= p;
+					event->pressure = ie.value;
 					break;
 			
 			} /* end of switch */
@@ -78,6 +77,16 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 	 */
 	if (event->touch_state == STATE_TOUCH_UP) {
 		return 0;
+	}
+
+	/**
+	 * Restore lost pieces.
+	 */
+	if (x == 0) {
+		x = event->x;
+	}
+	if (y == 0) {
+		y = event->y;
 	}
 
 	/* No correction. */

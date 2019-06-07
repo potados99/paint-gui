@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/poll.h>
 
 #include "touch.h"
 
@@ -19,58 +18,53 @@ int main(int argc, const char * argv[]) {
 	int 			read = 0;
 	unsigned long 		line_num = 0;
 	struct touch_event 	te;
-	struct pollfd 		p;
-	int			pread;
+	int 			touched = 0;
 
-	fd = open(EVENTPATH, O_RDONLY);
+
+	fd = open(EVENTPATH, O_RDONLY | O_NONBLOCK);
 	if (fd == -1) {	
 		perror("open failed.\n");
 		exit(1);
 	}
 
-	p.fd = fd;
-	p.events = POLLIN;
 
 	while (1) {
 		
-		pread = poll(&p, 1, 0);
-
-		if (pread == -1) {
-			perror("error while poll()");
-			exit(1);
-		}
-		else if (pread == 0) {
-			printf("pass\n");
-			continue;
-		}
-
-		if (p.revents & POLLIN) {
-				/**
-				  * Poll successful + fd ready + has event
-				  */
+		/**
+		  * Poll successful + fd ready + has event
+		  */
 		
-			read = touch_read(fd, &te, NULL); /* read with fd, to te, no correction. */
-			if (read == 0) {
-				/**
-				  * Successfull read.
-				  */
-				printf("[%ld] X: %5d,\tY: %5d,\tPressure: %d\n", line_num++, te.x, te.y, te.pressure);
+		read = touch_read(fd, &te, NULL); /* read with fd, to te, no correction. */
+	
+		if (read == 0) {
+			/**
+			  * Successfull read.
+			  */
+
+			if (te.touch_state == STATE_TOUCH_DOWN) {
+				touched = 1;
 			}
-			else {
-				if (read == 1) {
-					printf("nothing to read.\n");
-				}
-				else {
-					fprintf(stdout, "touch_read failed.\n");
-					exit(1);
-				}
-			}		
+			else if (te.touch_state == STATE_TOUCH_UP) {
+				touched = 0;
+			}
+
+			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %2d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
 		}
 		else {
-			printf("whats this case?\n");	
-		}
-}
-
+			if (read == 1) {
+				if (touched == 0) {
+					/**
+					 * Only when touch is finished.
+					 */
+					printf("nothing to read.\n");
+				}
+			}
+			else {
+				fprintf(stdout, "touch_read failed.\n");
+				exit(1);
+			}
+		}		
+	}
 
 	/* NOREACH */
 

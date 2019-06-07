@@ -19,7 +19,7 @@ int main(int argc, const char * argv[]) {
 	unsigned long 		line_num = 0;
 	struct touch_event 	te;
 
-	fd = open(EVENTPATH, O_RDONLY, O_NONBLOCK);
+	fd = open(EVENTPATH, O_RDONLY | O_NONBLOCK); /* non-block */
 	if (fd == -1) {	
 		perror("open failed.\n");
 		exit(1);

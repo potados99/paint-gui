@@ -1,4 +1,4 @@
-# Practice: touch-input
+# Practice: nonblock-input
 
 Monitor any touch input.
 

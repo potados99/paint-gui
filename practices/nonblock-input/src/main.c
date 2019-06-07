@@ -39,7 +39,7 @@ int main(int argc, const char * argv[]) {
 		}
 		else {
 			if (read == 1) {
-				printf("nothing to read.\n");
+	//			printf("nothing to read.\n");
 			}
 			else {
 				fprintf(stdout, "touch_read failed.\n");

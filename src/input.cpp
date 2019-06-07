@@ -1,12 +1,12 @@
 #include "input.h"
 
-extern "C" {
-	#include <fcntl.h>
-	#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-	#include <linux/input.h>
-	#include <linux/input-event-codes.h>
-	#include <errno.h>
+#include <linux/input.h>
+#include <linux/input-event-codes.h>
+#include <errno.h>
 
 
 /**
@@ -19,7 +19,7 @@ input::input(const char *event_fd_path) {
 /**
   * Private
   */
-int input::touch_read(int fd, touch_event *event, touch_correction *correctio) {
+int input::touch_read(int fd, touch_event *event, touch_correction *correction) {
 	if (event == NULL) return -1;
 
 	struct input_event 	ie;
@@ -123,4 +123,3 @@ void input::start_loop() {
 
 }
 
-}

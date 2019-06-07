@@ -9,10 +9,15 @@
 
 #define TS_SIZE 4096
 
+#define STATE_NONE 		0x00
+#define STATE_TOUCH_DOWN 	0x01
+#define STATE_TOUCH_UP 		0x02
+
 struct touch_event {
 	int x;
 	int y;
 	int pressure;
+	int touch_state;
 };
 
 struct touch_correction {

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
 
 #include "touch.h"
 
@@ -19,7 +20,7 @@ int main(int argc, const char * argv[]) {
 	unsigned long 		line_num = 0;
 	struct touch_event 	te;
 	int 			touched = 0;
-
+	time_t			last_time = 0;
 
 	fd = open(EVENTPATH, O_RDONLY | O_NONBLOCK);
 	if (fd == -1) {	
@@ -47,8 +48,10 @@ int main(int argc, const char * argv[]) {
 			else if (te.touch_state == STATE_TOUCH_UP) {
 				touched = 0;
 			}
-
-			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %2d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
+			
+			if (te.touch_state == STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
+			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
+			if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
 		}
 		else {
 			if (read == 1) {
@@ -56,7 +59,11 @@ int main(int argc, const char * argv[]) {
 					/**
 					 * Only when touch is finished.
 					 */
-					printf("nothing to read.\n");
+					time_t cur_time = time(NULL);
+					if (last_time < cur_time) {
+						printf("waiting...\n");
+						last_time = cur_time;
+					}
 				}
 			}
 			else {

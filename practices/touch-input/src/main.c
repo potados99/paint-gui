@@ -35,7 +35,9 @@ int main(int argc, const char * argv[]) {
 			/**
 			  * Successfull read.
 			  */
-			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d\n", line_num++, te.x, te.y, te.pressure);
+			if (te.touch_state == STATE_TOUCH_DOWN) printf("============================= TOUCH START =============================\n");
+			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
+			if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
 		}
 		else {
 			fprintf(stdout, "touch_read failed.\n");

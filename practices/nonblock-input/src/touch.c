@@ -11,15 +11,21 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 	if (event == NULL) return -1;
 
 	struct input_event 	ie;
-
-	int			nread = 0;
-	int 			x = 0;
-	int 			y = 0;
+	int			nread;
+	int 			x;
+	int 			y;
 
 	/**
-	 * Clean touch_event struct
+	 * Clean touch_event struct.
+	 * Leave other values but touch_state.
 	 */	
-	event->touch_state = STATE_NONE; /* default none. */
+	event->touch_state = STATE_NONE;
+
+	/**
+	 * Set 'Not set' flags.
+	 */
+	x = -1;
+	y = -1;
 
 	while (1) {
 
@@ -79,27 +85,21 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 		return 0;
 	}
 
-	/**
-	 * Restore lost pieces.
-	 */
-	if (x == 0) {
-		x = event->x;
-	}
-	if (y == 0) {
-		y = event->y;
-	}
-
 	/* No correction. */
 	if (correction == NULL) {
-		event->x = x;
-		event->y = y;
+		if (x != -1) event->x = x;
+		if (y != -1) event->y = y;
 		
 		return 0;
 	}
 
 	/* Do touch correction. */ 
-	event->x = (correction->xd_coef_x * x) + (correction->xd_coef_y * y) + correction->xd_coef_1;
-	event->y = (correction->yd_coef_x * x) + (correction->yd_coef_y * y) + correction->yd_coef_1;
+	if (x != -1) {
+		event->x = (correction->xd_coef_x * x) + (correction->xd_coef_y * y) + correction->xd_coef_1;
+	}
+	if (y != -1) {
+		event->y = (correction->yd_coef_x * x) + (correction->yd_coef_y * y) + correction->yd_coef_1;
+	}
 
 	return 0;
 }

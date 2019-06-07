@@ -35,10 +35,10 @@ int main(int argc, const char * argv[]) {
 			/**
 			  * Successfull read.
 			  */
-			printf("[%ld] X: %d,\tY: %d,\tPressure: %d\n", line_num++, te.x, te.y, te.pressure);
+			printf("[%ld] X: %d,\t\tY: %d,\t\tPressure: %d\n", line_num++, te.x, te.y, te.pressure);
 		}
 		else {
-			fprintf("touch_read failed.\n");
+			fprintf(stdout, "touch_read failed.\n");
 			exit(1);
 		}
 	}

@@ -21,15 +21,11 @@ struct touch_event {
 };
 
 struct touch_correction {
-	int k;
+	int x_min;
+	int x_max;
 
-	int xd_coef_x; /* A */
-	int xd_coef_y; /* B */
-	int xd_coef_1; /* C */
-
-	int yd_coef_x; /* D */
-	int yd_coef_y; /* E */
-	int yd_coef_1; /* F */
+	int y_min;
+	int y_max;
 };
 
 int touch_read(int fd, struct touch_event *event, struct touch_correction *correction);

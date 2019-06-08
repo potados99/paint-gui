@@ -10,7 +10,7 @@
 
 
 int main(int argc, const char * argv[]) {
-	puts("Practice: free-draw");
+	puts("Practice: rubber-band");
 
 	int ts_fd;
 	int dp_fd;
@@ -48,6 +48,9 @@ int main(int argc, const char * argv[]) {
 	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);
 	disp_draw_done(mem);
 
+	int start_x;
+	int start_y;
+
 	int last_x;
 	int last_y;
 
@@ -65,8 +68,8 @@ int main(int argc, const char * argv[]) {
 		}
 		
 		if (te.touch_state == STATE_TOUCH_DOWN) {
-			last_x = te.x;
-			last_y = te.y;
+			start_x = te.x;
+			start_y = te.y;
 
 			touched = 1;
 		}
@@ -83,7 +86,8 @@ int main(int argc, const char * argv[]) {
 		disp_partial_done(mem, te.x, te.y, 1, 1);
 		*/
 	
-		disp_draw_line(mem, last_x, last_y, te.x, te.y, PIXEL(255, 255, 255));
+		disp_draw_line(mem, start_x, start_y, last_x, last_y, 0);
+		disp_draw_line(mem, start_x, start_y, te.x, te.y, PIXEL(255, 255, 255));
 		disp_draw_done(mem);
 
 		last_x = te.x;

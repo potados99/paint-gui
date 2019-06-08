@@ -37,6 +37,7 @@ int main(int argc, const char * argv[]) {
 
 	rough_redraw_move(mem);
 	usleep(1000000); /* 1 sec */
+	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
 	partial_redraw_move(mem);
 
 	disp_unmap(mem);
@@ -47,13 +48,22 @@ int main(int argc, const char * argv[]) {
 
 
 void rough_redraw_move(unsigned short *mem) {
+	/**
+	 * Conclusion: THIS IS A TOTAL SHIT.
+	 */
 	for (int i = 0; i < 160; ++i) {
+		usleep(5000);
 		disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
-		disp_draw_rect(mem, i, i, 80, 80, PIXEL(255, 128, 0));
+		disp_draw_rect(mem, i, i, 80, 80, PIXEL(0, 128, 255));
 	}
 }
 
 void partial_redraw_move(unsigned short *mem) {
+	for (int i = 0; i < 159; ++i) {
+		usleep(5000);
+		disp_draw_rect(mem, i, i, 80, 80, PIXEL(0, 0, 0));
+		disp_draw_rect(mem, i + 1, i + 1, 80, 80, PIXEL(0, 128, 255));
+	}
 }
 
 

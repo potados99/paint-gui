@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "display.h"
+
 void rough_redraw_move(unsigned short *mem);
 void partial_redraw_move(unsigned short *mem);
 
@@ -32,7 +34,7 @@ int main(int argc, const char * argv[]) {
 
 	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
 
-	disp_draw_rect(mem, 0, 0, 80, 80, PIXEL(255, 128, 0));
+	disp_draw_rect(mem, 0, 0, 80, 80, PIXEL(0, 128, 255));
 
 	rough_redraw_move(mem);
 	usleep(1000000); /* 1 sec */

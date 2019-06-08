@@ -1,7 +1,7 @@
 /**
-  * Practice: touch-input
+  * Practice: nonblock-input
   *
-  * Receive touch event forever.
+  * Receive touch event forever without blocking
   */
 
 #include <stdio.h>

@@ -14,8 +14,6 @@
 unsigned short 		*disp_map(int fd);
 void 			disp_unmap(unsigned short *mem);
 
-void 			_draw(unsigned short *mem, int offset, unsigned short color);
-
 void			disp_draw_done(unsigned short *mem);			
 void 			disp_partial_done(unsigned short *mem, int x, int y, int width, int height);
 

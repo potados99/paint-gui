@@ -33,26 +33,12 @@ int main(int argc, const char * argv[]) {
 	mem = disp_map(dp_fd);
 
 	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
-
 	disp_draw_rect(mem, 0, 0, 80, 80, PIXEL(0, 128, 255));
-
+	
 	disp_draw_done(mem);
-
-	// rough_redraw_move(mem);
-	
-	// usleep(1000000); /* 1 sec */
-	// disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
-	
-	// partial_redraw_move(mem);
-	
-	// usleep(1000000); /* 1 sec */
-	// disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
-	
-
 
 	//smooth_redraw_move(mem);
 	//rough_redraw_move(mem);
-
 	partial_redraw_move(mem);
 	
 	disp_unmap(mem);
@@ -98,7 +84,8 @@ void smooth_redraw_move(unsigned short *mem) {
 			disp_draw_point(mem, i + 80, i + 80 - j, PIXEL(0, 128, 255));
 		}
 
-		disp_partial_done(mem, i, i, 81, 81);
+	//	disp_partial_done(mem, i, i, 81, 81);
+		disp_draw_done(mem);
 	}
 }
 

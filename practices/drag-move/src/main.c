@@ -21,11 +21,11 @@ int main(int argc, const char * argv[]) {
 	struct touch_event te;
 	struct touch_correction correction;
 
-	correction->x_min = 310;
-	correction->x_max = 3900;
+	correction.x_min = 310;
+	correction.x_max = 3900;
 
-	correction->y_min = 150;
-	correction->y_max = 3900;
+	correction.y_min = 150;
+	correction.y_max = 3900;
 	
 	touched = 0;
 	line_num = 0;
@@ -44,6 +44,9 @@ int main(int argc, const char * argv[]) {
 
 
 	mem = disp_map(dp_fd);
+
+	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, 0);
+	disp_draw_done(mem);
 
 	while (1) {
 		

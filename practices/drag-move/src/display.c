@@ -98,7 +98,7 @@ void disp_partial_done(unsigned short *mem, int x, int y, int width, int height)
 
 int disp_draw_point(unsigned short *mem, int x, int y, unsigned short color) {
 	_push(mem, x + (y * DISP_WIDTH), color);
-
+	
 	return 0;
 }
 

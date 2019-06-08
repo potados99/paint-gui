@@ -1,7 +1,5 @@
-# Experiment on []
+# Practice: drag-move
 
-## Purpose
+Continuous input and drawing.
 
-## Sources
-
-## Conclusion
+No calibration due to incorrectness of it.

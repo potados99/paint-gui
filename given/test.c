@@ -60,6 +60,8 @@ void setCalibration() {
 	f = (y[0] * ((x[2] * yd[1]) - (x[1] * yd[2]))) + (y[1] * ((x[0] * yd[2]) - (x[2] * yd[0]))) + (y[2] * ((x[1] * yd[0]) - (x[0] * yd[1])));
 	a = a / k; b = b / k; c = c / k;
 	d = d / k; e = e / k; f = f / k;
+
+	printf("calibration done: A: %f, B: %f, C: %f, D: %f, E: %f, D: %f, K: %f\n", a, b, c, d, e, f, k);
 }
 void clearLcd() {
 	int i, j;
@@ -189,7 +191,7 @@ int main(void) {
 		exit(1);
 	}
 
-	fd = open("/dev/input/event4", O_RDONLY);
+	fd = open("/dev/input/event1", O_RDONLY);
 	if (fd < 0) return -1;
 
 	printf("start\n");

@@ -36,18 +36,20 @@ int main(int argc, const char * argv[]) {
 
 	disp_draw_rect(mem, 0, 0, 80, 80, PIXEL(0, 128, 255));
 
-	rough_redraw_move(mem);
+	// rough_redraw_move(mem);
 	
-	usleep(1000000); /* 1 sec */
-	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
+	// usleep(1000000); /* 1 sec */
+	// disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
 	
-	partial_redraw_move(mem);
+	// partial_redraw_move(mem);
 	
-	usleep(1000000); /* 1 sec */
-	disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
+	// usleep(1000000); /* 1 sec */
+	// disp_draw_rect(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT, PIXEL(0, 0, 0)); /* clear background */
 	
-	smooth_redraw_move(mem);
-
+	while(1) {
+		// smooth_redraw_move(mem);
+		rough_redraw_move(mem);
+	}
 
 	disp_unmap(mem);
 	close(dp_fd);
@@ -78,14 +80,16 @@ void partial_redraw_move(unsigned short *mem) {
 
 void smooth_redraw_move(unsigned short *mem) {
 	for (int i = 0; i < 160; ++i) {
-		for (int j = i; j < 80; ++j) {
-			disp_draw_point(mem, j, i, PIXEL(0, 0, 0));
-			disp_draw_point(mem, i, j, PIXEL(0, 0, 0));
+		usleep(1000);
+
+		for (int j = 0; j < 80; ++j) {
+			disp_draw_point(mem, i + j, i, PIXEL(0, 0, 0));
+			disp_draw_point(mem, i, i + j, PIXEL(0, 0, 0));
 		}
 
-		for (int j = i + 80; j > 0; --j) {
-			disp_draw_point(mem, j, i + 80, PIXEL(0, 128, 255));
-			disp_draw_point(mem, i + 80, j, PIXEL(0, 128, 255));
+		for (int j = 0; j < 80; ++j) {
+			disp_draw_point(mem, i + 80 - j, i + 80, PIXEL(0, 128, 255));
+			disp_draw_point(mem, i + 80, i + 80 - j, PIXEL(0, 128, 255));
 		}
 	}
 }

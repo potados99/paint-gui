@@ -57,6 +57,10 @@ int main(int argc, const char * argv[]) {
 		ts_read = touch_read(ts_fd, &te, &correction);
 
 		if (ts_read != 0) {
+			if (ts_read == -1) {
+				printf("error while reading!\n");
+				return 1;
+			}
 			usleep(10000);	
 			continue;
 		}
@@ -73,7 +77,7 @@ int main(int argc, const char * argv[]) {
 		if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
 		
 		disp_draw_point(mem, te.x, te.y, PIXEL(255, 255, 255));
-		disp_draw_done(mem);
+		disp_partial_done(mem, te.x, te.y, 1, 1);
 	
 	}
 

@@ -21,6 +21,8 @@ struct touch_event {
 };
 
 struct touch_correction {
+	int k;
+
 	int xd_coef_x; /* A */
 	int xd_coef_y; /* B */
 	int xd_coef_1; /* C */

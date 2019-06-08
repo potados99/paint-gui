@@ -95,10 +95,10 @@ int touch_read(int fd, struct touch_event *event, struct touch_correction *corre
 
 	/* Do touch correction. */ 
 	if (x != -1) {
-		event->x = (correction->xd_coef_x * x) + (correction->xd_coef_y * y) + correction->xd_coef_1;
+		event->x = ((correction->xd_coef_x * x) + (correction->xd_coef_y * y) + correction->xd_coef_1) / correction->k;
 	}
 	if (y != -1) {
-		event->y = (correction->yd_coef_x * x) + (correction->yd_coef_y * y) + correction->yd_coef_1;
+		event->y = ((correction->yd_coef_x * x) + (correction->yd_coef_y * y) + correction->yd_coef_1) / correction->k;
 	}
 
 	return 0;

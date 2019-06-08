@@ -44,15 +44,15 @@ static inline void _flush_partial(unsigned short *mem, int x, int y, int width, 
 		}
 
 
-		if (++n_line > width) {
+		if (++n_line >= width) {
 			n_line = 0;
 			offset += (DISP_WIDTH - width);
 		} 
-		else {
-			++offset;
-		}
+	
+		++offset;
+	
 
-	} while (offset < offset_max);
+	} while (offset < offset_max + 1);
 
 }
 
@@ -112,16 +112,14 @@ int disp_draw_rect(unsigned short *mem, int x, int y, int width, int height, uns
 	do {
 		_push(mem, offset, color);
 	
-		if (++n_line > width) {
+		if (++n_line >= width) {
 			n_line = 0;
 			offset += (DISP_WIDTH - width);
 		} 
-		else {
-			++offset;
-		}
-
-
-	} while (offset < offset_max);
+		
+		++offset;
+		
+	} while (offset < offset_max + 1);
 
 	return 0;
 }

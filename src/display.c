@@ -12,7 +12,8 @@
 #include <math.h>
 #include <string.h>
 
-static unsigned short 	*disp_buf;
+static unsigned short   *dp_mem;
+static unsigned short 	*dp_buf;
 static unsigned long 	*bitmap;
 
 /**
@@ -56,9 +57,9 @@ do {                                                \
 *(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
 } while (0)
 
-static inline void _apply(unsigned short *mem, int point, int size) {
+static inline void _apply(int point, int size) {
 #ifndef UNSAFE
-    ASSERTDO(mem != NULL, print_error("_apply: mem cannot be null.\n"); return);
+    ASSERTDO(dp_mem != NULL, print_error("_apply: mem cannot be null.\n"); return);
     POINT_CHECK("_apply", point);
     SIZE_CHECK("_apply", size);
 #endif
@@ -81,7 +82,7 @@ static inline void _apply(unsigned short *mem, int point, int size) {
 
 			print_trace("write to display memory at offset{%d max} %d.\n", offset_max, offset);
 
-			*(mem + offset) = *(disp_buf + offset);
+			*(dp_mem + offset) = *(dp_buf + offset);
 		
             UNSET_BIT(bitmap, offset);
 		}
@@ -99,19 +100,19 @@ static inline void _apply(unsigned short *mem, int point, int size) {
 
 }
 
-static inline void _modify(unsigned short *mem, int offset,  unsigned short color) {
+static inline void _modify(int offset,  unsigned short color) {
 #ifndef UNSAFE
-    ASSERTDO(mem != NULL, print_error("_modify: mem cannot be null.\n"); return);
+    ASSERTDO(dp_mem != NULL, print_error("_modify: mem cannot be null.\n"); return);
     ASSERTDO(IN_RANGE(offset, 0, DP_WIDTH * DP_HEIGHT - 1), print_error("_modify: offset{%d} out of range.\n", offset); return);
 #endif
 
 	print_trace("modify pixel at offset %d to %d.\n", offset, color);
 
-	*(disp_buf + offset) = color;
+	*(dp_buf + offset) = color;
     SET_BIT(bitmap, offset);
 }
 
-static inline int _line_low(unsigned short *mem, int p0, int p1, unsigned short color) {
+static inline int _line_low(int p0, int p1, unsigned short color) {
     short x0, y0, x1, y1;
     
     x0 = X(p0);
@@ -132,7 +133,7 @@ static inline int _line_low(unsigned short *mem, int p0, int p1, unsigned short 
     short y = y0;
     
     for (short x = x0; x <= x1; ++x) {
-        _modify(mem, x + (DP_WIDTH * y), color);
+        _modify(x + (DP_WIDTH * y), color);
         
         if (D > 0) {
             y += yi;
@@ -145,7 +146,7 @@ static inline int _line_low(unsigned short *mem, int p0, int p1, unsigned short 
     return 0;
 }
 
-static inline int _line_high(unsigned short *mem, int p0, int p1, unsigned short color) {
+static inline int _line_high(int p0, int p1, unsigned short color) {
     short x0, y0, x1, y1;
     
     x0 = X(p0);
@@ -166,7 +167,7 @@ static inline int _line_high(unsigned short *mem, int p0, int p1, unsigned short
     short x = x0;
     
     for (short y = y0; y <= y1; ++y) {
-        _modify(mem, x + (DP_WIDTH * y), color);
+        _modify(x + (DP_WIDTH * y), color);
         
         if (D > 0) {
             x += xi;
@@ -182,54 +183,52 @@ static inline int _line_high(unsigned short *mem, int p0, int p1, unsigned short
 ////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
 
 
-unsigned short *disp_map(int fd) {
-	unsigned short *mem = (unsigned short *)mmap(NULL, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    ASSERTDO(mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return NULL);
+void disp_map(int fd) {
+	dp_mem = (unsigned short *)mmap(NULL, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 
-	disp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
-    ASSERTDO(disp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return NULL);
+	dp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
+    ASSERTDO(dp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return);
 
 	bitmap = (unsigned long *)malloc(sizeof(unsigned long) * BITMAP_SIZE + 1);
-    ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return NULL);
-
-	return mem;
+    ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return);
 }
 
-void disp_unmap(unsigned short *mem) {
-	munmap(mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
+void disp_unmap() {
+	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
 
-	free(disp_buf);
+	free(dp_buf);
 	free(bitmap);
 }
 
-int disp_draw_point(unsigned short *mem, int point, unsigned short color) {
-	_modify(mem, X(point) + (Y(point) * DP_WIDTH), color);
+int disp_draw_point(int point, unsigned short color) {
+	_modify(X(point) + (Y(point) * DP_WIDTH), color);
 	
 	return 0;
 }
 
-int disp_draw_line(unsigned short *mem, int p0, int p1, unsigned short color) {
+int disp_draw_line(int p0, int p1, unsigned short color) {
 
 	if (DELTA_HEIGHT(p0, p1) < DELTA_WIDTH(p0, p1)) {
 		if (X(p0) > X(p1)) {
-			return _line_low(mem, p1, p0, color);
+			return _line_low(p1, p0, color);
 		}
 		else {
-			return _line_low(mem, p0, p1, color);
+			return _line_low(p0, p1, color);
 		}
 	}
 	else {
 		if (Y(p0) > Y(p1)) {
-			return _line_high(mem, p1, p0, color);
+			return _line_high(p1, p0, color);
 		}
 		else {
-			return _line_high(mem, p0, p1, color);
+			return _line_high(p0, p1, color);
 		}
 	}
 	
 }
 
-int disp_draw_rect(unsigned short *mem, int point, int size, unsigned short color) {
+int disp_draw_rect(int point, int size, unsigned short color) {
     short x, y, width, height;
     
     x = X(point);
@@ -245,7 +244,7 @@ int disp_draw_rect(unsigned short *mem, int point, int size, unsigned short colo
 	register short 	n_line = 0;
 
 	do {
-		_modify(mem, offset, color);
+		_modify(offset, color);
 	
 		if (++n_line >= width) {
 			n_line = 0;
@@ -259,18 +258,18 @@ int disp_draw_rect(unsigned short *mem, int point, int size, unsigned short colo
 	return 0;
 }
 
-int disp_draw_whole(unsigned short *mem, unsigned short color) {
-    return disp_draw_rect(mem, 0, SIZE(DP_WIDTH, DP_HEIGHT), color);
+int disp_draw_whole(unsigned short color) {
+    return disp_draw_rect(0, SIZE(DP_WIDTH, DP_HEIGHT), color);
 }
 
-void disp_commit(unsigned short *mem) {
-    _apply(mem, 0, SIZE(DP_WIDTH, DP_HEIGHT));
+void disp_commit() {
+    _apply(0, SIZE(DP_WIDTH, DP_HEIGHT));
 }
 
-void disp_commit_partial(unsigned short *mem, int point, int size) {
-    _apply(mem, point, size);
+void disp_commit_partial(int point, int size) {
+    _apply(point, size);
 }
 
-void disp_clear(unsigned short *mem) {
-    memset(mem, 0, DP_MEM_SIZE);
+void disp_clear() {
+    memset(dp_mem, 0, DP_MEM_SIZE);
 }

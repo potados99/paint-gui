@@ -20,17 +20,17 @@
 
 #define PIXEL(R, G, B) (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
 
-unsigned short 	*disp_map(int fd);
-void 			disp_unmap(unsigned short *mem);
+void            disp_map(int fd);
+void 			disp_unmap(void);
 
-int 			disp_draw_point(unsigned short *mem, int point, unsigned short color);
-int			    disp_draw_line(unsigned short *mem, int p0, int p1, unsigned short color);
-int 			disp_draw_rect(unsigned short *mem, int point, int size, unsigned short color);
-int             disp_draw_whole(unsigned short *mem, unsigned short color);
+int 			disp_draw_point(int point, unsigned short color);
+int			    disp_draw_line(int p0, int p1, unsigned short color);
+int 			disp_draw_rect(int point, int size, unsigned short color);
+int             disp_draw_whole(unsigned short color);
 
-void            disp_commit(unsigned short *mem);
-void            disp_commit_partial(unsigned short *mem, int point, int size);
+void            disp_commit(void);
+void            disp_commit_partial(int point, int size);
 
-void            disp_clear(unsigned short *mem);
+void            disp_clear(void);
 
 #endif /* display_h */

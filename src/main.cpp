@@ -30,7 +30,11 @@ int main(int argc, const char * argv[]) {
     mydisp.clear(color::blue);
     mydisp.commit();
     
+    usleep(1000000);
+
     mydisp.draw_rect(point(0, 0), size(200, 200), color::white);
+    mydisp.commit();
+
     
     
 	return 0;

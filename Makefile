@@ -16,7 +16,7 @@ OBJ_DIR		:= build
 SRC_EXT		:= c
 OBJ_EXT		:= o
 
-FLAGS		:= -DVERBOSE=1
+FLAGS		:= -DVERBOSE=0
 
 #################################################
 

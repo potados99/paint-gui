@@ -1,4 +1,4 @@
-#include "input.h"
+#include "touch.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,25 +29,24 @@ struct input_event {
 
 #include <errno.h>
 #include <time.h>
-
+#include "machine_specific.h"
 
 /**
   * Constructor
   */
-input::input(const char *event_fd_path) {
+touch::touch(const char *event_fd_path):
+correction_(touch_correction(TS_X_MIN, TS_X_MAX, TS_Y_MIN, TS_Y_MAX)) {
 	fd_ = open(event_fd_path, O_RDONLY | O_NONBLOCK);
 	if (fd_ == -1) {
 		perror("open failed");
 		exit(1); // TODO: change it to throw
 	}
-
-	correction_ = touch_correction();
 }
 
 /**
   * Private
   */
-int input::touch_read(int fd, touch_event *event, touch_correction *correction) {
+int touch::_touch_read(int fd, touch_event *event, touch_correction *correction) {
 	if (event == NULL) return -1;
 
 	struct input_event 	ie;
@@ -134,72 +133,21 @@ int input::touch_read(int fd, touch_event *event, touch_correction *correction) 
 	}
 
 	/* Do touch correction. */ 
-	if (x != -1) {
-		event->x = (correction->xd_coef_x * x) + (correction->xd_coef_y * y) + correction->xd_coef_1;
-	}
-	if (y != -1) {
-		event->y = (correction->yd_coef_x * x) + (correction->yd_coef_y * y) + correction->yd_coef_1;
-	}
-
+    if (x != -1) {
+        event->x = (x - correction->x_min()) * 320 / (correction->x_max() - correction->x_min());
+    }
+    if (y != -1) {
+        event->y = (y - correction->y_min()) * 240 / (correction->y_max() - correction->y_min());
+    }
+    
 	return 0;
 }
 
 /**
   * Public
   */
-void input::start_loop() {
-	// TODO: replace this test code.
-
-	int 		read = 0;
-	unsigned long 	line_num = 0;
-	touch_event 	te;
-	
-	bool 		touched = 0;
-	time_t		last_time = 0;
-
-	while (1) {
-		
-		/**
-		  * Poll successful + fd ready + has event
-		  */
-		
-		read = touch_read(fd_, &te, NULL); /* read with fd, to te, no correction. */
-	
-		if (read == 0) {
-			/**
-			  * Successfull read.
-			  */
-
-			if (te.touch_state == STATE_TOUCH_DOWN) {
-				touched = 1;
-			}
-			else if (te.touch_state == STATE_TOUCH_UP) {
-				touched = 0;
-			}
-			
-			if (te.touch_state == STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
-			printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
-			if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
-		}
-		else {
-			if (read == 1) {
-				if (touched == 0) {
-					/**
-					 * Only when touch is finished.
-					 */
-					time_t cur_time = time(NULL);
-					if (last_time < cur_time) {
-						printf("waiting...\n");
-						last_time = cur_time;
-					}
-				}
-			}
-			else {
-				fprintf(stdout, "touch_read failed.\n");
-				exit(1);
-			}
-		}		
-	}
-
+int touch::touch_read(touch_event *event) {
+    return _touch_read(fd_, event, &correction_);
 }
+
 

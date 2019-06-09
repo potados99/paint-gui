@@ -1,6 +1,6 @@
 #include <iostream>
 #include <thread>
-#include "input.h"
+#include "touch.h"
 #include "shape.h"
 #include "visual_element.h"
 #include "app.h"
@@ -12,7 +12,7 @@ int main(int argc, const char * argv[]) {
     
     std::cout << ve1.to_string() << std::endl;
 
-    app myapp;
+    app myapp("/dev/input/event1");
     
     
     

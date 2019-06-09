@@ -2,8 +2,8 @@
 #ifndef machine_specific_h
 #define machine_specific_h
 
-#define EVENTPATH   "/dev/input/event1"
-#define FDPATH      "/dev/fb2"
+#define TSPATH      "/dev/input/event1"
+#define DPPATH      "/dev/fb2"
 
 #define DP_WIDTH    320
 #define DP_HEIGHT   240

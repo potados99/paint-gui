@@ -37,14 +37,21 @@ struct input_event {
 
 touch::touch(const char *event_fd_path):
 correction_(touch_correction(TS_X_MIN, TS_X_MAX, TS_Y_MIN, TS_Y_MAX)) {
-	fd_ = open(event_fd_path, O_RDONLY | O_NONBLOCK);
-	if (fd_ == -1) {        
-        print_error("touch::touch(): open() failed with %s.\n", event_fd_path);
-		exit(1);
-	}
+    /**
+     * Open fd. nonblock.
+     */
+    ASSERTDO((fd_ = open(event_fd_path, O_RDONLY | O_NONBLOCK)) != -1,
+             print_error("touch::touch(): open() failed with %s.\n", event_fd_path);
+             exit(1));
+}
+
+touch::~touch() {
+    close(fd_);
 }
 
 int touch::touch_read(touch_event *event) {
+    ASSERTDO(event != NULL, print_error("touch::touch_read(touch_event): event cannot be null.\n"); return -1);
+    
     return _touch_read(fd_, event, &correction_);
 }
 

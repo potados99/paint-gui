@@ -204,8 +204,8 @@ void disp_map(int fd) {
 void disp_unmap() {
 	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
 
-	free(dp_buf);
-	free(bitmap);
+	//free(dp_buf);
+	//free(bitmap);
 }
 
 void disp_set_direct(bool value) {

@@ -39,7 +39,7 @@ int main(int argc, const char *argv[]) {
 
 	int inc = 1;
 	for (int i = 0; i < 160; i += inc) {
-		usleep(10000);
+		usleep(20000);
 		disp_draw_rect(POINT(i, i), SIZE(80, 80), PIXEL(0, 128, 255));
 		disp_draw_line(start, POINT(319, 0), PIXEL(255, 255, 255));		
 		disp_draw_rect(POINT(i+inc, i+inc), SIZE(80, 80), PIXEL(0, 255, 0));

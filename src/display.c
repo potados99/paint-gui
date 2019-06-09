@@ -14,9 +14,6 @@
 #include <stdbool.h>
 
 static unsigned short   *dp_mem;
-//static unsigned short 	*dp_buf;
-//static unsigned long 	*bitmap;
-
 static unsigned short 	dp_buf[DP_MEM_SIZE];
 static unsigned long 	bitmap[DP_BITMAP_SIZE];
 
@@ -24,7 +21,7 @@ static bool             direct;
 
 /**
  * Assertion macros.
- * Local use.
+ * Local usage.
  */
 #define POINT_CHECK(FUNC_NAME, POINT_NAME)                                                  \
 do {                                                                                        \
@@ -65,19 +62,16 @@ do {                                                \
 
 static inline void _apply(int point, int size) {
 #ifndef UNSAFE
-    ASSERTDO(dp_mem != NULL, print_error("_apply: mem cannot be null.\n"); return);
     POINT_CHECK("_apply", point);
     SIZE_CHECK("_apply", size);
 #endif
   
-    short x, y, width, height;
+    short x = X(point);
+    short y = Y(point);
+    short width = WIDTH(size);
+    short height = HEIGHT(size);
     
-    x = X(point);
-    y = Y(point);
-    width = WIDTH(size);
-    height = HEIGHT(size);
-	
-	print_trace("apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
+    print_trace("_apply(): apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
 	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
@@ -86,7 +80,7 @@ static inline void _apply(int point, int size) {
 	do {
 		if (GET_BIT(bitmap, offset)) {
 
-			print_trace("write to display memory at offset{%d max} %d.\n", offset_max, offset);
+            print_trace("_apply(): write to display memory at offset{%d max} %d.\n", offset_max, offset);
 
 			*(dp_mem + offset) = *(dp_buf + offset);
 		
@@ -108,8 +102,7 @@ static inline void _apply(int point, int size) {
 
 static inline void _modify(int offset,  unsigned short color) {
 #ifndef UNSAFE
-    ASSERTDO(dp_mem != NULL, print_error("_modify: mem cannot be null.\n"); return);
-    ASSERTDO(IN_RANGE(offset, 0, DP_WIDTH * DP_HEIGHT - 1), print_error("_modify: offset{%d} out of range.\n", offset); return);
+    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_error("_modify: offset{%d} out of range.\n", offset); return);
 #endif
 
 	print_trace("modify pixel at offset %d to %d.\n", offset, color);
@@ -124,12 +117,10 @@ static inline void _modify(int offset,  unsigned short color) {
 }
 
 static inline void _line_low(int p0, int p1, unsigned short color) {
-    short x0, y0, x1, y1;
-    
-    x0 = X(p0);
-    y0 = Y(p0);
-    x1 = X(p1);
-    y1 = Y(p1);
+    short x0 = X(p0);
+    short y0 = Y(p0);
+    short x1 = X(p1);
+    short y1 = Y(p1);
     
     short dx = x1 - x0;
     short dy = y1 - y0;
@@ -156,12 +147,10 @@ static inline void _line_low(int p0, int p1, unsigned short color) {
 }
 
 static inline void _line_high(int p0, int p1, unsigned short color) {
-    short x0, y0, x1, y1;
-    
-    x0 = X(p0);
-    y0 = Y(p0);
-    x1 = X(p1);
-    y1 = Y(p1);
+    short x0 = X(p0);
+    short y0 = Y(p0);
+    short x1 = X(p1);
+    short y1 = Y(p1);
     
     short dx = x1 - x0;
     short dy = y1 - y0;
@@ -193,19 +182,11 @@ static inline void _line_high(int p0, int p1, unsigned short color) {
 void disp_map(int fd) {
 	dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
-
-	//dp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
-    //ASSERTDO(dp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return);
-
-	//bitmap = (unsigned long *)malloc(sizeof(unsigned long) * BITMAP_SIZE + 1);
-    //ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return);
 }
 
 void disp_unmap() {
 	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
-
-	//free(dp_buf);
-	//free(bitmap);
+    
 }
 
 void disp_set_direct(bool value) {
@@ -213,10 +194,13 @@ void disp_set_direct(bool value) {
 }
 
 void disp_draw_point(int point, unsigned short color) {
+    print_trace("disp_draw_point(): draw point at (%d, %d).\n", X(point), Y(point));
+
 	_modify(X(point) + (Y(point) * DP_WIDTH), color);
 }
 
 void disp_draw_line(int p0, int p1, unsigned short color) {
+    print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", X(p0), Y(p0) , X(p1), Y(p1));
 
 	if (DELTA_HEIGHT(p0, p1) < DELTA_WIDTH(p0, p1)) {
 		if (X(p0) > X(p1)) {
@@ -237,16 +221,13 @@ void disp_draw_line(int p0, int p1, unsigned short color) {
 }
 
 void disp_draw_rect(int point, int size, unsigned short color) {
-    short x, y, width, height;
-    
-    x = X(point);
-    y = Y(point);
-    
-    width = WIDTH(size);
-    height = HEIGHT(size);
- 
-	print_trace("draw rect at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
+    short x = X(point);
+    short y = Y(point);
+    short width = WIDTH(size);
+    short height = HEIGHT(size);
    
+    print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
+
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
 	register short 	n_line = 0;
@@ -269,17 +250,24 @@ void disp_draw_whole(unsigned short color) {
 }
 
 void disp_commit() {
+    print_trace("disp_commit(): commit all changes.\n");
+
     _apply(0, SIZE(DP_WIDTH, DP_HEIGHT));
 }
 
 void disp_commit_partial(int point, int size) {
+    print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", X(point), Y(point), WIDTH(size), HEIGHT(size));
+
     _apply(point, size);
 }
 
 void disp_cancel() {
-	memset(dp_buf, 0, DP_BITMAP_SIZEB);
+    print_trace("disp_cancel(): remove changes from bitmap.\n");
+    memset(bitmap, 0, DP_BITMAP_SIZEB);
 }
 
 void disp_clear() {
+    print_trace("disp_clear(): clear screen to black.\n");
+
     memset(dp_mem, 0, DP_MEM_SIZEB);
 }

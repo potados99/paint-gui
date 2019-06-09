@@ -5,15 +5,15 @@
 TARGET_INITIAL	:= paint
 TARGET		:= $(TARGET_INITIAL)
 
-CC		:= g++
-CFLAGS		:= -Wall -std=c++11
+CC		:= gcc
+CFLAGS		:= -Wall
 LIB		:=
 
 TARGET_DIR	:= bin
 SRC_DIR		:= src
 INC_DIR		:= include
 OBJ_DIR		:= build
-SRC_EXT		:= cpp
+SRC_EXT		:= c
 OBJ_EXT		:= o
 
 FLAGS		:= -DVERBOSE=1

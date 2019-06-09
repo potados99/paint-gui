@@ -21,7 +21,7 @@ public:
     shape(type type, color color): type_(type), color_(color) {}
     
     type type() { return type_; }
-    color color() { return color_; }
+    color& color() { return color_; }
 };
 
 #endif /* shape_h */

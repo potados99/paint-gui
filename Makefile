@@ -16,6 +16,8 @@ OBJ_DIR		:= build
 SRC_EXT		:= cpp
 OBJ_EXT		:= o
 
+FLAGS		:= -DVERBOSE=1
+
 #################################################
 
 ## DO NOT EDIT BELOW ##
@@ -45,4 +47,4 @@ $(TARGET): $(OBJECTS)
 # COMPILE
 $(OBJ_DIR)/%.$(OBJ_EXT): $(SRC_DIR)/%.$(SRC_EXT)
 	@echo [$@]
-	$(CC) $(CFLAGS) -c -o $@ $< -I$(INC_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $< -I$(INC_DIR) $(FLAGS)

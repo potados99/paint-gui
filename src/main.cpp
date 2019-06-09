@@ -24,18 +24,37 @@ int main(int argc, const char * argv[]) {
     display mydisp(DPPATH);
     
     mydisp.clear();
-    
+
+    std::cout << "cleared" << std::endl;
+
     usleep(1000000);
     
     mydisp.clear(color16::blue);
     mydisp.commit();
+
+    std::cout << "blued" << std::endl;
     
     usleep(1000000);
 
     mydisp.draw_rect(point(0, 0), size(200, 200), color16::white);
     mydisp.commit();
 
-    
-    
+    std::cout << "yeah" << std::endl;
+ 
+
+
+	for (int i = 0; i < 119; ++i) {
+		// usleep(1);
+		mydisp.draw_rect(point(i, 0), size(200, 200), color16::blue);
+		mydisp.draw_rect(point(i + 1, 0), size(200, 200), color16::white);
+		mydisp.commit();
+	}
+
+
+
+
+
+
+   
 	return 0;
 }

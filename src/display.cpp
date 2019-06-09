@@ -75,6 +75,8 @@ display::display(const char *dp_fd_path) {
 
     bitmap_ = (unsigned long *)malloc(sizeof(unsigned long) * (width_ * height_ / 32) + 1);
     ASSERTDO(bitmap_ != NULL, print_error("display::display(const char *): malloc() failed.\n"); exit(1));
+
+    print_info("display initialized.\n");
 }
 
 display::~display() {
@@ -199,7 +201,7 @@ int display::_draw_line(int x0, int y0, int x1, int y1, color16 c) {
 }
 
 int display::_draw_line_low(int x0, int y0, int x1, int y1, color16 c) {
-    int dx = x1 - x0;
+	int dx = x1 - x0;
     int dy = y1 - y0;
     int yi = 1;
     
@@ -252,12 +254,31 @@ int display::_draw_line_high(int x0, int y0, int x1, int y1, color16 c) {
 }
 
 int display::_draw_rect(int x, int y, int width, int height, color16 c) {
-    
+	
+	const int 		offset_max = (x + width - 1) + (width_ * (y + height - 1));
+	register int 	offset = x + (width_* y);
+	
+	register int 	n_line = 0;
+
+	do {
+        _write(offset, c);
+	
+		if (++n_line >= width) {
+			n_line = 0;
+			offset += (width_ - width);
+		} 
+		
+		++offset;
+		
+	} while (offset <= offset_max);
+
     return 0;
 }
 
-int display::_commit(int x, int y, int width, int height) {
+int display::_commit(int x, int y, int width, int height) {   
     _apply(x, y, width, height);
+
+	print_trace("commit changes: x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
     return 0;
 }
@@ -291,6 +312,8 @@ void display::_write(int offset, color16 c) {
     
     *(buf_ + offset) = c.to_short();
     _set_bit(offset, 1);
+
+	print_trace("wrote buf[%d] = %d.\n", offset, c.to_short());
 }
 
 void display::_apply(int x, int y, int width, int height) {

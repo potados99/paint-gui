@@ -4,8 +4,29 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+
+#ifdef __APPLE__
+
+///////////////////// DELETE HERE ON RELEASE ENV //////////////////////
+struct input_event {
+    int type, code, value;
+};
+#define EV_SYN          1
+#define EV_KEY          2
+#define EV_ABS          3
+#define ABS_X           4
+#define ABS_Y           5
+#define ABS_PRESSURE    6
+#define BTN_TOUCH       7
+///////////////////// DELETE HERE ON RELEASE ENV //////////////////////
+
+#else
 #include <linux/input.h>
 #include <linux/input-event-codes.h>
+#endif
+
+
 #include <errno.h>
 #include <time.h>
 
@@ -30,9 +51,9 @@ int input::touch_read(int fd, touch_event *event, touch_correction *correction) 
 	if (event == NULL) return -1;
 
 	struct input_event 	ie;
-	int			nread;
-	int 			x;
-	int 			y;
+	ssize_t	    		nread;
+	int 		    	x;
+	int 			    y;
 
 	/**
 	 * Clean touch_event struct.
@@ -51,7 +72,7 @@ int input::touch_read(int fd, touch_event *event, touch_correction *correction) 
 		/**
 		 * Single read
 		 */
-		nread = read(fd, &ie, sizeof(struct input_event));
+		nread = read(fd, &ie, (size_t)sizeof(struct input_event));
 	        if (nread == -1){
 			if (errno == EAGAIN) {
 				return 1;

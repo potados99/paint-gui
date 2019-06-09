@@ -7,16 +7,16 @@
  */
 class color {
 private:
-    int r_;
-    int g_;
-    int b_;
+    unsigned char r_;
+    unsigned char g_;
+    unsigned char b_;
     
 public:
-    color(int r, int g, int b): r_(r), g_(g), b_(b) {}
+    color(unsigned char r, unsigned char g, unsigned char b): r_(r), g_(g), b_(b) {}
     
-    int r() { return r_; }
-    int g() { return g_; }
-    int b() { return b_; }
+    unsigned char r() { return r_; }
+    unsigned char g() { return g_; }
+    unsigned char b() { return b_; }
 };
 
 #endif /* color_h */

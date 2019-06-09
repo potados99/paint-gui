@@ -34,16 +34,16 @@ void app::start_input_loop() {
              * Successfull read.
              */
             
-            if (te.touch_state == STATE_TOUCH_DOWN) {
+            if (te.state == touch_state::STATE_TOUCH_DOWN) {
                 touched = 1;
             }
-            else if (te.touch_state == STATE_TOUCH_UP) {
+            else if (te.state == touch_state::STATE_TOUCH_UP) {
                 touched = 0;
             }
             
-            if (te.touch_state == STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
-            printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
-            if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
+            if (te.state == touch_state::STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
+            printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.state);
+            if (te.state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
         }
         else {
             if (read == 1) {

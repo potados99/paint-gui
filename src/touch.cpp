@@ -7,8 +7,7 @@
 
 
 #ifdef __APPLE__
-
-///////////////////// DELETE HERE ON RELEASE ENV //////////////////////
+///////////////////// TEST ENVIRONMENT //////////////////////
 struct input_event {
     int type, code, value;
 };
@@ -19,33 +18,41 @@ struct input_event {
 #define ABS_Y           5
 #define ABS_PRESSURE    6
 #define BTN_TOUCH       7
-///////////////////// DELETE HERE ON RELEASE ENV //////////////////////
-
+///////////////////// TEST ENVIRONMENT //////////////////////
 #else
 #include <linux/input.h>
 #include <linux/input-event-codes.h>
 #endif
 
-
 #include <errno.h>
 #include <time.h>
 #include "machine_specific.h"
 
-/**
-  * Constructor
-  */
+#include "debug.h"
+
+
+/******************************
+ * Public
+ ******************************/
+
 touch::touch(const char *event_fd_path):
 correction_(touch_correction(TS_X_MIN, TS_X_MAX, TS_Y_MIN, TS_Y_MAX)) {
 	fd_ = open(event_fd_path, O_RDONLY | O_NONBLOCK);
-	if (fd_ == -1) {
-		perror("open failed");
-		exit(1); // TODO: change it to throw
+	if (fd_ == -1) {        
+        print_error("touch::touch(): open() failed with %s.\n", event_fd_path);
+		exit(1);
 	}
 }
 
-/**
-  * Private
-  */
+int touch::touch_read(touch_event *event) {
+    return _touch_read(fd_, event, &correction_);
+}
+
+
+/******************************
+ * Private
+ ******************************/
+
 int touch::_touch_read(int fd, touch_event *event, touch_correction *correction) {
 	if (event == NULL) return -1;
 
@@ -58,7 +65,7 @@ int touch::_touch_read(int fd, touch_event *event, touch_correction *correction)
 	 * Clean touch_event struct.
 	 * Leave other values but touch_state.
 	 */	
-	event->touch_state = STATE_NONE;
+    event->state = touch_state::STATE_NONE;
 
 	/**
 	 * Set 'Not set' flags.
@@ -77,7 +84,7 @@ int touch::_touch_read(int fd, touch_event *event, touch_correction *correction)
 				return 1;
 			}
 			else {
-				perror("read error");
+                print_error("touch::_touch_read(): read() failed due to unknown error.\n");
 				return -1;
 			}
 		}
@@ -93,13 +100,24 @@ int touch::_touch_read(int fd, touch_event *event, touch_correction *correction)
 				/**
 				 * Of cource BTN_TOUCH.
 				 */
-				event->touch_state = (ie.value ? STATE_TOUCH_DOWN : STATE_TOUCH_UP);
+                if (ie.value == 1) {
+                    print_error("touch::_touch_read(): touch down.\n");
+                    event->state = touch_state::STATE_TOUCH_DOWN;
+                }
+                else if (ie.value == 0) {
+                    print_error("touch::_touch_read(): touch up.\n");
+                    event->state = touch_state::STATE_TOUCH_UP;
+                }
+                else {
+                    /* NOT POSSIBLE */
+                    print_error("touch::_touch_read(): IMPOSSIBLE AREA.\n");
+                }
 			}
 		}
 		else if (ie.type == EV_ABS) {
 			switch (ie.code) {
 				case ABS_X:
-					x = (TS_SIZE - ie.value);
+					x = (TS_WDITH - ie.value);
 					break;
 
 				case ABS_Y:
@@ -120,7 +138,7 @@ int touch::_touch_read(int fd, touch_event *event, touch_correction *correction)
 	/**
 	 * Nothing to do with coordinates.
 	 */
-	if (event->touch_state == STATE_TOUCH_UP) {
+    if (event->state == touch_state::STATE_TOUCH_UP) {
 		return 0;
 	}
 
@@ -134,20 +152,13 @@ int touch::_touch_read(int fd, touch_event *event, touch_correction *correction)
 
 	/* Do touch correction. */ 
     if (x != -1) {
-        event->x = (x - correction->x_min()) * 320 / (correction->x_max() - correction->x_min());
+        event->x = (x - correction->x_min()) * DP_WIDTH / (correction->x_max() - correction->x_min());
     }
     if (y != -1) {
-        event->y = (y - correction->y_min()) * 240 / (correction->y_max() - correction->y_min());
+        event->y = (y - correction->y_min()) * DP_HEIGHT / (correction->y_max() - correction->y_min());
     }
     
 	return 0;
-}
-
-/**
-  * Public
-  */
-int touch::touch_read(touch_event *event) {
-    return _touch_read(fd_, event, &correction_);
 }
 
 

@@ -4,6 +4,7 @@
 #include "shape.h"
 #include "visual_element.h"
 #include "app.h"
+#include "display.h"
 
 int main(int argc, const char * argv[]) {
 	std::cout << "hello world!" << std::endl;

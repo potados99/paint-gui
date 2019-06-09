@@ -1,106 +1,101 @@
 #include "touch.h"
+#include "machine_specific.h"
+#include "debug.h"
 
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <linux/input.h> /* struct input_event */
-#include <linux/input-event-codes.h> /* EV_ABS, ABS_X ... */
 #include <errno.h>
 
-int touch_read(int fd, struct touch_event *event, struct touch_correction *correction) {
-	if (event == NULL) return -1;
 
-	struct input_event 	ie;
-	int			nread;
-	int 			x;
-	int 			y;
+#ifdef __APPLE__
+///////////////////// TEST ENVIRONMENT //////////////////////
+struct input_event {
+    int type, code, value;
+};
+#define EV_SYN          1
+#define EV_KEY          2
+#define EV_ABS          3
+#define ABS_X           4
+#define ABS_Y           5
+#define ABS_PRESSURE    6
+#define BTN_TOUCH       7
+///////////////////// TEST ENVIRONMENT //////////////////////
+#else
+#include <linux/input.h>
+#include <linux/input-event-codes.h>
+#endif
 
-	/**
-	 * Clean touch_event struct.
-	 * Leave other values but touch_state.
-	 */	
-	event->touch_state = STATE_NONE;
+int touch_read(int fd, struct touch_event *event) {
+#ifndef UNSAFE
+    ASSERTDO(event != NULL, print_error("touch_read(): event cannot be null.\n"); return -1);
+#endif
+    
+    struct input_event ie;
 
-	/**
-	 * Set 'Not set' flags.
-	 */
-	x = -1;
-	y = -1;
+    /**
+     * Clean touch_event struct.
+     * Leave other values but touch_state.
+     */
+    event->touch_state = STATE_NONE;
 
-	while (1) {
-
-		/**
-		 * Single read
-		 */
-		nread = read(fd, &ie, sizeof(struct input_event));
-	        if (nread == -1){
-			if (errno == EAGAIN) {
-				return 1;
-			}
-			else {
-				perror("read error");
-				return -1;
-			}
-		}
-
-		/**
-		 * Process read values
-		 */
-		if (ie.type == EV_SYN) {
-			break; /* time to return! */
-		}
-		else if (ie.type == EV_KEY) {
-			if (ie.code == BTN_TOUCH) {
-				/**
-				 * Of cource BTN_TOUCH.
-				 */
-				event->touch_state = (ie.value ? STATE_TOUCH_DOWN : STATE_TOUCH_UP);
-			}
-		}
-		else if (ie.type == EV_ABS) {
-			switch (ie.code) {
-				case ABS_X:
-					x = (TS_SIZE - ie.value);
-					break;
-
-				case ABS_Y:
-					y = ie.value;
-					break;
-
-				case ABS_PRESSURE:
-					event->pressure = ie.value;
-					break;
-			
-			} /* end of switch */
-	
-		} /* end of if */
-	
-	} /* end of while */
-
-
-	/**
-	 * Nothing to do with coordinates.
-	 */
-	if (event->touch_state == STATE_TOUCH_UP) {
-		return 0;
-	}
-
-	/* No correction. */
-	if (correction == NULL) {
-		if (x != -1) event->x = x;
-		if (y != -1) event->y = y;
-		
-		return 0;
-	}
-
-	/* Do touch correction. */ 
-	if (x != -1) {
-		event->x = (x - correction->x_min) * 320 / (correction->x_max - correction->x_min);
-	}
-	if (y != -1) {
-		event->y = (y - correction->y_min) * 240 / (correction->y_max - correction->y_min);
-	}
-
-	return 0;
+    while (1) {
+        
+        /**
+         * Single read
+         */
+        if (read(fd, &ie, sizeof(struct input_event) == -1)) {
+#ifdef NONBLOCK_READ
+            /**
+             * With non-block read, EAGAIN is not an error.
+             */
+            if (errno == EAGAIN)
+                return 1;
+            else {
+                print_error("touch_read(): error other than EAGAIN occured while read().\n");
+                return -1;
+            }
+#else
+            /**
+             * With blocking read, every error is a problem.
+             */
+            print_error("touch_read(): error while read().\n");
+            return -1;
+#endif
+        }
+        
+        /**
+         * Process read values
+         */
+        switch (ie.type) {
+            case EV_SYN:
+                return 0;
+                
+            case EV_KEY:
+                if (ie.code == BTN_TOUCH)
+                    event->touch_state = (ie.value ? STATE_TOUCH_DOWN : STATE_TOUCH_UP);
+                break;
+                
+            case EV_ABS:
+                switch (ie.code) {
+                    case ABS_X:
+                        event->x = ((TS_WDITH - ie.value) - TS_X_MIN) * DP_WIDTH / (TS_X_MAX - TS_X_MIN);
+                        break;
+                        
+                    case ABS_Y:
+                        event->y = (ie.value - TS_Y_MIN) * DP_HEIGHT / (TS_Y_MAX - TS_Y_MIN);
+                        break;
+                        
+                    case ABS_PRESSURE:
+                        event->pressure = ie.value;
+                        break;
+                }
+                break;
+                
+        } /* end of switch */
+    } /* end of while */
+    
+    return 0;
 }
+
 

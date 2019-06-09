@@ -1,17 +1,11 @@
 #ifndef touch_h
 #define touch_h
 
-#define EVENTPATH "/dev/input/event1"
-
-#define READ_X	0x01
-#define READ_Y	0x02
-#define READ_P	0x04
-
-#define TS_SIZE 4096
-
-#define STATE_NONE 		0x00
+#define STATE_NONE 		    0x00
 #define STATE_TOUCH_DOWN 	0x01
 #define STATE_TOUCH_UP 		0x02
+
+// #define NONBLOCK_READ
 
 struct touch_event {
 	int x;
@@ -20,14 +14,11 @@ struct touch_event {
 	int touch_state;
 };
 
-struct touch_correction {
-	int x_min;
-	int x_max;
+/**
+ * QAUTION: NO EXCEPTION HANDLING WHEN UNSAFE MODE.
+ * BE VERY CAREFUL WHEN USING THIS FUNCTION.
+ */
+int touch_read(int fd, struct touch_event *event);
 
-	int y_min;
-	int y_max;
-};
-
-int touch_read(int fd, struct touch_event *event, struct touch_correction *correction);
 
 #endif /* touch_h */

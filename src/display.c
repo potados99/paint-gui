@@ -1,4 +1,7 @@
 #include "display.h"
+#include "metric.h"
+#include "machine_specific.h"
+#include "debug.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h> 
@@ -7,192 +10,239 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <math.h>
+#include <string.h>
 
-#include "metric.h"
+static unsigned short 	*disp_buf;
+static unsigned long 	*bitmap;
 
-unsigned short 	*disp_buf;
-unsigned long 	*bitmap;
+/**
+ * Assertion macros.
+ * Local use.
+ */
+#define POINT_CHECK(FUNC_NAME, POINT_NAME)                                                  \
+do {                                                                                        \
+ASSERTDO(IN_RANGE(X(POINT_NAME), 0, DP_WIDTH - 1),                                          \
+print_error(FUNC_NAME ": X(" #POINT_NAME "){%d} out of range.\n", X(POINT_NAME));           \
+return);                                                                                    \
+ASSERTDO(IN_RANGE(Y(POINT_NAME), 0, DP_HEIGHT - 1),                                         \
+print_error(FUNC_NAME ": Y(" #POINT_NAME "){%d} out of range.\n", Y(POINT_NAME));           \
+         return);                                                                           \
+} while (0)
 
-static inline int _get_bit(int offset) {
-	int bitmap_idx = offset / 32;
-	int bitmap_bit = offset % 32;
+#define SIZE_CHECK(FUNC_NAME, SIZE_NAME)                                                    \
+do {                                                                                        \
+ASSERTDO(IN_RANGE(WIDTH(SIZE_NAME), 0, DP_WIDTH),                                           \
+print_error(FUNC_NAME ": WIDTH(" #SIZE_NAME "){%d} out of range.\n", WIDTH(SIZE_NAME));     \
+return);                                                                                    \
+ASSERTDO(IN_RANGE(HEIGHT(SIZE_NAME), 0, DP_HEIGHT),                                         \
+print_error(FUNC_NAME ": HEIGHT(" #SIZE_NAME "){%d} out of range.\n", HEIGHT(SIZE_NAME));   \
+return);                                                                                    \
+} while (0)
 
-	return bitmap[bitmap_idx] & (1 << bitmap_bit);  //test
-}
 
-static inline void _set_bit(int offset, int val) {
-	int bitmap_idx = offset / 32;
-	int bitmap_bit = offset % 32;
 
-	if (val) {
-		bitmap[bitmap_idx] |= (1 << bitmap_bit);             //set
-	}
-	else {
-		bitmap[bitmap_idx] &= ~(1 << bitmap_bit);             //unset
-	}
-}
+////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
 
-static inline void _flush_partial(unsigned short *mem, int x, int y, int width, int height) {
+#define GET_BIT(PTR, OFFSET)                        \
+((*(PTR + (offset / 32))) & (1 << (offset % 32)))
 
-	const int 	offset_max = (x + width - 1) + (DISP_WIDTH * (y + height - 1));
+#define SET_BIT(PTR, OFFSET)                        \
+do {                                                \
+*(PTR + (offset / 32)) |= (1 << (offset % 32));     \
+} while (0)
 
-	register int 	offset = x + (DISP_WIDTH * y);
-	register int 	n_line = 0;
+#define UNSET_BIT(PTR, OFFSET)                      \
+do {                                                \
+*(PTR + (offset / 32)) &= ~(1 << (offset % 32));    \
+} while (0)
+
+static inline void _apply(unsigned short *mem, int point, int size) {
+#ifndef UNSAFE
+    ASSERTDO(mem != NULL, print_error("_apply: mem cannot be null.\n"); return);
+    POINT_CHECK("_apply", point);
+    SIZE_CHECK("_apply", size);
+#endif
+    
+    short x, y, width, height;
+    
+    x = X(point);
+    y = Y(point);
+    width = WIDTH(size);
+    height = WIDTH(size);
+    
+	const short 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
+
+	register short 	offset = x + (DP_WIDTH * y);
+	register short 	n_line = 0;
 
 	do {
-		if (_get_bit(offset)) {
+		if (GET_BIT(bitmap, offset)) {
 			*(mem + offset) = *(disp_buf + offset);
 		
-			_set_bit(offset, 0);
+            UNSET_BIT(bitmap, offset);
 		}
 
 
 		if (++n_line >= width) {
 			n_line = 0;
-			offset += (DISP_WIDTH - width);
+			offset += (DP_WIDTH - width);
 		} 
 	
 		++offset;
 	
 
-	} while (offset < offset_max + 1);
+	} while (offset <= offset_max);
 
 }
 
-static inline void _push(unsigned short *mem, int offset,  unsigned short color) {
-	if (offset < 0 || offset >= DISP_WIDTH * DISP_HEIGHT) {
-		printf("_push: offset out of range: %d\n", offset);
-		return;
-	}
+static inline void _modify(unsigned short *mem, int offset,  unsigned short color) {
+#ifndef UNSAFE
+    ASSERTDO(mem != NULL, print_error("_modify: mem cannot be null.\n"); return);
+    ASSERTDO(IN_RANGE(offset, 0, DP_WIDTH * DP_HEIGHT - 1), print_error("_modify: offset out of range.\n"); return);
+#endif
 
 	*(disp_buf + offset) = color;
-	_set_bit(offset, 1);
+    SET_BIT(disp_buf, offset);
 }
 
+static inline int _line_low(unsigned short *mem, int p0, int p1, unsigned short color) {
+    short x0, y0, x1, y1;
+    
+    x0 = X(p0);
+    y0 = Y(p0);
+    x1 = X(p1);
+    y1 = Y(p1);
+    
+    short dx = x1 - x0;
+    short dy = y1 - y0;
+    short yi = 1;
+    
+    if (dy < 0) {
+        yi = -1;
+        dy = -dy;
+    }
+    
+    short D = 2*dy - dx;
+    short y = y0;
+    
+    for (short x = x0; x <= x1; ++x) {
+        _modify(mem, x + (DP_WIDTH * y), color);
+        
+        if (D > 0) {
+            y += yi;
+            D -= 2*dx;
+        }
+        
+        D += 2*dy;
+    }
+    
+    return 0;
+}
+
+static inline int _line_high(unsigned short *mem, int p0, int p1, unsigned short color) {
+    short x0, y0, x1, y1;
+    
+    x0 = X(p0);
+    y0 = Y(p0);
+    x1 = X(p1);
+    y1 = Y(p1);
+    
+    short dx = x1 - x0;
+    short dy = y1 - y0;
+    short xi = 1;
+    
+    if (dx < 0) {
+        xi = -1;
+        dx = -dx;
+    }
+    
+    short D = 2*dx - dy;
+    short x = x0;
+    
+    for (short y = y0; y <= y1; ++y) {
+        _modify(mem, x + (DP_WIDTH * y), color);
+        
+        if (D > 0) {
+            x += xi;
+            D -= 2*dy;
+        }
+        
+        D += 2*dx;
+    }
+    
+    return 0;
+}
+
+////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
 
 
 unsigned short *disp_map(int fd) {
-	unsigned short *mem = (unsigned short *)mmap(NULL, DISP_WIDTH * DISP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	
-	if (mem == MAP_FAILED) {
-		perror("error while mmap()");
-		exit(1);	
-	}	
+	unsigned short *mem = (unsigned short *)mmap(NULL, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    ASSERTDO(mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return NULL);
 
-	disp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DISP_WIDTH * DISP_HEIGHT + 1);
-	bitmap = (unsigned long *)malloc(sizeof(unsigned long) * 2400 + 1);
+	disp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
+    ASSERTDO(disp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return NULL);
+
+	bitmap = (unsigned long *)malloc(sizeof(unsigned long) * BITMAP_SIZE + 1);
+    ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return NULL);
 
 	return mem;
 }
 
 void disp_unmap(unsigned short *mem) {
-	munmap(mem, DISP_WIDTH * DISP_HEIGHT * PIXEL_SIZE);
+	munmap(mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
 
 	free(disp_buf);
 	free(bitmap);
 }
-void disp_draw_done(unsigned short *mem) {
-	_flush_partial(mem, 0, 0, DISP_WIDTH, DISP_HEIGHT);
-}
 
-void disp_partial_done(unsigned short *mem, int x, int y, int width, int height) {
-	_flush_partial(mem, x, y, width, height);
-}
-
-int disp_draw_point(unsigned short *mem, int x, int y, unsigned short color) {
-	_push(mem, x + (y * DISP_WIDTH), color);
+int disp_draw_point(unsigned short *mem, int point, unsigned short color) {
+	_modify(mem, X(point) + (Y(point) * DP_WIDTH), color);
 	
 	return 0;
 }
 
+int disp_draw_line(unsigned short *mem, int p0, int p1, unsigned short color) {
 
-static inline int _line_low(unsigned short *mem, int x0, int y0, int x1, int y1, unsigned short color) {
-	int dx = x1 - x0;
-	int dy = y1 - y0;
-	int yi = 1;
-
-	if (dy < 0) {
-		yi = -1;
-		dy = -dy;
-	}
-
-	int D = 2*dy - dx;
-	int y = y0;
-
-	for (int x = x0; x <= x1; ++x) {
-		_push(mem, x + (DISP_WIDTH * y), color);
-		
-		if (D > 0) {
-			y += yi;
-			D -= 2*dx;
-		}
-
-		D += 2*dy;
-	}
-
-	return 0;
-}
-
-static inline int _line_high(unsigned short *mem, int x0, int y0, int x1, int y1, unsigned short color) {
-	int dx = x1 - x0;
-	int dy = y1 - y0;
-	int xi = 1;
-
-	if (dx < 0) {
-		xi = -1;
-		dx = -dx;
-	}
-
-	int D = 2*dx - dy;
-	int x = x0;
-
-	for (int y = y0; y <= y1; ++y) {
-		_push(mem, x + (DISP_WIDTH * y), color);
-		
-		if (D > 0) {
-			x += xi;
-			D -= 2*dy;
-		}
-
-		D += 2*dx;
-	}
-
-	return 0;
-}
-
-int disp_draw_line(unsigned short *mem, int x0, int y0, int x1, int y1, unsigned short color) {
-	if (abs(y1 - y0) < abs(x1 - x0)) {
-		if (x0 > x1) {
-			return _line_low(mem, x1, y1, x0, y0, color);
+	if (DELTA_HEIGHT(p0, p1) < DELTA_WIDTH(p0, p1)) {
+		if (X(p0) > X(p1)) {
+			return _line_low(mem, p1, p0, color);
 		}
 		else {
-			return _line_low(mem, x0, y0, x1, y1, color);
+			return _line_low(mem, p0, p1, color);
 		}
 	}
 	else {
-		if (y0 > y1) {
-			return _line_high(mem, x1, y1, x0, y0, color);
+		if (Y(p0) > Y(p1)) {
+			return _line_high(mem, p1, p0, color);
 		}
 		else {
-			return _line_high(mem, x0, y0, x1, y1, color);
+			return _line_high(mem, p0, p1, color);
 		}
 	}
 	
 }
 
-int disp_draw_rect(unsigned short *mem, int x, int y, int width, int height, unsigned short color) {
-
-	const int 	offset_max = (x + width - 1) + (DISP_WIDTH * (y + height - 1));
-	register int 	offset = x + (DISP_WIDTH * y);
+int disp_draw_rect(unsigned short *mem, int point, int size, unsigned short color) {
+    short x, y, width, height;
+    
+    x = X(point);
+    y = Y(point);
+    
+    width = WIDTH(size);
+    height = WIDTH(size);
+    
+	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
+	register int 	offset = x + (DP_WIDTH * y);
 	
 	register int 	n_line = 0;
 
 	do {
-		_push(mem, offset, color);
+		_modify(mem, offset, color);
 	
 		if (++n_line >= width) {
 			n_line = 0;
-			offset += (DISP_WIDTH - width);
+			offset += (DP_WIDTH - width);
 		} 
 		
 		++offset;
@@ -202,25 +252,18 @@ int disp_draw_rect(unsigned short *mem, int x, int y, int width, int height, uns
 	return 0;
 }
 
-int to_point_and_size(int x0, int y0, int x1, int y1, struct point *point, struct size *size) {
-	int temp;
+int disp_draw_whole(unsigned short *mem, unsigned short color) {
+    return disp_draw_rect(mem, 0, SIZE(DP_WIDTH, DP_HEIGHT), color);
+}
 
-	if (x0 > x1) {
-		temp = x0;
-		x0 = x1;
-		x1 = temp;
-	}
-	if (y0 > y1) {
-		temp = y0;
-		y0 = y1;
-		y1 = temp;
-	}
+void disp_commit(unsigned short *mem) {
+    _apply(mem, 0, SIZE(DP_WIDTH, DP_HEIGHT));
+}
 
-	point->x = x0;
-	point->y = y0;
+void disp_commit_partial(unsigned short *mem, int point, int size) {
+    _apply(mem, point, size);
+}
 
-	size->width = x1 - x0 + 1;
-	size->height = y1 - y0 + 1;
-
-	return 0;
+void disp_clear(unsigned short *mem) {
+    memset(mem, 0, DP_MEM_SIZE);
 }

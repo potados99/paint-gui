@@ -5,9 +5,9 @@
 TARGET_INITIAL	:= moving-rect
 TARGET		:= $(TARGET_INITIAL)
 
-CC		:= gcc
-CFLAGS		:= -Wall
-LIB		:=
+CC			:= gcc
+CFLAGS		:= -Wall -O3
+LIB			:=
 
 TARGET_DIR	:= bin
 SRC_DIR		:= src

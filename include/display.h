@@ -33,6 +33,7 @@ void            disp_draw_whole(unsigned short color);
 
 void            disp_commit(void);
 void            disp_commit_partial(int point, int size);
+void			disp_cancel(void);
 
 void            disp_clear(void);
 

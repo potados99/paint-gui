@@ -272,6 +272,10 @@ void disp_commit_partial(int point, int size) {
     _apply(point, size);
 }
 
+void disp_cancel() {
+	memset(dp_buf, 0, sizeof(unsigned long) * BITMAP_SIZE);
+}
+
 void disp_clear() {
     memset(dp_mem, 0, DP_MEM_SIZE);
 }

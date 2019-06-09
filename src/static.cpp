@@ -19,12 +19,12 @@ int visual_element::element_count = 0;
 /**
  * class color
  */
-color color::black = color(0, 0, 0);
-color color::white = color(255, 255, 255);
-color color::red = color(255, 0, 0);
-color color::green = color(0, 255, 0);
-color color::blue = color(0, 0, 255);
-color color::yellow = color(255, 255, 0);
-color color::cyan = color(0, 255, 255);
-color color::maganta = color(255, 0, 255);
+color color::black(0, 0, 0);
+color color::white(255, 255, 255);
+color color::red(255, 0, 0);
+color color::green(0, 255, 0);
+color color::blue(0, 0, 255);
+color color::yellow(255, 255, 0);
+color color::cyan(0, 255, 255);
+color color::maganta(255, 0, 255);
 

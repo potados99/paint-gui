@@ -14,12 +14,12 @@
 void app::start_input_loop() {
     // TODO: replace this test code.
     
-    int         read = 0;
-    unsigned long     line_num = 0;
+    int             read = 0;
+    unsigned long   line_num = 0;
     touch_event     te;
     
-    bool         touched = 0;
-    time_t        last_time = 0;
+    bool            touched = 0;
+    time_t          last_time = 0;
     
     while (1) {
         

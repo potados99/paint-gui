@@ -37,12 +37,13 @@ int main(int argc, const char *argv[]) {
 	disp_draw_line(POINT(0, 239), POINT(319, 0), PIXEL(255, 255, 255));
 	disp_commit();
 
-	for (int i = 0; i < 160; ++i) {
-		usleep(20000);
+	int inc = 1;
+	for (int i = 0; i < 160; i += inc) {
+		usleep(10000);
 		disp_draw_rect(POINT(i, i), SIZE(80, 80), PIXEL(0, 128, 255));
 		disp_draw_line(start, POINT(319, 0), PIXEL(255, 255, 255));		
-		disp_draw_rect(POINT(i+1, i+1), SIZE(80, 80), PIXEL(0, 255, 0));
-		disp_commit_partial(POINT(i, i), SIZE(81, 81));
+		disp_draw_rect(POINT(i+inc, i+inc), SIZE(80, 80), PIXEL(0, 255, 0));
+		disp_commit_partial(POINT(i, i), SIZE(80 + inc, 80 + inc));
 		disp_cancel();
 	}
 

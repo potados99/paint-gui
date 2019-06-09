@@ -14,8 +14,12 @@
 #include <stdbool.h>
 
 static unsigned short   *dp_mem;
-static unsigned short 	*dp_buf;
-static unsigned long 	*bitmap;
+//static unsigned short 	*dp_buf;
+//static unsigned long 	*bitmap;
+
+static unsigned short 	dp_buf[DP_PIXELS];
+static unsigned long 	bitmap[DP_BITMAP_SIZE];
+
 static bool             direct;
 
 /**
@@ -190,11 +194,11 @@ void disp_map(int fd) {
 	dp_mem = (unsigned short *)mmap(NULL, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 
-	dp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
-    ASSERTDO(dp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return);
+	//dp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
+    //ASSERTDO(dp_buf != NULL, print_error("disp_map(): malloc() failed.\n"); return);
 
-	bitmap = (unsigned long *)malloc(sizeof(unsigned long) * BITMAP_SIZE + 1);
-    ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return);
+	//bitmap = (unsigned long *)malloc(sizeof(unsigned long) * BITMAP_SIZE + 1);
+    //ASSERTDO(bitmap != NULL, print_error("disp_map(): malloc() failed.\n"); return);
 }
 
 void disp_unmap() {

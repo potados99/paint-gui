@@ -11,8 +11,11 @@
 #define DP_HEIGHT       240
 
 #define PIXEL_SIZE      2
-#define BITMAP_SIZE     2400
-#define DP_MEM_SIZE     153600
+
+#define DP_MEM_SIZE		(DP_WIDTH * DP_HEIGHT)
+#define DP_MEM_SIZEB	(DP_MEM_SIZE * PIXEL_SIZE)
+#define DP_BITMAP_SIZE	(DP_MEM_SIZE / 32)
+#define DP_BITMAP_SIZEB	(DP_BITMAP_SIZE * 4)
 
 #define TS_WDITH        4096 /* 2^12 */
 #define TS_HEIGHT       4096

@@ -44,16 +44,16 @@ return);                                                                        
 ////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
 
 #define GET_BIT(PTR, OFFSET)                        \
-((*(PTR + (offset / 32))) & (1 << (offset % 32)))
+((*(PTR + (OFFSET / 32))) & (1 << (OFFSET % 32)))
 
 #define SET_BIT(PTR, OFFSET)                        \
 do {                                                \
-*(PTR + (offset / 32)) |= (1 << (offset % 32));     \
+*(PTR + (OFFSET / 32)) |= (1 << (OFFSET % 32));     \
 } while (0)
 
 #define UNSET_BIT(PTR, OFFSET)                      \
 do {                                                \
-*(PTR + (offset / 32)) &= ~(1 << (offset % 32));    \
+*(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
 } while (0)
 
 static inline void _apply(unsigned short *mem, int point, int size) {
@@ -62,21 +62,25 @@ static inline void _apply(unsigned short *mem, int point, int size) {
     POINT_CHECK("_apply", point);
     SIZE_CHECK("_apply", size);
 #endif
-    
+  
     short x, y, width, height;
     
     x = X(point);
     y = Y(point);
     width = WIDTH(size);
-    height = WIDTH(size);
+    height = HEIGHT(size);
+	
+	print_trace("apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
-	const short 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
-
-	register short 	offset = x + (DP_WIDTH * y);
+	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
+	register int 	offset = x + (DP_WIDTH * y);
 	register short 	n_line = 0;
 
 	do {
 		if (GET_BIT(bitmap, offset)) {
+
+			print_trace("write to display memory at offset{%d max} %d.\n", offset_max, offset);
+
 			*(mem + offset) = *(disp_buf + offset);
 		
             UNSET_BIT(bitmap, offset);
@@ -98,11 +102,13 @@ static inline void _apply(unsigned short *mem, int point, int size) {
 static inline void _modify(unsigned short *mem, int offset,  unsigned short color) {
 #ifndef UNSAFE
     ASSERTDO(mem != NULL, print_error("_modify: mem cannot be null.\n"); return);
-    ASSERTDO(IN_RANGE(offset, 0, DP_WIDTH * DP_HEIGHT - 1), print_error("_modify: offset out of range.\n"); return);
+    ASSERTDO(IN_RANGE(offset, 0, DP_WIDTH * DP_HEIGHT - 1), print_error("_modify: offset{%d} out of range.\n", offset); return);
 #endif
 
+	print_trace("modify pixel at offset %d to %d.\n", offset, color);
+
 	*(disp_buf + offset) = color;
-    SET_BIT(disp_buf, offset);
+    SET_BIT(bitmap, offset);
 }
 
 static inline int _line_low(unsigned short *mem, int p0, int p1, unsigned short color) {
@@ -230,12 +236,13 @@ int disp_draw_rect(unsigned short *mem, int point, int size, unsigned short colo
     y = Y(point);
     
     width = WIDTH(size);
-    height = WIDTH(size);
-    
+    height = HEIGHT(size);
+ 
+	print_trace("draw rect at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
+   
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
-	
-	register int 	n_line = 0;
+	register short 	n_line = 0;
 
 	do {
 		_modify(mem, offset, color);

@@ -23,23 +23,23 @@ static bool             direct;
  * Assertion macros.
  * Local usage.
  */
-#define POINT_CHECK(FUNC_NAME, POINT_NAME)                                                  \
+#define POINT_CHECK(FUNC_NAME, X, Y)                                                        \
 do {                                                                                        \
-ASSERTDO(IN_RANGE(X(POINT_NAME), 0, DP_WIDTH - 1),                                          \
-print_error(FUNC_NAME ": X(" #POINT_NAME "){%d} out of range.\n", X(POINT_NAME));           \
+ASSERTDO(IN_RANGE(X, 0, DP_WIDTH - 1),                                                      \
+print_error(FUNC_NAME ": " #X "{%d} out of range.\n", X);                                   \
 return);                                                                                    \
-ASSERTDO(IN_RANGE(Y(POINT_NAME), 0, DP_HEIGHT - 1),                                         \
-print_error(FUNC_NAME ": Y(" #POINT_NAME "){%d} out of range.\n", Y(POINT_NAME));           \
+ASSERTDO(IN_RANGE(Y, 0, DP_HEIGHT - 1),                                                     \
+print_error(FUNC_NAME ": " #Y "{%d} out of range.\n", Y);                                   \
          return);                                                                           \
 } while (0)
 
-#define SIZE_CHECK(FUNC_NAME, SIZE_NAME)                                                    \
+#define SIZE_CHECK(FUNC_NAME, W, H)                                                         \
 do {                                                                                        \
-ASSERTDO(IN_RANGE(WIDTH(SIZE_NAME), 0, DP_WIDTH),                                           \
-print_error(FUNC_NAME ": WIDTH(" #SIZE_NAME "){%d} out of range.\n", WIDTH(SIZE_NAME));     \
+ASSERTDO(IN_RANGE(W, 0, DP_WIDTH),                                                          \
+print_error(FUNC_NAME ": " #W "{%d} out of range.\n", W);                                   \
 return);                                                                                    \
-ASSERTDO(IN_RANGE(HEIGHT(SIZE_NAME), 0, DP_HEIGHT),                                         \
-print_error(FUNC_NAME ": HEIGHT(" #SIZE_NAME "){%d} out of range.\n", HEIGHT(SIZE_NAME));   \
+ASSERTDO(IN_RANGE(H, 0, DP_HEIGHT),                                                         \
+print_error(FUNC_NAME ": " #H "{%d} out of range.\n", H);                                   \
 return);                                                                                    \
 } while (0)
 
@@ -60,17 +60,10 @@ do {                                                \
 *(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
 } while (0)
 
-static inline void _apply(int point, int size) {
-#ifndef UNSAFE
-    POINT_CHECK("_apply", point);
-    SIZE_CHECK("_apply", size);
-#endif
+static inline void _apply(short x, short y, short width, short height) {
+    POINT_CHECK("_apply", x, y);
+    SIZE_CHECK("_apply", width, height);
   
-    short x = X(point);
-    short y = Y(point);
-    short width = WIDTH(size);
-    short height = HEIGHT(size);
-    
     print_trace("_apply(): apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
 	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
@@ -101,9 +94,7 @@ static inline void _apply(int point, int size) {
 }
 
 static inline void _modify(int offset,  unsigned short color) {
-#ifndef UNSAFE
-    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_error("_modify: offset{%d} out of range.\n", offset); return);
-#endif
+    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_info("_modify: offset{%d} out of range.\n", offset); return);
 
 	print_trace("modify pixel at offset %d to %d.\n", offset, color);
 
@@ -116,12 +107,7 @@ static inline void _modify(int offset,  unsigned short color) {
     }
 }
 
-static inline void _line_low(int p0, int p1, unsigned short color) {
-    short x0 = X(p0);
-    short y0 = Y(p0);
-    short x1 = X(p1);
-    short y1 = Y(p1);
-    
+static inline void _line_low(short x0, short y0, short x1, short y1, unsigned short color) {
     short dx = x1 - x0;
     short dy = y1 - y0;
     short yi = 1;
@@ -146,12 +132,7 @@ static inline void _line_low(int p0, int p1, unsigned short color) {
     }
 }
 
-static inline void _line_high(int p0, int p1, unsigned short color) {
-    short x0 = X(p0);
-    short y0 = Y(p0);
-    short x1 = X(p1);
-    short y1 = Y(p1);
-    
+static inline void _line_high(short x0, short y0, short x1, short y1, unsigned short color) {
     short dx = x1 - x0;
     short dy = y1 - y0;
     short xi = 1;
@@ -193,39 +174,34 @@ void disp_set_direct(bool value) {
     direct = value;
 }
 
-void disp_draw_point(int point, unsigned short color) {
-    print_trace("disp_draw_point(): draw point at (%d, %d).\n", X(point), Y(point));
+void disp_draw_point(short x, short y, unsigned short color) {
+    print_trace("disp_draw_point(): draw point at (%d, %d).\n", x, y);
 
-	_modify(X(point) + (Y(point) * DP_WIDTH), color);
+	_modify(x + (y * DP_WIDTH), color);
 }
 
-void disp_draw_line(int p0, int p1, unsigned short color) {
-    print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", X(p0), Y(p0) , X(p1), Y(p1));
+void disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short color) {
+    print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", x0, y0 , x1, y1);
 
-	if (DELTA_HEIGHT(p0, p1) < DELTA_WIDTH(p0, p1)) {
-		if (X(p0) > X(p1)) {
-            _line_low(p1, p0, color);
+	if (ABS(y1 - y0) < ABS(x1 - x0)) {
+		if (x0 > x1) {
+            _line_low(x1, y1, x0, y0, color);
 		}
 		else {
-            _line_low(p0, p1, color);
+            _line_low(x0, y0, x1, y1, color);
 		}
 	}
 	else {
-		if (Y(p0) > Y(p1)) {
-            _line_high(p1, p0, color);
+		if (y0 > y1) {
+            _line_high(x1, y1, x0, y0, color);
 		}
 		else {
-            _line_high(p0, p1, color);
+            _line_high(x0, y0, x1, y1, color);
 		}
 	}
 }
 
-void disp_draw_rect(int point, int size, unsigned short color) {
-    short x = X(point);
-    short y = Y(point);
-    short width = WIDTH(size);
-    short height = HEIGHT(size);
-   
+void disp_draw_rect(short x, short y, short width, short height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
@@ -246,23 +222,24 @@ void disp_draw_rect(int point, int size, unsigned short color) {
 }
 
 void disp_draw_whole(unsigned short color) {
-    return disp_draw_rect(0, SIZE(DP_WIDTH, DP_HEIGHT), color);
+    return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
 
 void disp_commit() {
     print_trace("disp_commit(): commit all changes.\n");
 
-    _apply(0, SIZE(DP_WIDTH, DP_HEIGHT));
+    _apply(0, 0, DP_WIDTH, DP_HEIGHT);
 }
 
-void disp_commit_partial(int point, int size) {
-    print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", X(point), Y(point), WIDTH(size), HEIGHT(size));
+void disp_commit_partial(short x, short y, short width, short height) {
+    print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", x, y, width, height);
 
-    _apply(point, size);
+    _apply(x, y, width, height);
 }
 
 void disp_cancel() {
     print_trace("disp_cancel(): remove changes from bitmap.\n");
+    
     memset(bitmap, 0, DP_BITMAP_SIZEB);
 }
 

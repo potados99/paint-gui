@@ -19,8 +19,7 @@ int main(int argc, const char *argv[]) {
 	disp_draw_whole(PIXEL(0, 128, 255));
 	disp_commit();
 	
-	int start = POINT(0, DP_HEIGHT - 1);
-
+ 
 	//usleep(1000000);
 /*
     disp_set_direct(true);
@@ -34,17 +33,17 @@ int main(int argc, const char *argv[]) {
 	
 	disp_set_direct(false);
 
-	disp_draw_line(POINT(0, 239), POINT(319, 0), PIXEL(255, 255, 255));
+	disp_draw_line(0, 239, 319, 0, PIXEL(255, 255, 255));
 	disp_commit();
 
 	int inc = 1;
 	for (int i = 0; i < 160; i += inc) {
 		usleep(20000);
-		disp_draw_rect(POINT(i, i), SIZE(80, 80), PIXEL(0, 128, 255));
-		disp_draw_line(start, POINT(319, 0), PIXEL(255, 255, 255));		
-		disp_draw_rect(POINT(i+inc, i+inc), SIZE(80, 80), PIXEL(0, 255, 0));
-		disp_commit_partial(POINT(i, i), SIZE(80 + inc, 80 + inc));
-		disp_cancel();
+		disp_draw_rect(i, i, 80, 80, PIXEL(0, 128, 255)); /* erase */
+		disp_draw_line(0, DP_HEIGHT - 1, 319, 0, PIXEL(255, 255, 255)); /* draw under */
+		disp_draw_rect(i + inc, i + inc, 80, 80, PIXEL(0, 255, 0)); /* draw over */
+		disp_commit_partial(i, i, 80 + inc, 80 + inc); /* apply partially */
+		disp_cancel(); /* remove other not applied changes. */
 	}
 
 	disp_unmap();

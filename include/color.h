@@ -5,23 +5,23 @@
 /**
  * Immutable.
  */
-class color {
+class color16 {
 private:
     unsigned short r_;
     unsigned short g_;
     unsigned short b_;
     
 public:
-    static color black;
-    static color white;
-    static color red;
-    static color green;
-    static color blue;
-    static color yellow;
-    static color cyan;
-    static color maganta;
+    static color16 black;
+    static color16 white;
+    static color16 red;
+    static color16 green;
+    static color16 blue;
+    static color16 yellow;
+    static color16 cyan;
+    static color16 maganta;
     
-    color(unsigned short r, unsigned short g, unsigned short b): r_(r), g_(g), b_(b) {}
+    color16(unsigned short r, unsigned short g, unsigned short b): r_(r), g_(g), b_(b) {}
     
     unsigned short r() { return r_; }
     unsigned short g() { return g_; }

@@ -15,13 +15,13 @@ public:
     
 private:
     type type_;
-    color color_;
+    color16 color_;
     
 public:
-    shape(type type, color color): type_(type), color_(color) {}
+    shape(type type, color16 color): type_(type), color_(color) {}
     
     type type() { return type_; }
-    color& color() { return color_; }
+    color16& color() { return color_; }
 };
 
 #endif /* shape_h */

@@ -84,20 +84,20 @@ display::~display() {
     free(bitmap_);
 }
 
-int display::draw_point(point p, color c) {
+int display::draw_point(point p, color16 c) {
     POINT_CHECK("display::draw_point(point, color", p);
 
     return _draw_point(p.x(), p.y(), c);
 }
 
-int display::draw_line(point p0, point p1, color c) {
+int display::draw_line(point p0, point p1, color16 c) {
     POINT_CHECK("display::draw_line(point, point, color", p0);
     POINT_CHECK("display::draw_line(point, point, color)", p1);
     
     return _draw_line(p0.x(), p0.y(), p1.x(), p1.y(), c);
 }
 
-int display::draw_rect(point p0, point p1, color c) {
+int display::draw_rect(point p0, point p1, color16 c) {
     POINT_CHECK("display::draw_rect(point, point, color)", p0);
     POINT_CHECK("display::draw_rect(point, point, color)", p1);
     
@@ -111,7 +111,7 @@ int display::draw_rect(point p0, point p1, color c) {
     return _draw_rect(x, y, width, height, c);
 }
 
-int display::draw_rect(point p, size s, color c) {
+int display::draw_rect(point p, size s, color16 c) {
     POINT_CHECK("display::draw_rect(point, size, color)", p);
     SIZE_CHECK("display::draw_rect(point, size, color)", s);
     
@@ -124,7 +124,7 @@ int display::clear() {
     return 0;
 }
 
-int display::clear(color c) {
+int display::clear(color16 c) {
     return _draw_rect(0, 0, width_, height_, c);
 }
 
@@ -173,13 +173,13 @@ int display::unmap() {
     return munmap(mem_, width_ * height_ * sizeof(unsigned short));
 }
 
-int display::_draw_point(int x, int y, color c) {
+int display::_draw_point(int x, int y, color16 c) {
     _write(x + (y * width_), c);
     
     return 0;
 }
 
-int display::_draw_line(int x0, int y0, int x1, int y1, color c) {
+int display::_draw_line(int x0, int y0, int x1, int y1, color16 c) {
     if (abs(y1 - y0) < abs(x1 - x0)) {
         if (x0 > x1) {
             return _draw_line_low(x1, y1, x0, y0, c);
@@ -198,7 +198,7 @@ int display::_draw_line(int x0, int y0, int x1, int y1, color c) {
     }
 }
 
-int display::_draw_line_low(int x0, int y0, int x1, int y1, color c) {
+int display::_draw_line_low(int x0, int y0, int x1, int y1, color16 c) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int yi = 1;
@@ -225,7 +225,7 @@ int display::_draw_line_low(int x0, int y0, int x1, int y1, color c) {
     return 0;
 }
 
-int display::_draw_line_high(int x0, int y0, int x1, int y1, color c) {
+int display::_draw_line_high(int x0, int y0, int x1, int y1, color16 c) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int xi = 1;
@@ -251,7 +251,7 @@ int display::_draw_line_high(int x0, int y0, int x1, int y1, color c) {
     return 0;
 }
 
-int display::_draw_rect(int x, int y, int width, int height, color c) {
+int display::_draw_rect(int x, int y, int width, int height, color16 c) {
     
     return 0;
 }
@@ -282,7 +282,7 @@ int display::_points_to_point_and_size(int x0, int y0, int x1, int y1, int *x, i
     return 0;
 }
 
-void display::_write(int offset, color c) {
+void display::_write(int offset, color16 c) {
 #ifndef UNSAFE
     ASSERTDO(offset >= 0 && offset < width_ * height_,
              print_error("display::_write(int, color): offset out of range.\n");

@@ -21,16 +21,16 @@ private:
     /**
      * No error or exception handling in functions starting with underscroe.
      */
-    int _draw_point(int x, int y, color c);
-    int _draw_line(int x0, int y0, int x1, int y1, color c);
-    int _draw_line_low(int x0, int y0, int x1, int y1, color c);
-    int _draw_line_high(int x0, int y0, int x1, int y1, color c);
-    int _draw_rect(int x, int y, int width, int height, color c);
+    int _draw_point(int x, int y, color16 c);
+    int _draw_line(int x0, int y0, int x1, int y1, color16 c);
+    int _draw_line_low(int x0, int y0, int x1, int y1, color16 c);
+    int _draw_line_high(int x0, int y0, int x1, int y1, color16 c);
+    int _draw_rect(int x, int y, int width, int height, color16 c);
     int _commit(int x, int y, int width, int height);
     
     int _points_to_point_and_size(int x0, int y0, int x1, int y1, int *x, int *y, int *width, int *height);
 
-    void _write(int offset, color c);
+    void _write(int offset, color16 c);
     void _apply(int x, int y, int width, int height);
     void _flush();
 
@@ -41,15 +41,15 @@ public:
     display(const char *dp_fd_path);
     ~display();
     
-    int draw_point(point p, color c);
+    int draw_point(point p, color16 c);
     
-    int draw_line(point p0, point p1, color c);
+    int draw_line(point p0, point p1, color16 c);
     
-    int draw_rect(point p0, point p1, color c);
-    int draw_rect(point p, size s, color c);
+    int draw_rect(point p0, point p1, color16 c);
+    int draw_rect(point p, size s, color16 c);
     
     int clear();
-    int clear(color c);
+    int clear(color16 c);
     
     int commit();
     int commit(point p0, point p1);

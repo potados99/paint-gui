@@ -27,12 +27,12 @@ int main(int argc, const char * argv[]) {
     
     usleep(1000000);
     
-    mydisp.clear(color::blue);
+    mydisp.clear(color16::blue);
     mydisp.commit();
     
     usleep(1000000);
 
-    mydisp.draw_rect(point(0, 0), size(200, 200), color::white);
+    mydisp.draw_rect(point(0, 0), size(200, 200), color16::white);
     mydisp.commit();
 
     

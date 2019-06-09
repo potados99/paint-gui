@@ -17,7 +17,7 @@ static unsigned short   *dp_mem;
 //static unsigned short 	*dp_buf;
 //static unsigned long 	*bitmap;
 
-static unsigned short 	dp_buf[DP_PIXELS];
+static unsigned short 	dp_buf[DP_MEM_SIZE];
 static unsigned long 	bitmap[DP_BITMAP_SIZE];
 
 static bool             direct;
@@ -191,7 +191,7 @@ static inline void _line_high(int p0, int p1, unsigned short color) {
 
 
 void disp_map(int fd) {
-	dp_mem = (unsigned short *)mmap(NULL, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 
 	//dp_buf = (unsigned short *)malloc(sizeof(unsigned long) * DP_WIDTH * DP_HEIGHT + 1);
@@ -277,9 +277,9 @@ void disp_commit_partial(int point, int size) {
 }
 
 void disp_cancel() {
-	memset(dp_buf, 0, sizeof(unsigned long) * BITMAP_SIZE);
+	memset(dp_buf, 0, DP_BITMAP_SIZEB);
 }
 
 void disp_clear() {
-    memset(dp_mem, 0, DP_MEM_SIZE);
+    memset(dp_mem, 0, DP_MEM_SIZEB);
 }

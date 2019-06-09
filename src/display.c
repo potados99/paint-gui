@@ -61,9 +61,50 @@ do {                                                \
 } while (0)
 
 static inline void _apply(short x, short y, short width, short height) {
-    POINT_CHECK("_apply", x, y);
+    /**
+     * Points can be negative, but size cannot.
+     */
     SIZE_CHECK("_apply", width, height);
   
+    /**
+     * Cur area to fit in screen.
+     */
+    if (x >= DP_WIDTH || y >= DP_HEIGHT) {
+        /**
+         * Meaningless.
+         */
+        return;
+    }
+    if (x + width < 0 || y + height < 0) {
+        /**
+         * Meaningless, also.
+         */
+        return;
+    }
+    
+    /**
+     * Bring start point into screen.
+     */
+    if (x < 0) {
+        width += x;
+        x = 0;
+    }
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+    
+    /**
+     * Cut excess area at the right and the bottom.
+     */
+    if (x + width >= DP_WIDTH) {
+        width = DP_WIDTH - x;
+    }
+    if (y + height >= DP_HEIGHT) {
+        height = DP_HEIGHT - y;
+    }
+    
+    
     print_trace("_apply(): apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
 	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
@@ -96,7 +137,7 @@ static inline void _apply(short x, short y, short width, short height) {
 static inline void _modify(int offset,  unsigned short color) {
     ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_info("_modify: offset{%d} out of range.\n", offset); return);
 
-	print_trace("modify pixel at offset %d to %d.\n", offset, color);
+    print_trace("_modify(): modify pixel at offset %d to %d.\n", offset, color);
 
     if (direct) {
         *(dp_mem + offset) = color;

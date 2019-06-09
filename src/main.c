@@ -29,10 +29,11 @@ int main(int argc, const char *argv[]) {
 
 	usleep(1000000);
 
+    disp_set_direct(true);
 	for (int i = 0; i < 100; ++i) {
 		disp_draw_line(start, POINT(i, 0), PIXEL(0, 128, 255));
 		disp_draw_line(start, POINT(i + 1, 0), PIXEL(255, 255, 255));
-		disp_commit();
+		//disp_commit();
 	} 
 
 

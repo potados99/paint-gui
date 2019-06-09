@@ -2,6 +2,7 @@
 #define display_h
 
 #include "macros.h"
+#include <stdbool.h>
 
 #define X(POINT)                UPPER16(POINT)
 #define Y(POINT)                LOWER16(POINT)
@@ -23,10 +24,12 @@
 void            disp_map(int fd);
 void 			disp_unmap(void);
 
-int 			disp_draw_point(int point, unsigned short color);
-int			    disp_draw_line(int p0, int p1, unsigned short color);
-int 			disp_draw_rect(int point, int size, unsigned short color);
-int             disp_draw_whole(unsigned short color);
+void            disp_set_direct(bool value);
+
+void 			disp_draw_point(int point, unsigned short color);
+void			disp_draw_line(int p0, int p1, unsigned short color);
+void 			disp_draw_rect(int point, int size, unsigned short color);
+void            disp_draw_whole(unsigned short color);
 
 void            disp_commit(void);
 void            disp_commit_partial(int point, int size);

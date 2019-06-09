@@ -11,10 +11,12 @@
 #include <sys/time.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 
 static unsigned short   *dp_mem;
 static unsigned short 	*dp_buf;
 static unsigned long 	*bitmap;
+static bool             direct;
 
 /**
  * Assertion macros.
@@ -108,11 +110,16 @@ static inline void _modify(int offset,  unsigned short color) {
 
 	print_trace("modify pixel at offset %d to %d.\n", offset, color);
 
-	*(dp_buf + offset) = color;
-    SET_BIT(bitmap, offset);
+    if (direct) {
+        *(dp_mem + offset) = color;
+    }
+    else {
+        *(dp_buf + offset) = color;
+        SET_BIT(bitmap, offset);
+    }
 }
 
-static inline int _line_low(int p0, int p1, unsigned short color) {
+static inline void _line_low(int p0, int p1, unsigned short color) {
     short x0, y0, x1, y1;
     
     x0 = X(p0);
@@ -142,11 +149,9 @@ static inline int _line_low(int p0, int p1, unsigned short color) {
         
         D += 2*dy;
     }
-    
-    return 0;
 }
 
-static inline int _line_high(int p0, int p1, unsigned short color) {
+static inline void _line_high(int p0, int p1, unsigned short color) {
     short x0, y0, x1, y1;
     
     x0 = X(p0);
@@ -176,8 +181,6 @@ static inline int _line_high(int p0, int p1, unsigned short color) {
         
         D += 2*dx;
     }
-    
-    return 0;
 }
 
 ////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
@@ -201,34 +204,35 @@ void disp_unmap() {
 	free(bitmap);
 }
 
-int disp_draw_point(int point, unsigned short color) {
-	_modify(X(point) + (Y(point) * DP_WIDTH), color);
-	
-	return 0;
+void disp_set_direct(bool value) {
+    direct = value;
 }
 
-int disp_draw_line(int p0, int p1, unsigned short color) {
+void disp_draw_point(int point, unsigned short color) {
+	_modify(X(point) + (Y(point) * DP_WIDTH), color);
+}
+
+void disp_draw_line(int p0, int p1, unsigned short color) {
 
 	if (DELTA_HEIGHT(p0, p1) < DELTA_WIDTH(p0, p1)) {
 		if (X(p0) > X(p1)) {
-			return _line_low(p1, p0, color);
+            _line_low(p1, p0, color);
 		}
 		else {
-			return _line_low(p0, p1, color);
+            _line_low(p0, p1, color);
 		}
 	}
 	else {
 		if (Y(p0) > Y(p1)) {
-			return _line_high(p1, p0, color);
+            _line_high(p1, p0, color);
 		}
 		else {
-			return _line_high(p0, p1, color);
+            _line_high(p0, p1, color);
 		}
 	}
-	
 }
 
-int disp_draw_rect(int point, int size, unsigned short color) {
+void disp_draw_rect(int point, int size, unsigned short color) {
     short x, y, width, height;
     
     x = X(point);
@@ -254,11 +258,9 @@ int disp_draw_rect(int point, int size, unsigned short color) {
 		++offset;
 		
 	} while (offset < offset_max + 1);
-
-	return 0;
 }
 
-int disp_draw_whole(unsigned short color) {
+void disp_draw_whole(unsigned short color) {
     return disp_draw_rect(0, SIZE(DP_WIDTH, DP_HEIGHT), color);
 }
 

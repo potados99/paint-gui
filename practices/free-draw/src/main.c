@@ -8,6 +8,7 @@
 #include "display.h"
 #include "metric.h"
 
+#define ABS(X) ((X) < 0 ? -(X) : (X))
 
 int main(int argc, const char * argv[]) {
 	puts("Practice: free-draw");
@@ -83,6 +84,11 @@ int main(int argc, const char * argv[]) {
 		disp_partial_done(mem, te.x, te.y, 1, 1);
 		*/
 	
+		if (ABS(te.x - last_x) > 15 || ABS(te.y - last_y) > 15) {
+			printf("BOOM!\n");
+			continue;
+		}
+
 		disp_draw_line(mem, last_x, last_y, te.x, te.y, PIXEL(255, 255, 255));
 		disp_draw_done(mem);
 

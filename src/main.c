@@ -53,7 +53,7 @@ int main(int argc, const char *argv[]) {
         if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
         
         disp_draw_line(last_x, last_y, te.x, te.y, COLOR(0, 0, 0));
-        disp_commit_partial(last_x, last_y, te.x, te.y);
+        disp_commit_partialp(MIN(last_x, te.x) - 1, MIN(last_y, te.y) - 1, MAX(last_x, te.x) + 1, MAX(last_y, te.y) + 1);
         
         last_x = te.x;
         last_y = te.y;

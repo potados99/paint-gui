@@ -2,6 +2,7 @@
 #include "metric.h"
 #include "machine_specific.h"
 #include "debug.h"
+#include "macros.h"
 
 #include <sys/ioctl.h>
 #include <sys/types.h> 
@@ -276,6 +277,10 @@ void disp_draw_rect(short x, short y, short width, short height, unsigned short 
 	} while (offset < offset_max + 1);
 }
 
+void disp_draw_rectp(short x0, short y0, short x1, short y1, unsigned short color) {
+	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
+}
+
 void disp_draw_whole(unsigned short color) {
     return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
@@ -292,6 +297,10 @@ void disp_commit_partial(short x, short y, short width, short height) {
     print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", x, y, width, height);
 
     _apply(x, y, width, height);
+}
+
+void disp_commit_partialp(short x0, short y0, short x1, short y1) {
+	disp_commit_partial(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0));
 }
 
 void disp_cancel() {

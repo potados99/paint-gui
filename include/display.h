@@ -25,12 +25,14 @@ void            disp_set_direct(bool value);
 void 			disp_draw_point(short x, short y, unsigned short color);
 void			disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short color);
 void 			disp_draw_rect(short x, short y, short width, short height, unsigned short color);
+void 			disp_draw_rectp(short x0, short y0, short x1, short y1, unsigned short color);
 void            disp_draw_whole(unsigned short color);
 
 void            disp_draw_shape(struct shape *shape);
 
 void            disp_commit(void);
 void            disp_commit_partial(short x, short y, short width, short height);
+void            disp_commit_partialp(short x0, short y0, short x1, short y1);
 void			disp_cancel(void);
 
 void            disp_clear(void);

@@ -32,13 +32,15 @@ struct input_event {
 #include <linux/input-event-codes.h>
 #endif
 
+/**
+ * 캘리브레이션 적용해주는 매크로입니다. 사실 여기서는 캘리브레이션을 하지 않아요.
+ * 다만 비율을 맞추어 줄 뿐입니다.
+ */
 #define TRANSFORM_X(VAL) (((TS_WDITH - VAL) - TS_X_MIN) * DP_WIDTH / (TS_X_MAX - TS_X_MIN))
 #define TRANSFORM_Y(VAL) ((VAL - TS_Y_MIN) * DP_HEIGHT / (TS_Y_MAX - TS_Y_MIN))
 
 int touch_read(int fd, struct touch_event *event) {
-#ifndef UNSAFE
     ASSERTDO(event != NULL, print_error("touch_read(): event cannot be null.\n"); return -1);
-#endif
    
     /**
      * 리눅스니까 리눅스가 제공해주시는 input_event를 씁니다.

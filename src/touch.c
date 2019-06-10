@@ -113,7 +113,7 @@ int touch_read(int fd, struct touch_event *event) {
                 // if (ie.code == BTN_TOUCH)
                 if (ie.value == 1) {
                     event->touch_state = STATE_TOUCH_DOWN;
-                    distance = SIZE(320, 240);
+                    event->last_distance = SIZE(320, 240);
                 }
                 else {
                     event->touch_state = STATE_TOUCH_UP;
@@ -129,11 +129,14 @@ int touch_read(int fd, struct touch_event *event) {
                     case ABS_X:
                         raw_x = TRANSFORM_X(ie.value);
                         
-                        if (event->touch_state != STATE_TOUCH_DOWN) {
+                        if (event->touch_state == STATE_NONE) {
                             distance = SIZE(ABS(raw_x - event->x), HEIGHT(distance));
+
                             if (WIDTH(distance) > WIDTH(event->last_distance) + TS_JUMP_TOLERANCE) {
                                 print_info("touch_read(): big jump in x detected.\n");
                             }
+							
+							event->last_distance = distance;
                         }
                         
                         event->x = raw_x;
@@ -142,11 +145,14 @@ int touch_read(int fd, struct touch_event *event) {
                     case ABS_Y:
                         raw_y = TRANSFORM_Y(ie.value);
                         
-                        if (event->touch_state != STATE_TOUCH_DOWN) {
+                        if (event->touch_state == STATE_NONE) {
                             distance = SIZE(WIDTH(distance), ABS(raw_y - event->y));
-                            if (HEIGHT(distance) > HEIGHT(event->last_distance) + TS_JUMP_TOLERANCE) {
+                            
+							if (HEIGHT(distance) > HEIGHT(event->last_distance) + TS_JUMP_TOLERANCE) {
                                 print_info("touch_read(): big jump in y detected.\n");
                             }
+
+							event->last_distance = distance;
                         }
                         
                         event->y = raw_y;

@@ -260,10 +260,10 @@ void disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short colo
 void disp_draw_rect(short x, short y, short width, short height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
-    disp_draw_line(x, y, x + width, y, color);                      /* 위쪽! */
-    disp_draw_line(x, y + height, x + width, y + height, color);    /* 아래쪽! */
-    disp_draw_line(x, y, x, y + height, color);                     /* 왼쪽! */
-    disp_draw_line(x + width, y, x + width, y + height, color);     /* 오른쪽! */
+    disp_draw_line(x, y, x + width - 1, y, color);                      		/* 위쪽! */
+    disp_draw_line(x, y + height - 1, x + width - 1, y + height - 1, color);    /* 아래쪽! */
+    disp_draw_line(x, y, x, y + height - 1, color);                     			/* 왼쪽! */
+    disp_draw_line(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
 }
 
 void disp_draw_rect_fill(short x, short y, short width, short height, unsigned short color) {
@@ -295,7 +295,7 @@ void disp_draw_rectp_fill(short x0, short y0, short x1, short y1, unsigned short
 }
 
 void disp_draw_whole(unsigned short color) {
-    return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
+    return disp_draw_rect_fill(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
 
 void disp_draw_shape(struct shape *shape) {

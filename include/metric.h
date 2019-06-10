@@ -6,6 +6,20 @@
 #ifndef metric_h
 #define metric_h
 
+#include "macros.h"
+
+#define X(POINT)                UPPER16(POINT)
+#define Y(POINT)                LOWER16(POINT)
+
+#define WIDTH(SIZE)             UPPER16(SIZE)
+#define HEIGHT(SIZE)            LOWER16(SIZE)
+
+#define POINT(X, Y)             COMBINE16(X, Y)
+#define SIZE(W, H)              COMBINE16(W, H)
+
+#define DELTA_WIDTH(P0, P1)     ABS(X(P1) - X(P0))
+#define DELTA_HEIGHT(P0, P1)    ABS(Y(P1) - Y(P0))
+
 struct point {
 	short x;
 	short y;

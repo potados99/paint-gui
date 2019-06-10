@@ -21,12 +21,12 @@
  * 이는 또한 이전 터치 결과를 조금 저장하여 불연속적인 입력을 무시하는 필터링 기능도 합니다.
  */
 struct touch_event {
-	unsigned short x;                   /* [0, 320] */
-	unsigned short y;                   /* [0, 240] */
-	unsigned char pressure;             /* [0, 255] */
-	unsigned char touch_state;          /* [0, 2] */
+	unsigned short  x;                      /* [0, 320] */
+	unsigned short  y;                      /* [0, 240] */
+	unsigned char   pressure;               /* [0, 255] */
+	unsigned char   touch_state;            /* [0, 2] */
     
-    unsigned short last_distance;       /* [0, 570] */
+    unsigned int    last_distance;
 };
 
 /**

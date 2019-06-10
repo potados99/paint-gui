@@ -13,15 +13,27 @@
 #include <string.h>
 #include <stdbool.h>
 
-static unsigned short   *dp_mem;
-static unsigned short 	dp_buf[DP_MEM_SIZE];
-static unsigned long 	bitmap[DP_BITMAP_SIZE];
+/**
+ * 이것들은 display.c에 종속되는 전역 변수로 두었습니다.
+ * display라는 모듈 또는 객체를 만들어 그곳에 보관할 수도 있지만,
+ * 있어봤자 디스플레이는 한개인데...
+ */
+static unsigned short   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
+static unsigned short 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
+static unsigned long 	bitmap[DP_BITMAP_SIZE]; /* 변화가 생긴 지점을 저장하는 메타데이터 역할의 변수. */
 
-static bool             direct;
+static bool             direct;                 /* 직접 쓰기 모드의 활성화 여부를 저장하는 변수. */
 
 /**
- * Assertion macros.
- * Local usage.
+ * 당황하지 마십시오!!!
+ * 아주 낮은 레벨의 함수에서 쓸 파라미터 확인용 매크로입니다.
+ * 이 소스파일에서만 쓰일 예정이어서 이곳에 두었습니다.
+ *
+ * POINT_CHECK은 x와 y 좌표가 각각 폐구간 [0, 319], [0, 239]에 속하는지 확인합니다.
+ * SIZE_CHECK은 width와 height가 각각 폐구간 [0, 320], [0, 240]에 속하는지 확인합니다.
+ * 만약에 적절치 않으면 함수 이름과 함께 에러 메시지를 뿜고 리턴해버립니다.
+ *
+ * 그런데 사실 몇번 뜯어고치면서 이것들도 안쓰게 되었습니다...
  */
 #define POINT_CHECK(FUNC_NAME, X, Y)                                                        \
 do {                                                                                        \
@@ -45,8 +57,11 @@ return);                                                                        
 
 
 
-////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
-
+/********************************************************************************************/
+/**
+ * 여기에 속하는 함수 또는 매크로들은 1초에 적어도 수십번씩 실행될 것들이라
+ * 퍼포먼스가 매우매우 중요합니다...
+ */
 #define GET_BIT(PTR, OFFSET)                        \
 ((*(PTR + (OFFSET / 32))) & (1 << (OFFSET % 32)))
 
@@ -197,8 +212,7 @@ static inline void _line_high(short x0, short y0, short x1, short y1, unsigned s
         D += 2*dx;
     }
 }
-
-////////////////////////// VERY VERY PERFORMANCE SENSITIVE //////////////////////////
+/********************************************************************************************/
 
 
 void disp_map(int fd) {
@@ -265,6 +279,8 @@ void disp_draw_rect(short x, short y, short width, short height, unsigned short 
 void disp_draw_whole(unsigned short color) {
     return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
+
+void disp_draw_shape(struct shape *shape);
 
 void disp_commit() {
     print_trace("disp_commit(): commit all changes.\n");

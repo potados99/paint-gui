@@ -285,7 +285,41 @@ void disp_draw_whole(unsigned short color) {
     return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
 
-void disp_draw_shape(struct shape *shape);
+void disp_draw_shape(struct shape *shape) {
+    ASSERTDO(shape != NULL, print_error("disp_draw_shape(): shape cannot be null.\n"); return);
+    
+    switch (shape->type) {
+        case ST_LINE:
+            disp_draw_line(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
+            break;
+            
+        case ST_RECT:
+            break;
+            
+        case ST_RECT_FILL:
+            disp_draw_rect(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
+            break;
+            
+        case ST_OVAL:
+            
+            break;
+            
+            
+        case ST_OVAL_FILL:
+            
+            break;
+            
+            
+        case ST_FDRAW:
+            
+            break;
+            
+            
+        default:
+            print_error("disp_draw_shape(): invalid shape type: %d\n", shape->type);
+            break;
+    }
+}
 
 void disp_commit() {
     print_trace("disp_commit(): commit all changes.\n");

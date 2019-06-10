@@ -17,7 +17,9 @@ int main(int argc, const char *argv[]) {
     int                 last_x = 0;
     int                 last_y = 0;
     struct touch_event  te;
-    
+ 	te.x = 0;
+	te.y = 0;
+   
     unsigned long       line_num = 0;
 
     
@@ -29,28 +31,28 @@ int main(int argc, const char *argv[]) {
     
     disp_map(dp_fd);
     
-	disp_draw_whole(COLOR(0, 128, 255));
+	disp_draw_whole(COLOR(255, 255, 255));
 	disp_commit();
 	
     
     while (1) {
         
-        ts_read = touch_read(ts_fd, &te);
-        
+        ts_read = touch_read(ts_fd, &te); 
+ 
         if (te.touch_state == STATE_TOUCH_DOWN) {
             last_x = te.x;
             last_y = te.y;
-            
             touched = 1;
         }
         else if (te.touch_state == STATE_TOUCH_UP) {
             touched = 0;
         }
+ 
         if (te.touch_state == STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
         printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
         if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
         
-        disp_draw_line(last_x, last_y, te.x, te.y, COLOR(255, 255, 255));
+        disp_draw_line(last_x, last_y, te.x, te.y, COLOR(0, 0, 0));
         disp_commit();
         
         last_x = te.x;

@@ -35,19 +35,20 @@ int touch_read(int fd, struct touch_event *event) {
 #ifndef UNSAFE
     ASSERTDO(event != NULL, print_error("touch_read(): event cannot be null.\n"); return -1);
 #endif
-    
+   
     /**
      * 리눅스니까 리눅스가 제공해주시는 input_event를 씁니다.
      */
-    struct input_event ie;
-    
+    struct input_event 	ie;
+ 	int					nread;
+   
     /**
      * 입력값을 그대로 쓰지는 않을겁니다. 왜냐면 입력이 튀는 경우가 있거든요.
      * 그래서 입력 후에 처리(필터링)하기 위해 잠시 담아둘 변수입니다.
      * 간혹 입력이 없는 경우가 있습니다. 그런 경우를 위해 이전 값을 담아둡니다.
      */
-    short               raw_x = event->x;
-    short               raw_y = event->y;
+    short               raw_x = -1;
+    short               raw_y = -1;
     
     /**
      * 현재 들어온 좌표가 예측 범위에서 벗어나는 이상한 값인지 판단할 때에 쓰입니다.
@@ -69,7 +70,9 @@ int touch_read(int fd, struct touch_event *event) {
         /**
          * 읽기
          */
-        if (read(fd, &ie, sizeof(struct input_event) == -1)) {
+        nread = read(fd, &ie, sizeof(struct input_event));
+
+		if (nread == -1)  {
 #ifdef NONBLOCK_READ
             /**
              * non-block 읽기에서, EAGAIN은 에러가 아닙니다.
@@ -99,8 +102,8 @@ int touch_read(int fd, struct touch_event *event) {
                  * 끝입니다. 이제 처리합시다.
                  * 브레이크를 두번 할수도 없고 해서 고투를 썼어요..
                  */
-                goto process_input;
-                
+               	goto process_input;
+               
             case EV_KEY:
                 /**
                  * 이 디스플레이가 지원하는 EV_KEY는 사실 BTN_TOUCH밖에 없습니다.
@@ -146,6 +149,9 @@ int touch_read(int fd, struct touch_event *event) {
     
 process_input:
     
+	if (raw_x == -1) raw_x = event->x;
+	if (raw_y == -1) raw_y = event->y;
+
     /**
      * 터치가 지속중인 상태에만 검사를 해야 합니다!
      *
@@ -175,13 +181,16 @@ process_input:
             /**
              * 튀지 않는 온화한 자만이 event의 x와 y에 대입될 자격이 있습니다.
              */
-            event->x = raw_x;
+           	event->x = raw_x;
             event->y = raw_y;
-            
+             
             event->last_distance = distance;
         }
     }
-    
+ 	else if (event->touch_state == STATE_TOUCH_DOWN) {
+		 	event->x = raw_x;
+            event->y = raw_y;	
+	}   
     return 0;
 }
 

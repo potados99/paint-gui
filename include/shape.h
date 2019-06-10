@@ -11,12 +11,14 @@
 /**
  * Shape 종류 (ST: Shape Type).
  */
-#define ST_LINE         (0x01 << 0)
-#define ST_RECT         (0x01 << 1)
-#define ST_RECT_FILL    (0x01 << 2)
-#define ST_OVAL         (0x01 << 3)
-#define ST_OVAL_FILL    (0x01 << 4)
-#define ST_FDRAW        (0x01 << 5)
+#define ST_LINE         1
+#define ST_RECT         2
+#define ST_RECT_FILL    3
+#define ST_RECTP        4
+#define ST_RECTP_FILL   5
+#define ST_OVAL         6
+#define ST_OVAL_FILL    7
+#define ST_FDRAW        8
 
 /**
  * unsigned short 타입에 적절한 한 픽셀을 만드는 매크로입니다.

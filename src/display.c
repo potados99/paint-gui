@@ -260,6 +260,15 @@ void disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short colo
 void disp_draw_rect(short x, short y, short width, short height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
+    disp_draw_line(x, y, x + width, y, color);                      /* 위쪽! */
+    disp_draw_line(x, y + height, x + width, y + height, color);    /* 아래쪽! */
+    disp_draw_line(x, y, x, y + height, color);                     /* 왼쪽! */
+    disp_draw_line(x + width, y, x + width, y + height, color);     /* 오른쪽! */
+}
+
+void disp_draw_rect_fill(short x, short y, short width, short height, unsigned short color) {
+    print_trace("disp_draw_rect_fill(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
+
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
 	register short 	n_line = 0;
@@ -281,6 +290,10 @@ void disp_draw_rectp(short x0, short y0, short x1, short y1, unsigned short colo
 	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
 }
 
+void disp_draw_rectp_fill(short x0, short y0, short x1, short y1, unsigned short color) {
+    disp_draw_rect_fill(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
+}
+
 void disp_draw_whole(unsigned short color) {
     return disp_draw_rect(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
@@ -294,26 +307,32 @@ void disp_draw_shape(struct shape *shape) {
             break;
             
         case ST_RECT:
+            disp_draw_rect(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
             break;
             
         case ST_RECT_FILL:
-            disp_draw_rect(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
+            disp_draw_rect_fill(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
+            break;
+            
+        case ST_RECTP:
+            disp_draw_rectp(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
+            break;
+            
+        case ST_RECTP_FILL:
+            disp_draw_rectp_fill(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
             break;
             
         case ST_OVAL:
             
             break;
             
-            
         case ST_OVAL_FILL:
             
             break;
             
-            
         case ST_FDRAW:
             
             break;
-            
             
         default:
             print_error("disp_draw_shape(): invalid shape type: %d\n", shape->type);

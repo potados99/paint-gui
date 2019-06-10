@@ -127,13 +127,23 @@ int touch_read(int fd, struct touch_event *event) {
                  */
                 switch (ie.code) {
                     case ABS_X:
+                        /**
+                         * ie.value를 캘리브레이션 값에 맞게 조정합니다.
+                         */
                         raw_x = TRANSFORM_X(ie.value);
                         
+                        /**
+                         * 터치 필터링은 터치중에만 하면 됩니당.
+                         */
                         if (event->touch_state == STATE_NONE) {
                             distance = SIZE(ABS(raw_x - event->x), HEIGHT(distance));
 
+                            /**
+                             * x값의 변화량이 너무 크다 싶으면 잘라줍니다. 컷!
+                             */
                             if (WIDTH(distance) > WIDTH(event->last_distance) + TS_JUMP_TOLERANCE) {
                                 print_info("touch_read(): big jump in x detected.\n");
+                                break;
                             }
 							
 							event->last_distance = distance;
@@ -150,6 +160,7 @@ int touch_read(int fd, struct touch_event *event) {
                             
 							if (HEIGHT(distance) > HEIGHT(event->last_distance) + TS_JUMP_TOLERANCE) {
                                 print_info("touch_read(): big jump in y detected.\n");
+                                break;
                             }
 
 							event->last_distance = distance;

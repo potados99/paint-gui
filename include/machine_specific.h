@@ -32,6 +32,6 @@
 #define TS_Y_MIN            150
 #define TS_Y_MAX            3900
 
-#define TS_JUMP_TOLERANCE   50
+#define TS_JUMP_TOLERANCE   5
 
 #endif /* machine_specific_h */

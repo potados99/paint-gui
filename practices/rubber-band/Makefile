@@ -2,7 +2,7 @@
 
 # Makefile boilerplate version 0.1.0 (20190416)
 
-TARGET_INITIAL	:= free-draw
+TARGET_INITIAL	:= rubber-band
 TARGET		:= $(TARGET_INITIAL)
 
 CC		:= gcc

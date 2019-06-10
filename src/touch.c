@@ -44,20 +44,7 @@ int touch_read(int fd, struct touch_event *event) {
      * 리눅스니까 리눅스가 제공해주시는 input_event를 씁니다.
      */
     struct input_event 	ie;
-   
-    /**
-     * 입력값을 그대로 쓰지는 않을겁니다. 왜냐면 입력이 튀는 경우가 있거든요.
-     * 그래서 입력 후에 처리(필터링)하기 위해 잠시 담아둘 변수입니다.
-     * 간혹 입력이 없는 경우가 있습니다. 그런 경우를 위해 이전 값을 담아둡니다.
-     */
-    short               raw_x = -1;
-    short               raw_y = -1;
-    
-    /**
-     * 현재 들어온 좌표가 예측 범위에서 벗어나는 이상한 값인지 판단할 때에 쓰입니다.
-     */
-    unsigned int        distance = 0;
-    
+
     /**
      * 별다른 일이 있기 전까지는 터치 상태는 기본 STATE_NONE입니다.
      */
@@ -111,13 +98,7 @@ int touch_read(int fd, struct touch_event *event) {
                  * if 비교 안해도 돼요..
                  */
                 // if (ie.code == BTN_TOUCH)
-                if (ie.value == 1) {
-                    event->touch_state = STATE_TOUCH_DOWN;
-                    event->last_distance = SIZE(320, 240);
-                }
-                else {
-                    event->touch_state = STATE_TOUCH_UP;
-                }
+                event->touch_state = (ie.value ? STATE_TOUCH_DOWN : STATE_TOUCH_UP);
                 break;
                 
             case EV_ABS:
@@ -127,46 +108,11 @@ int touch_read(int fd, struct touch_event *event) {
                  */
                 switch (ie.code) {
                     case ABS_X:
-                        /**
-                         * ie.value를 캘리브레이션 값에 맞게 조정합니다.
-                         */
-                        raw_x = TRANSFORM_X(ie.value);
-                        
-                        /**
-                         * 터치 필터링은 터치중에만 하면 됩니당.
-                         */
-                        if (event->touch_state == STATE_NONE) {
-                            distance = SIZE(ABS(raw_x - event->x), HEIGHT(distance));
-
-                            /**
-                             * x값의 변화량이 너무 크다 싶으면 잘라줍니다. 컷!
-                             */
-                            if (WIDTH(distance) > WIDTH(event->last_distance) + TS_JUMP_TOLERANCE) {
-                                print_info("touch_read(): big jump in x detected.\n");
-                                break;
-                            }
-							
-							event->last_distance = distance;
-                        }
-                        
-                        event->x = raw_x;
+                        event->x = TRANSFORM_X(ie.value);
                         break;
                         
                     case ABS_Y:
-                        raw_y = TRANSFORM_Y(ie.value);
-                        
-                        if (event->touch_state == STATE_NONE) {
-                            distance = SIZE(WIDTH(distance), ABS(raw_y - event->y));
-                            
-							if (HEIGHT(distance) > HEIGHT(event->last_distance) + TS_JUMP_TOLERANCE) {
-                                print_info("touch_read(): big jump in y detected.\n");
-                                break;
-                            }
-
-							event->last_distance = distance;
-                        }
-                        
-                        event->y = raw_y;
+                        event->y = TRANSFORM_Y(ie.value);
                         break;
                         
                     case ABS_PRESSURE:

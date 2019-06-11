@@ -6,6 +6,8 @@
 #ifndef debug_h
 #define debug_h
 
+#include <stdio.h>
+
 /**
  * X가 참일 것이라 가정한 뒤, 아니면 WHAT을 실행합니다.
  */
@@ -31,20 +33,61 @@ WHAT;                           \
  * 이 VERBOSE 전처리기 변수는 Makefile에 의해 전달됩니다. Makefile 손보세용.
  */
 #if (VERBOSE > 1)
-#define print_trace(_fmt, ...) \
+#define print_trace(_fmt, ...)                                                              \
 fprintf(stdout, "[TRACE] "_fmt, ##__VA_ARGS__)
 #else
 #define print_trace(_fmt, ...) NULL
 #endif
 
 #if (VERBOSE > 0)
-#define print_info(_fmt, ...) \
+#define print_info(_fmt, ...)                                                               \
 fprintf(stdout, "[INFO] " _fmt, ##__VA_ARGS__)
 #else
 #define print_info(_fmt, ...) NULL
 #endif
 
-#define print_error(_fmt, ...) \
+#define print_error(_fmt, ...)                                                              \
 fprintf(stderr, "[ERROR] " _fmt, ##__VA_ARGS__)
+
+
+/**
+ * X가 NULL인지 검사합니다.
+ */
+#define NULL_CHECK(FUNC_NAME, X)                                                            \
+ASSERTDO((X) != NULL, print_error(FUNC_NAME ": " #X " is NULL.\n"); return)
+
+/**
+ * NULL_CHECK를 한 다음에 값을 반환합니다.
+ */
+#define NULL_CHECK_RET(FUNC_NAME, X, RET)                                                   \
+ASSERTDO((X) != NULL, print_error(FUNC_NAME ": " #X " is NULL.\n"); return RET)
+
+
+/**
+ * 한 점의 X, Y 좌표가 각각 [0, X_MAX], [0, Y_MAX]에 속하는지 검사합니다.
+ */
+#define POINT_CHECK(FUNC_NAME, X, Y, X_MAX, Y_MAX)                                          \
+do {                                                                                        \
+ASSERTDO(IN_RANGE(X, 0, X_MAX),                                                             \
+print_error(FUNC_NAME ": " #X "{%d} out of range.\n", X);                                   \
+return);                                                                                    \
+ASSERTDO(IN_RANGE(Y, 0, Y_MAX),                                                             \
+print_error(FUNC_NAME ": " #Y "{%d} out of range.\n", Y);                                   \
+return);                                                                                    \
+} while (0)
+
+/**
+ * 한 크기의 길이와 높이가 각각 [0, W_MAX], [0, H_MAX]에 속하는지 검사합니다.
+ */
+#define SIZE_CHECK(FUNC_NAME, W, H, W_MAX, H_MAX)                                           \
+do {                                                                                        \
+ASSERTDO(IN_RANGE(W, 0, W_MAX),                                                             \
+print_error(FUNC_NAME ": " #W "{%d} out of range.\n", W);                                   \
+return);                                                                                    \
+ASSERTDO(IN_RANGE(H, 0, H_MAX),                                                             \
+print_error(FUNC_NAME ": " #H "{%d} out of range.\n", H);                                   \
+return);                                                                                    \
+} while (0)
+
 
 #endif /* debug_h */

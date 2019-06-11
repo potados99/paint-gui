@@ -25,38 +25,6 @@ static unsigned long 	bitmap[DP_BITMAP_SIZE]; /* 변화가 생긴 지점을 저�
 
 static bool             direct;                 /* 직접 쓰기 모드의 활성화 여부를 저장하는 변수. */
 
-/**
- * 당황하지 마십시오!!!
- * 아주 낮은 레벨의 함수에서 쓸 파라미터 확인용 매크로입니다.
- * 이 소스파일에서만 쓰일 예정이어서 이곳에 두었습니다.
- *
- * POINT_CHECK은 x와 y 좌표가 각각 폐구간 [0, 319], [0, 239]에 속하는지 확인합니다.
- * SIZE_CHECK은 width와 height가 각각 폐구간 [0, 320], [0, 240]에 속하는지 확인합니다.
- * 만약에 적절치 않으면 함수 이름과 함께 에러 메시지를 뿜고 리턴해버립니다.
- *
- * 그런데 사실 몇번 뜯어고치면서 이것들도 안쓰게 되었습니다...
- */
-#define POINT_CHECK(FUNC_NAME, X, Y)                                                        \
-do {                                                                                        \
-ASSERTDO(IN_RANGE(X, 0, DP_WIDTH - 1),                                                      \
-print_error(FUNC_NAME ": " #X "{%d} out of range.\n", X);                                   \
-return);                                                                                    \
-ASSERTDO(IN_RANGE(Y, 0, DP_HEIGHT - 1),                                                     \
-print_error(FUNC_NAME ": " #Y "{%d} out of range.\n", Y);                                   \
-         return);                                                                           \
-} while (0)
-
-#define SIZE_CHECK(FUNC_NAME, W, H)                                                         \
-do {                                                                                        \
-ASSERTDO(IN_RANGE(W, 0, DP_WIDTH),                                                          \
-print_error(FUNC_NAME ": " #W "{%d} out of range.\n", W);                                   \
-return);                                                                                    \
-ASSERTDO(IN_RANGE(H, 0, DP_HEIGHT),                                                         \
-print_error(FUNC_NAME ": " #H "{%d} out of range.\n", H);                                   \
-return);                                                                                    \
-} while (0)
-
-
 
 /********************************************************************************************/
 /**
@@ -80,7 +48,7 @@ static inline void _apply(short x, short y, short width, short height) {
     /**
      * Points can be negative, but size cannot.
      */
-    SIZE_CHECK("_apply", width, height);
+    SIZE_CHECK("_apply", width, height, DP_WIDTH, DP_HEIGHT);
   
     /**
      * Cur area to fit in screen.
@@ -298,46 +266,37 @@ void disp_draw_whole(unsigned short color) {
     return disp_draw_rect_fill(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
 
-void disp_draw_shape(struct shape *shape) {
-    ASSERTDO(shape != NULL, print_error("disp_draw_shape(): shape cannot be null.\n"); return);
+void disp_draw_2d_shape(struct shape *shape) {
+    NULL_CHECK("disp_draw_2d_shape()", shape);
+    
+    draw_2d draw_function = NULL;
     
     switch (shape->type) {
-        case ST_LINE:
-            disp_draw_line(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
-            break;
+        /**
+         * 함수 mapping 테이블입니다.
+         */
+        case ST_LINE:           draw_function = disp_draw_line; break;
+        case ST_RECT:           draw_function = disp_draw_rect; break;
+        case ST_RECT_FILL:      draw_function = disp_draw_rect_fill; break;
+        case ST_RECTP:          draw_function = disp_draw_rectp; break;
+        case ST_RECTP_FILL:     draw_function = disp_draw_rectp_fill; break;
+        case ST_OVAL:           draw_function = NULL; break;
+        case ST_OVAL_FILL:      draw_function = NULL; break;
+        case ST_FDRAW:          goto free_draw;
             
-        case ST_RECT:
-            disp_draw_rect(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
-            break;
-            
-        case ST_RECT_FILL:
-            disp_draw_rect_fill(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
-            break;
-            
-        case ST_RECTP:
-            disp_draw_rectp(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
-            break;
-            
-        case ST_RECTP_FILL:
-            disp_draw_rectp_fill(shape->values[0], shape->values[1], shape->values[2], shape->values[3], shape->color);
-            break;
-            
-        case ST_OVAL:
-            
-            break;
-            
-        case ST_OVAL_FILL:
-            
-            break;
-            
-        case ST_FDRAW:
-            
-            break;
-            
-        default:
-            print_error("disp_draw_shape(): invalid shape type: %d\n", shape->type);
-            break;
+        default:                print_error("disp_draw_2d_shape(): invalid shape type: %d\n", shape->type); return;
     }
+    
+    draw_function(shape->value[0] + shape->offset[0],
+                  shape->value[1] + shape->offset[1],
+                  shape->value[2] + shape->offset[0],
+                  shape->value[3] + shape->offset[1],
+                  shape->color);
+    
+    return;
+    
+free_draw:
+    return;
 }
 
 void disp_commit() {

@@ -40,8 +40,8 @@ struct input_event {
 #define TRANSFORM_Y(VAL) ((VAL - TS_Y_MIN) * DP_HEIGHT / (TS_Y_MAX - TS_Y_MIN))
 
 int touch_read(int fd, struct touch_event *event) {
-    ASSERTDO(event != NULL, print_error("touch_read(): event cannot be null.\n"); return -1);
-   
+    NULL_CHECK_RET("touch_read()", event, -1);
+    
     /**
      * 리눅스니까 리눅스가 제공해주시는 input_event를 씁니다.
      */

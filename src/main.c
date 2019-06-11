@@ -33,72 +33,72 @@ int main(int argc, const char *argv[]) {
     
 	disp_draw_whole(COLOR(255, 255, 255));
 	disp_commit();
-	
+    
 
 	struct shape sq0;
 	sq0.type = ST_RECTP;
-	sq0.values[0] = 50;
-	sq0.values[1] = 50;
-	sq0.values[2] = 150;
-	sq0.values[3] = 150;
+	sq0.value[0] = 50;
+	sq0.value[1] = 50;
+	sq0.value[2] = 150;
+	sq0.value[3] = 150;
 	sq0.color = 0;
-	disp_draw_shape(&sq0);
+	disp_draw_2d_shape(&sq0);
 	disp_commit();
 	usleep(400000);
 
 	struct shape sq1;
 	sq1.type = ST_RECTP;
-	sq1.values[0] = 100;
-	sq1.values[1] = 70;
-	sq1.values[2] = 200;
-	sq1.values[3] = 170;
+	sq1.value[0] = 100;
+	sq1.value[1] = 70;
+	sq1.value[2] = 200;
+	sq1.value[3] = 170;
 	sq1.color = COLOR(255, 0, 0);
-	disp_draw_shape(&sq1);
+	disp_draw_2d_shape(&sq1);
 	disp_commit();
 	usleep(400000);
 
 	struct shape ln0;
 	ln0.type = ST_LINE;
-	ln0.values[0] = 80;
-	ln0.values[1] = 25;
-	ln0.values[2] = 240;
-	ln0.values[3] = 210;
+	ln0.value[0] = 80;
+	ln0.value[1] = 25;
+	ln0.value[2] = 240;
+	ln0.value[3] = 210;
 	ln0.color = COLOR(0, 128, 0);
-	disp_draw_shape(&ln0);
+	disp_draw_2d_shape(&ln0);
 	disp_commit();
 	usleep(400000);
 
 	struct shape sq2;
 	sq2.type = ST_RECTP_FILL;
-	sq2.values[0] = 20;
-	sq2.values[1] = 120;
-	sq2.values[2] = 250;
-	sq2.values[3] = 130;
+	sq2.value[0] = 20;
+	sq2.value[1] = 120;
+	sq2.value[2] = 250;
+	sq2.value[3] = 130;
 	sq2.color = COLOR(0, 128, 255);
-	disp_draw_shape(&sq2);
+	disp_draw_2d_shape(&sq2);
 	disp_commit();
 	usleep(400000);
  
+    /**
+     * Move + partial redraw.
+     */
 	for (int i = 0; i < 70; ++i) {
 		usleep(100000);
 		disp_draw_whole(COLOR(255, 255, 255));
+        shape_move(&sq1, +1, +1);
 
-		disp_draw_shape(&sq0);
-
-		sq1.values[1] += 1;
-		sq1.values[3] += 1;
-		disp_draw_shape(&sq1);
-
-		disp_draw_shape(&ln0);
-
-		disp_draw_shape(&sq2);
+		disp_draw_2d_shape(&sq0);
+		disp_draw_2d_shape(&sq1);
+		disp_draw_2d_shape(&ln0);
+		disp_draw_2d_shape(&sq2);
 		
-		disp_commit_partialp(sq1.values[0], sq1.values[1] - 1, sq1.values[2], sq1.values[3]);
+		disp_commit_partialp(sq1.value[0], sq1.value[1] - 1, sq1.value[2], sq1.value[3]);
 	}
 
-
-
-   
+    
+    /**
+     * Read + free draw
+     */
     while (1) {
         
         ts_read = touch_read(ts_fd, &te); 

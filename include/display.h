@@ -13,9 +13,10 @@
 #include <stdbool.h>
 
 /**
- * 범위 검사하는 매크로입니다.
+ * 모든(?) 2차원 그리기 함수는 이 규격을 준수합니다!
  */
-#define IN_RANGE(X, START, END) ((X >= START) && (X <= END))
+typedef         void (*draw_2d)(short, short, short, short, unsigned short);
+
 
 void            disp_map(int fd);
 void 			disp_unmap(void);
@@ -34,7 +35,7 @@ void            disp_draw_rectp_fill(short x0, short y0, short x1, short y1, uns
 
 void            disp_draw_whole(unsigned short color);
 
-void            disp_draw_shape(struct shape *shape);
+void            disp_draw_2d_shape(struct shape *shape);
 
 void            disp_commit(void);
 void            disp_commit_partial(short x, short y, short width, short height);

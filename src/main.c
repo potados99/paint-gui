@@ -17,12 +17,10 @@ int main(int argc, const char *argv[]) {
     int                 touched;
     int                 last_x = 0;
     int                 last_y = 0;
-    struct touch_event  te;
- 	te.x = 0;
-	te.y = 0;
-   
     unsigned long       line_num = 0;
    
+    TOUCH_EVENT(te); /* decl & init */
+
     ts_fd = open(TS_FD_PATH, TS_OPEN_OPTION);
     ASSERTDO(ts_fd != -1, print_error("open() error with %s.\n", TS_FD_PATH); return -1);
     

@@ -16,6 +16,9 @@
 #define STATE_TOUCH_DOWN 	0x01
 #define STATE_TOUCH_UP 		0x02
 
+#define TOUCH_EVENT(NAME)   \
+struct touch_event NAME = {0}
+
 /**
  * 터치를 읽은 결과를 저장하는 구조체입니다.
  */

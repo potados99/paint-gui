@@ -26,17 +26,18 @@
 #define COLOR(R, G, B)  \
 (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
 
-/**
- * 새로운 shape 구조체를 만드는 매크로입니다. 0으로 초기화 해줍니다.
- */
-#define SHAPE(NAME) \
-struct shape NAME = {0}
 
 /**
  * zindex는 shape를 만들 때마다 계속해서 늘어나야 합니다.
  * 그래서 전역 static 변수로 만들어서 계속 늘려줍니다.
  */
 static unsigned short zindex = 0;
+
+/**
+ * 새로운 shape 구조체를 만드는 매크로입니다. 0으로 초기화 해줍니다.
+ */
+#define SHAPE(NAME)     \
+struct shape NAME = {0}
 
 /**
  * 이 프로그램에 필요한 모든 도형을 표현할 수 있는 구조체입니다.

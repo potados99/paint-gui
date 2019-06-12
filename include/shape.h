@@ -8,6 +8,9 @@
 
 #include "metric.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 /**
  * Shape 종류 (ST: Shape Type).
  */
@@ -26,18 +29,38 @@
 #define COLOR(R, G, B)  \
 (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
 
-
 /**
  * zindex는 shape를 만들 때마다 계속해서 늘어나야 합니다.
  * 그래서 전역 static 변수로 만들어서 계속 늘려줍니다.
  */
-static unsigned int zindex = 0;
+static unsigned int zindex_count = 0;
 
 /**
  * 새로운 shape 구조체를 만드는 매크로입니다. 0으로 초기화 해줍니다.
  */
-#define SHAPE(NAME)     \
-struct shape NAME = {0}
+#define SHAPE(NAME)                                                     \
+struct shape NAME = {0};                                                \
+do {                                                                    \
+NAME.zindex = zindex_count++;                                           \
+} while (0)
+
+/**
+ * 새로운 shape 구조체를 힙에다 만들고 초기화합니다.
+ */
+#define SHAPE_ALLOC(NAME)                                               \
+struct shape *NAME = (struct shape *)malloc(sizeof(struct shape));      \
+do {                                                                    \
+memset(NAME, 0, sizeof(struct shape));                                  \
+NAME->zindex = zindex_count++;                                          \
+} while (0)
+
+#define SHAPE_FREE(PTR)                                                 \
+do {                                                                    \
+if (PTR->fdraw_points.head != NULL) {                                   \
+points_free(&PTR->fdraw_points);                                        \
+}                                                                       \
+free(PTR);                                                              \
+} while (0)
 
 /**
  * 이 프로그램에 필요한 모든 도형을 표현할 수 있는 구조체입니다.
@@ -78,5 +101,7 @@ struct shape {
 };
 
 void shape_move(struct shape *shape, int delta_x, int delta_y);
+
+
 
 #endif /* shape_h */

@@ -45,6 +45,19 @@
 #define IN_RANGE(X, START, END) ((X >= START) && (X <= END))
 
 /**
+ * points 리스트 쉽게 다루게 해주는 매크로입니당.
+ */
+#define FOREACH_POINT(PTR, VAR_NAME) \
+for(struct point_node *VAR_NAME = (PTR)->head; VAR_NAME; VAR_NAME = VAR_NAME->next)
+
+/**
+ * point_node 구조체를 할당해서 초기화해줍니다.
+ */
+#define POINT_NODE_ALLOC(NAME) \
+struct point_node *NAME = (struct point_node *)malloc(sizeof(struct point_node));   \
+memset(NAME, 0, sizeof(struct point_node));                                         \
+
+/**
  * 점을 표현하는 연결리스트에서 쓰일 노드.
  */
 struct point_node {
@@ -52,6 +65,12 @@ struct point_node {
     int y;
     struct point_node *next;
 };
+
+/**
+ * points 구조체를 생성, 초기화해줍니다.
+ */
+#define POINTS(NAME)\
+struct points NAME = {0}
 
 /**
  * 연결리스트의 시작과 끝을 가지고 있는 '연결리스트' 그 자체.

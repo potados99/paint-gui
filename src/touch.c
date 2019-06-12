@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "macros.h"
 #include "metric.h"
+#include "input-event-codes.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -29,7 +30,6 @@ struct input_event {
 ///////////////////// TEST ENVIRONMENT //////////////////////
 #else
 #include <linux/input.h>
-#include <linux/input-event-codes.h>
 #endif
 
 /**

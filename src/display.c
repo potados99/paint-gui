@@ -185,7 +185,7 @@ static inline void _line_high(int x0, int y0, int x1, int y1, unsigned short col
 
 
 void disp_map(int fd) {
-	dp_mem = (unsigned int *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 }
 

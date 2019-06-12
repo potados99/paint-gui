@@ -7,6 +7,9 @@
 #define metric_h
 
 #include "macros.h"
+#include "list.h"
+
+#include <stdlib.h>
 
 /**
  * 32비트 usigned 정수로부터 상위(X) / 하위(Y) 16비트를 꺼내옵니다.
@@ -45,12 +48,6 @@
 #define IN_RANGE(X, START, END) ((X >= START) && (X <= END))
 
 /**
- * points 리스트 쉽게 다루게 해주는 매크로입니당.
- */
-#define FOREACH_POINT(PTR, VAR_NAME) \
-for(struct point_node *VAR_NAME = (PTR)->head; VAR_NAME; VAR_NAME = VAR_NAME->next)
-
-/**
  * point_node 구조체를 할당해서 초기화해줍니다.
  */
 #define POINT_NODE_ALLOC(NAME) \
@@ -61,36 +58,13 @@ memset(NAME, 0, sizeof(struct point_node));                                     
  * 점을 표현하는 연결리스트에서 쓰일 노드.
  */
 struct point_node {
-    int x;
-    int y;
-    struct point_node *next;
-};
-
-/**
- * points 구조체를 생성, 초기화해줍니다.
- */
-#define POINTS(NAME)\
-struct points NAME = {0}
-
-/**
- * 연결리스트의 시작과 끝을 가지고 있는 '연결리스트' 그 자체.
- * 리스트를 가지고 다닐 때에는 이놈만 씁니당.
- */
-struct points {
-    struct point_node *head;
+    int                 x;
+    int                 y;
     
-    /*
-     * head만 가지고 다니면 될 것을, 굳이 새 구조체를 정의해서 이렇게 들고다니는 이유:
-     *
-     * 1. Node만 봐서는 이게 시작인지 끝인지도 몰라 이것을 연결리스트로 보기에는 대표성이 없습니다.
-     * 2. 새 노드를 추가할 때 기존 리스트의 마지막 노드에 연결해야 하는데, 매번 head부터 끝까지 찾는 것은 낭비이므로,
-     *  tail을 미리 가지고 있으면서 O(1) 시간 내에 추가 연산이 가능하도록 합니다.
-     */
-    struct point_node *tail;
+    struct list_head    list;
 };
 
-void points_add(struct points *points, int x, int y);
-
-void points_free(struct points *points);
+void points_add(struct list_head *points_head, int x, int y);
+void points_free(struct list_head *points_head);
 
 #endif /* metric_h */

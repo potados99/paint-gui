@@ -7,6 +7,7 @@
 #define shape_h
 
 #include "metric.h"
+#include "list.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -51,9 +52,9 @@ NAME.zindex = zindex_count++;                                           \
 struct shape *NAME = (struct shape *)malloc(sizeof(struct shape));      \
 do {                                                                    \
 memset(NAME, 0, sizeof(struct shape));                                  \
-NAME->zindex = zindex_count++;                                          \
 } while (0)
 
+/*
 #define SHAPE_FREE(PTR)                                                 \
 do {                                                                    \
 if (PTR->fdraw_points.head != NULL) {                                   \
@@ -61,6 +62,7 @@ points_free(&PTR->fdraw_points);                                        \
 }                                                                       \
 free(PTR);                                                              \
 } while (0)
+*/
 
 /**
  * 이 프로그램에 필요한 모든 도형을 표현할 수 있는 구조체입니다.
@@ -70,38 +72,46 @@ struct shape {
     /**
      * shape의 종류.
      */
-    unsigned char   type;
+    unsigned char       type;
 
     /**
      * 모든 shape에 대해 공통인 값들.
      */
-    int             value[4];
+    int                 value[4];
     
     /**
      * 도형을 평행이동하면, 원래의 좌표를 건드리지 않고 이 offset을 수정합니다.
      * offset은 음수일 수도, 양수일 수도 있습니다!
      */
-    int             offset[2];
+    int                 offset[2];
     
     /**
      * 도형의 높낮이(z축)를 저장합니다. 숫자가 높을수록 사용자와 가깝습니다.
+     * 65535를 설마 넘겠어...
      */
-    unsigned int    zindex;
+    unsigned short      zindex;
     
     /**
      * 예..그냥 한 픽셀 컬러입니다.
      */
-    unsigned int    color;
+    unsigned short      color;
     
     /**
      * Free draw를 표현하기 위한 점들을 담은 연결리스트입니다.
      * metric.h의 struct point_node와 struct points 참조하세용.
      */
-    struct points   fdraw_points;
+    struct list_head    fdraw_points;
+    
+    /**
+     * shape들의 연결리스트입니다.
+     */
+    struct list_head list;
 };
+
 
 void shape_move(struct shape *shape, int delta_x, int delta_y);
 
+struct shape *shapes_link(struct list_head *shapes_head, struct shape *shape);
 
 
 #endif /* shape_h */

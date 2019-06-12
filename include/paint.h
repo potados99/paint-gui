@@ -39,7 +39,7 @@ struct paint {
      * 현재 입력 상태를 저장합니다.
      */
     bool            now_drawing;
-    int             last_x
+    int             last_x;
 
     
 };

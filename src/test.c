@@ -167,68 +167,114 @@ int draw_read_test() {
     
     /* 도달 불가능한 영역! */
     
-    disp_unmap();
+    // disp_unmap();
     
-    close(dp_fd);
-    close(ts_fd);
+    // close(dp_fd);
+    // close(ts_fd);
     
 }
 
 int list_test() {
-    POINTS(ps);
+    printf("list_test() start.\n");
     
-    points_add(&ps, 1, 2);
-    points_add(&ps, 2, 3);
-    points_add(&ps, 3, 4);
-    points_add(&ps, 4, 5);
-
-    FOREACH_POINT(&ps, p) {
-        printf("x: %d, y: %d\n", p->x, p->y);
+    LIST_HEAD(points_head);
+    
+    points_add(&points_head, 1, 2);
+    points_add(&points_head, 2, 3);
+    points_add(&points_head, 3, 4);
+    points_add(&points_head, 4, 5);
+    points_add(&points_head, 5, 6);
+    
+    struct point_node *cur;
+    list_for_each_entry(cur, &points_head, list) {
+        printf("point(%d, %d)\n", cur->x, cur->y);
     }
+
+    points_free(&points_head);
     
-    points_free(&ps);
-    
+    printf("list_test() done.\n\n");
+
     return 0;
 }
 
 int shape_creation_test(void) {
     /**
-     * 선을 만들 때에는 이러케!
+     * 이것만 있으면 모든 shape의 정보를 털 수 있다!!
      */
-    SHAPE_ALLOC(sh1);
-    sh1->type = ST_LINE;
-    sh1->value[0] = 0;
-    sh1->value[1] = 0;
-    sh1->value[2] = 319;
-    sh1->value[3] = 239;
+    LIST_HEAD(shapes_head);
     
     /**
-     * 자유그리기를 만들때에는 이러케!
+     * 사각형!
      */
-    SHAPE_ALLOC(sh2);
-    sh2->type = ST_FDRAW;
-    sh2->value[0] = 50;
-    sh2->value[1] = 50;
-    sh2->value[2] = 50; /* width */
-    sh2->value[3] = 50; /* height */
-    POINTS(pts);
-    sh2->fdraw_points = pts;
-    points_add(&sh2->fdraw_points, 50, 50);
-    points_add(&sh2->fdraw_points, 65, 65);
-    points_add(&sh2->fdraw_points, 75, 75);
-    points_add(&sh2->fdraw_points, 87, 87);
-    points_add(&sh2->fdraw_points, 100, 100);
+    SHAPE(rect0);
+    rect0.type = ST_RECT;
+    rect0.value[0] = 0;
+    rect0.value[1] = 0;
+    rect0.value[2] = 50;
+    rect0.value[3] = 50;
+    rect0.color = COLOR(255, 255, 255);
+    shapes_link(&shapes_head, &rect0);
+    
+    /**
+     * 자유그리기!
+     */
+    SHAPE(free0);
+    free0.type = ST_FDRAW;
+    free0.value[0] = 100;
+    free0.value[1] = 100;
+    free0.value[2] = 150;
+    free0.value[3] = 150;
+    free0.color = COLOR(0, 0, 50);
+    struct shape *free0_allocated = shapes_link(&shapes_head, &free0);
+    free0_allocated->fdraw_points.prev = &free0_allocated->fdraw_points;
+    free0_allocated->fdraw_points.next = &free0_allocated->fdraw_points;
+    points_add(&free0_allocated->fdraw_points, 100, 100);
+    points_add(&free0_allocated->fdraw_points, 112, 112);
+    points_add(&free0_allocated->fdraw_points, 125, 125);
+    points_add(&free0_allocated->fdraw_points, 137, 137);
+    points_add(&free0_allocated->fdraw_points, 150, 150);
 
-    FOREACH_POINT(&sh2->fdraw_points, point) {
-        printf("sh2 point: x: %d, y: %d\n", point->x, point->y);
-    }
-    
     /**
-     * 해방은 다같이!!
+     * 순회하며 출력하기!
      */
-    SHAPE_FREE(sh1);
-    SHAPE_FREE(sh2);
-    
+    struct shape *cur_shape;
+    list_for_each_entry(cur_shape, &shapes_head, list) {
+        printf("============ SHAPE START ============\n");
+        
+        printf("Shape type: %d\n",
+               cur_shape->type);
+        
+        printf("Shape values: (%d, %d, %d, %d)\n",
+               cur_shape->value[0],
+               cur_shape->value[1],
+               cur_shape->value[2],
+               cur_shape->value[3]);
+        
+        printf("Shape offset: (%d, %d)\n",
+               cur_shape->offset[0],
+               cur_shape->offset[1]);
+        
+        printf("Shape color: 0x%04x\n",
+               cur_shape->color);
+        
+        /**
+         * 마냑에 fdraw_points가 유효하다면은,,,
+         */
+        if (cur_shape->fdraw_points.next != NULL) {
+            printf("Shape points: ");
+            
+            struct point_node *cur_point;
+            list_for_each_entry(cur_point, &cur_shape->fdraw_points, list) {
+                printf("(%d, %d) ",
+                       cur_point->x,
+                       cur_point->y);
+            }
+            
+            printf("\n");
+        }
+        
+        printf("============ SHAPE END ============\n\n");
+    }
     
     return 0;
 }

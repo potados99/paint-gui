@@ -19,8 +19,8 @@
  * display라는 모듈 또는 객체를 만들어 그곳에 보관할 수도 있지만,
  * 있어봤자 디스플레이는 한개인데...
  */
-static unsigned int   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
-static unsigned int 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
+static unsigned short   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
+static unsigned short 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
 static unsigned long 	bitmap[DP_BITMAP_SIZE]; /* 변화가 생긴 지점을 저장하는 메타데이터 역할의 변수. */
 
 static bool             direct;                 /* 직접 쓰기 모드의 활성화 여부를 저장하는 변수. */

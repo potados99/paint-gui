@@ -3,20 +3,20 @@
 # Makefile boilerplate version 0.1.0 (20190416)
 
 TARGET_INITIAL	:= paint
-TARGET		:= $(TARGET_INITIAL)
+TARGET			:= $(TARGET_INITIAL)
 
-CC		:= gcc
-CFLAGS		:= -Wall -Ofast
-LIB		:=
+CC				:= gcc
+CFLAGS			:= -Wall -Ofast -std=c99
+LIB				:=
 
-TARGET_DIR	:= bin
-SRC_DIR		:= src
-INC_DIR		:= include
-OBJ_DIR		:= build
-SRC_EXT		:= c
-OBJ_EXT		:= o
+TARGET_DIR		:= bin
+SRC_DIR			:= src
+INC_DIR			:= include
+OBJ_DIR			:= build
+SRC_EXT			:= c
+OBJ_EXT			:= o
 
-FLAGS		:= -DVERBOSE=1
+FLAGS			:= -DVERBOSE=1
 
 #################################################
 

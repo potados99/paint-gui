@@ -15,31 +15,30 @@
 /**
  * 모든(?) 2차원 그리기 함수는 이 규격을 준수합니다!
  */
-typedef         void (*draw_2d)(short, short, short, short, unsigned short);
-
+typedef         void (*draw_2d)(int, int, int, int, unsigned short);
 
 void            disp_map(int fd);
 void 			disp_unmap(void);
 
 void            disp_set_direct(bool value);
 
-void 			disp_draw_point(short x, short y, unsigned short color);
+void 			disp_draw_point(int x, int y, unsigned short color);
 
-void			disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short color);
+void			disp_draw_line(int x0, int y0 , int x1, int y1, unsigned short color);
 
-void            disp_draw_rect(short x, short y, short width, short height, unsigned short color);
-void 			disp_draw_rect_fill(short x, short y, short width, short height, unsigned short color);
+void            disp_draw_rect(int x, int y, int width, int height, unsigned short color);
+void 			disp_draw_rect_fill(int x, int y, int width, int height, unsigned short color);
 
-void 			disp_draw_rectp(short x0, short y0, short x1, short y1, unsigned short color);
-void            disp_draw_rectp_fill(short x0, short y0, short x1, short y1, unsigned short color);
+void 			disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color);
+void            disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color);
 
 void            disp_draw_whole(unsigned short color);
 
 void            disp_draw_2d_shape(struct shape *shape);
 
 void            disp_commit(void);
-void            disp_commit_partial(short x, short y, short width, short height);
-void            disp_commit_partialp(short x0, short y0, short x1, short y1);
+void            disp_commit_partial(int x, int y, int width, int height);
+void            disp_commit_partialp(int x0, int y0, int x1, int y1);
 void			disp_cancel(void);
 
 void            disp_clear(void);

@@ -48,8 +48,8 @@
  * 점을 표현하는 연결리스트에서 쓰일 노드.
  */
 struct point_node {
-    short x;
-    short y;
+    int x;
+    int y;
     struct point_node *next;
 };
 
@@ -70,7 +70,7 @@ struct points {
     struct point_node *tail;
 };
 
-void points_add(struct points *points, short x, short y);
+void points_add(struct points *points, int x, int y);
 
 void points_free(struct points *points);
 

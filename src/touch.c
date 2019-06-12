@@ -20,13 +20,6 @@
 struct input_event {
     int type, code, value;
 };
-#define EV_SYN          1
-#define EV_KEY          2
-#define EV_ABS          3
-#define ABS_X           4
-#define ABS_Y           5
-#define ABS_PRESSURE    6
-#define BTN_TOUCH       7
 ///////////////////// TEST ENVIRONMENT //////////////////////
 #else
 #include <linux/input.h>

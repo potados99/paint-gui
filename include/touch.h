@@ -23,8 +23,8 @@ struct touch_event NAME = {0}
  * 터치를 읽은 결과를 저장하는 구조체입니다.
  */
 struct touch_event {
-	unsigned short  x;                      /* [0, 320] */
-	unsigned short  y;                      /* [0, 240] */
+	unsigned int    x;                      /* [0, 320] */
+	unsigned int    y;                      /* [0, 240] */
 	unsigned char   pressure;               /* [0, 255] */
 	unsigned char   touch_state;            /* [0, 2] */    
 };

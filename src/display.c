@@ -19,8 +19,8 @@
  * display라는 모듈 또는 객체를 만들어 그곳에 보관할 수도 있지만,
  * 있어봤자 디스플레이는 한개인데...
  */
-static unsigned short   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
-static unsigned short 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
+static unsigned int   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
+static unsigned int 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
 static unsigned long 	bitmap[DP_BITMAP_SIZE]; /* 변화가 생긴 지점을 저장하는 메타데이터 역할의 변수. */
 
 static bool             direct;                 /* 직접 쓰기 모드의 활성화 여부를 저장하는 변수. */
@@ -44,7 +44,7 @@ do {                                                \
 *(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
 } while (0)
 
-static inline void _apply(short x, short y, short width, short height) {
+static inline void _apply(int x, int y, int width, int height) {
     /**
      * Points can be negative, but size cannot.
      */
@@ -93,7 +93,7 @@ static inline void _apply(short x, short y, short width, short height) {
     
 	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
-	register short 	n_line = 0;
+	register int 	n_line = 0;
 
 	do {
 		if (GET_BIT(bitmap, offset)) {
@@ -132,20 +132,20 @@ static inline void _modify(int offset,  unsigned short color) {
     }
 }
 
-static inline void _line_low(short x0, short y0, short x1, short y1, unsigned short color) {
-    short dx = x1 - x0;
-    short dy = y1 - y0;
-    short yi = 1;
+static inline void _line_low(int x0, int y0, int x1, int y1, unsigned short color) {
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int yi = 1;
     
     if (dy < 0) {
         yi = -1;
         dy = -dy;
     }
     
-    short D = 2*dy - dx;
-    short y = y0;
+    int D = 2*dy - dx;
+    int y = y0;
     
-    for (short x = x0; x <= x1; ++x) {
+    for (int x = x0; x <= x1; ++x) {
         _modify(x + (DP_WIDTH * y), color);
         
         if (D > 0) {
@@ -157,20 +157,20 @@ static inline void _line_low(short x0, short y0, short x1, short y1, unsigned sh
     }
 }
 
-static inline void _line_high(short x0, short y0, short x1, short y1, unsigned short color) {
-    short dx = x1 - x0;
-    short dy = y1 - y0;
-    short xi = 1;
+static inline void _line_high(int x0, int y0, int x1, int y1, unsigned short color) {
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int xi = 1;
     
     if (dx < 0) {
         xi = -1;
         dx = -dx;
     }
     
-    short D = 2*dx - dy;
-    short x = x0;
+    int D = 2*dx - dy;
+    int x = x0;
     
-    for (short y = y0; y <= y1; ++y) {
+    for (int y = y0; y <= y1; ++y) {
         _modify(x + (DP_WIDTH * y), color);
         
         if (D > 0) {
@@ -185,7 +185,7 @@ static inline void _line_high(short x0, short y0, short x1, short y1, unsigned s
 
 
 void disp_map(int fd) {
-	dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	dp_mem = (unsigned int *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 }
 
@@ -198,13 +198,13 @@ void disp_set_direct(bool value) {
     direct = value;
 }
 
-void disp_draw_point(short x, short y, unsigned short color) {
+void disp_draw_point(int x, int y, unsigned short color) {
     print_trace("disp_draw_point(): draw point at (%d, %d).\n", x, y);
 
 	_modify(x + (y * DP_WIDTH), color);
 }
 
-void disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short color) {
+void disp_draw_line(int x0, int y0 , int x1, int y1, unsigned short color) {
     print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", x0, y0 , x1, y1);
 
 	if (ABS(y1 - y0) < ABS(x1 - x0)) {
@@ -225,7 +225,7 @@ void disp_draw_line(short x0, short y0 , short x1, short y1, unsigned short colo
 	}
 }
 
-void disp_draw_rect(short x, short y, short width, short height, unsigned short color) {
+void disp_draw_rect(int x, int y, int width, int height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
     disp_draw_line(x, y, x + width - 1, y, color);                      		/* 위쪽! */
@@ -234,12 +234,12 @@ void disp_draw_rect(short x, short y, short width, short height, unsigned short 
     disp_draw_line(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
 }
 
-void disp_draw_rect_fill(short x, short y, short width, short height, unsigned short color) {
+void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short color) {
     print_trace("disp_draw_rect_fill(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
-	register short 	n_line = 0;
+	register int 	n_line = 0;
 
 	do {
 		_modify(offset, color);
@@ -254,11 +254,11 @@ void disp_draw_rect_fill(short x, short y, short width, short height, unsigned s
 	} while (offset < offset_max + 1);
 }
 
-void disp_draw_rectp(short x0, short y0, short x1, short y1, unsigned short color) {
+void disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color) {
 	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
 }
 
-void disp_draw_rectp_fill(short x0, short y0, short x1, short y1, unsigned short color) {
+void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
     disp_draw_rect_fill(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
 }
 
@@ -305,13 +305,13 @@ void disp_commit() {
     _apply(0, 0, DP_WIDTH, DP_HEIGHT);
 }
 
-void disp_commit_partial(short x, short y, short width, short height) {
+void disp_commit_partial(int x, int y, int width, int height) {
     print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", x, y, width, height);
 
     _apply(x, y, width, height);
 }
 
-void disp_commit_partialp(short x0, short y0, short x1, short y1) {
+void disp_commit_partialp(int x0, int y0, int x1, int y1) {
 	disp_commit_partial(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0));
 }
 

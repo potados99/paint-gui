@@ -12,19 +12,8 @@
  * TODO: 각 파일 include 정리
  */
 
-#define 외쳐(이렇게)         printf(이렇게 "\n");
-#define 만약               if
-#define 숫자               int
-#define 얘보다_크면          >
-
 int main(int argc, const char *argv[]) {
     
-    숫자 첫째 = 1;
-    숫자 둘째 = 0;
-    
-    만약(첫째 얘보다_크면 둘째) {
-        외쳐("예에에에에에에!");
-    }
     
     int                 ts_fd; /* 터치스크린 파일 기술자 */
     int                 dp_fd; /* 디스플레이 파일 기술자 */
@@ -117,14 +106,14 @@ int main(int argc, const char *argv[]) {
 	for (int i = 0; i < 70; ++i) {
 		usleep(100000);
 		disp_draw_whole(COLOR(255, 255, 255));
-        shape_move(&sq1, +1, +1);
+        shape_move(&sq1, 0, +1);
 
 		disp_draw_2d_shape(&sq0);
 		disp_draw_2d_shape(&sq1);
 		disp_draw_2d_shape(&ln0);
 		disp_draw_2d_shape(&sq2);
 		
-		disp_commit_partialp(sq1.value[0], sq1.value[1] - 1, sq1.value[2], sq1.value[3]);
+		disp_commit_partialp(sq1.value[0], sq1.value[1], sq1.value[2] + sq1.offset[1] - 1, sq1.value[3] + sq1.offset[1]);
 	}
     
     /**

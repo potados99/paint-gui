@@ -6,7 +6,7 @@ TARGET_INITIAL	:= paint
 TARGET			:= $(TARGET_INITIAL)
 
 CC				:= gcc
-CFLAGS			:= -Wall -Ofast -std=c99
+CFLAGS			:= -Wall -Ofast
 LIB				:=
 
 TARGET_DIR		:= bin

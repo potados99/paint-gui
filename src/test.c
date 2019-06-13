@@ -55,7 +55,7 @@ int draw_read_test() {
     struct shape *rect = shape_create(ST_RECTP, 0, 0, 50, 50, COLOR(255, 255, 255));
     shapes_list_add(&shapes_head, rect);
     
-    struct shape *fdraw = shape_create(ST_FDRAW, 0, 0, 0, 0, COLOR(0, 0, 50));
+    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 50));
     shape_add_point(fdraw, 100, 100);
     shape_add_point(fdraw, 112, 120);
     shape_add_point(fdraw, 125, 130);
@@ -186,7 +186,7 @@ int shape_creation_test(void) {
     /**
      * 자유그리기!
      */
-    struct shape *fdraw = shape_create(ST_FDRAW, 0, 0, 0, 0, COLOR(0, 0, 50));
+    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 50));
     shape_add_point(fdraw, 100, 100);
     shape_add_point(fdraw, 125, 125);
     shape_add_point(fdraw, 150, 150);

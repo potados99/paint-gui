@@ -35,7 +35,7 @@ struct shape *shape_create(unsigned char type,
     /**
      * 만약 자유 그리기라면, fdraw_points 리스트도 초기화해줍니다.
      */
-    if (type == ST_FDRAW)
+    if (type == ST_FREEP)
         LIST_HEAD_REINIT(node_allocated->fdraw_points);
     
     return node_allocated;
@@ -44,7 +44,7 @@ struct shape *shape_create(unsigned char type,
 void shape_delete(struct shape *shape) {
     NULL_CHECK("shape_delete()", shape);
 
-    if (shape->type == ST_FDRAW && shape->fdraw_points.next != NULL) {
+    if (shape->type == ST_FREEP && shape->fdraw_points.next != NULL) {
         points_free(&shape->fdraw_points);
     }
     
@@ -70,7 +70,7 @@ void shape_move(struct shape *shape, int delta_x, int delta_y) {
 void shape_add_point(struct shape *shape, int x, int y) {
     NULL_CHECK("shape_add_point()", shape);
 
-    ASSERTDO(shape->type == ST_FDRAW, print_info("shape_add_point(): cannot add point to non-freedraw type shape.\n"); return);
+    ASSERTDO(shape->type == ST_FREEP, print_info("shape_add_point(): cannot add point to non-freedraw type shape.\n"); return);
     
     /**
      * 처음 찍히는 점이라면, 이에 맞게 영역을 손봐줍니당.

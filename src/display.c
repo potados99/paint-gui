@@ -275,14 +275,14 @@ void disp_draw_2d_shape(struct shape *shape) {
         /**
          * 함수 mapping 테이블입니다.
          */
-        case ST_LINE:           draw_function = disp_draw_line; break;
+        case ST_LINEP:          draw_function = disp_draw_line; break;
         case ST_RECT:           draw_function = disp_draw_rect; break;
         case ST_RECT_FILL:      draw_function = disp_draw_rect_fill; break;
         case ST_RECTP:          draw_function = disp_draw_rectp; break;
         case ST_RECTP_FILL:     draw_function = disp_draw_rectp_fill; break;
         case ST_OVAL:           draw_function = NULL; break;
         case ST_OVAL_FILL:      draw_function = NULL; break;
-        case ST_FDRAW:          goto free_draw;
+        case ST_FREEP:          goto free_draw;
             
         default:                print_error("disp_draw_2d_shape(): invalid shape type: %d\n", shape->type); return;
     }

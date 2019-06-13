@@ -16,7 +16,7 @@
  * Shape 종류 (ST: Shape Type).
  * 이 프로그램에서, 도형의 위치와 범위는 시작점과 끝점 두개로 표현합니다.
  */
-#define ST_LINE         1   /* 두 점으로 표현 */
+#define ST_LINEP        1   /* 두 점으로 표현 */
 #define ST_RECT         2   /* 한 점과 길이+높이로 표현 */
 #define ST_RECT_FILL    3   /* 한 점과 길이+높이로 표현 */
 #define ST_RECTP        4   /* 두 점으로 표현*/
@@ -25,7 +25,7 @@
 #define ST_OVAL_FILL    7   /* 한 점과 길이+높이로 표현 */
 #define ST_OVALP        8   /* 두 점으로 표현*/
 #define ST_OVALP_FILL   9   /* 두 점으로 표현*/
-#define ST_FDRAW        10  /* 두 점으로 표현 */
+#define ST_FREEP        10  /* 두 점으로 표현 */
 
 /**
  * unsigned int 타입에 적절한 한 픽셀을 만드는 매크로입니다.

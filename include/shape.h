@@ -14,15 +14,18 @@
 
 /**
  * Shape 종류 (ST: Shape Type).
+ * 이 프로그램에서, 도형의 위치와 범위는 시작점과 끝점 두개로 표현합니다.
  */
-#define ST_LINE         1
-#define ST_RECT         2
-#define ST_RECT_FILL    3
-#define ST_RECTP        4
-#define ST_RECTP_FILL   5
-#define ST_OVAL         6
-#define ST_OVAL_FILL    7
-#define ST_FDRAW        8
+#define ST_LINE         1   /* 두 점으로 표현 */
+#define ST_RECT         2   /* 한 점과 길이+높이로 표현 */
+#define ST_RECT_FILL    3   /* 한 점과 길이+높이로 표현 */
+#define ST_RECTP        4   /* 두 점으로 표현*/
+#define ST_RECTP_FILL   5   /* 두 점으로 표현*/
+#define ST_OVAL         6   /* 한 점과 길이+높이로 표현 */
+#define ST_OVAL_FILL    7   /* 한 점과 길이+높이로 표현 */
+#define ST_OVALP        8   /* 두 점으로 표현*/
+#define ST_OVALP_FILL   9   /* 두 점으로 표현*/
+#define ST_FDRAW        10  /* 두 점으로 표현 */
 
 /**
  * unsigned int 타입에 적절한 한 픽셀을 만드는 매크로입니다.
@@ -77,6 +80,12 @@ struct shape {
 
     /**
      * 모든 shape에 대해 공통인 값들.
+     * Line은 당연히 두 점의 좌표(x0, y0, x1, y1)로 저장합니다.
+     * Rect는 두 점의 좌표로 저장하는게 기본이며, 이때 type은 ST_RECTP입니다.
+     * 한 점의 좌표와 길이, 높이로 저장할 수도 있습니다. 이때 type은 ST_RECT입니다.
+     * 타원 또한 마찬가지입니다.
+     * 직선을 제외한 2차원 평면도형은 모두 시작과 끝점을 기준으로 영역 또는 크기를 다룹니다.
+     * Freedraw의 경우는 두 점으로 영역의 시작과 끝을 표현합니다.
      */
     int                 value[4];
     

@@ -6,11 +6,11 @@
 
 int main(int argc, const char *argv[]) {
     
-    //draw_read_test();
+    draw_read_test();
     
     //list_test();
     
-    shape_creation_test();
+    //shape_creation_test();
     
 	return 0;
 }

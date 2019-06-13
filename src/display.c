@@ -204,7 +204,7 @@ void disp_draw_point(int x, int y, unsigned short color) {
 	_modify(x + (y * DP_WIDTH), color);
 }
 
-void disp_draw_line(int x0, int y0 , int x1, int y1, unsigned short color) {
+void disp_draw_linep(int x0, int y0 , int x1, int y1, unsigned short color) {
     print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", x0, y0 , x1, y1);
 
 	if (ABS(y1 - y0) < ABS(x1 - x0)) {
@@ -228,10 +228,10 @@ void disp_draw_line(int x0, int y0 , int x1, int y1, unsigned short color) {
 void disp_draw_rect(int x, int y, int width, int height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
 
-    disp_draw_line(x, y, x + width - 1, y, color);                      		/* 위쪽! */
-    disp_draw_line(x, y + height - 1, x + width - 1, y + height - 1, color);    /* 아래쪽! */
-    disp_draw_line(x, y, x, y + height - 1, color);                     		/* 왼쪽! */
-    disp_draw_line(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
+    disp_draw_linep(x, y, x + width - 1, y, color);                      		/* 위쪽! */
+    disp_draw_linep(x, y + height - 1, x + width - 1, y + height - 1, color);    /* 아래쪽! */
+    disp_draw_linep(x, y, x, y + height - 1, color);                     		/* 왼쪽! */
+    disp_draw_linep(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
 }
 
 void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short color) {
@@ -275,13 +275,15 @@ void disp_draw_2d_shape(struct shape *shape) {
         /**
          * 함수 mapping 테이블입니다.
          */
-        case ST_LINEP:          draw_function = disp_draw_line; break;
+        case ST_LINEP:          draw_function = disp_draw_linep; break;
         case ST_RECT:           draw_function = disp_draw_rect; break;
         case ST_RECT_FILL:      draw_function = disp_draw_rect_fill; break;
         case ST_RECTP:          draw_function = disp_draw_rectp; break;
         case ST_RECTP_FILL:     draw_function = disp_draw_rectp_fill; break;
         case ST_OVAL:           draw_function = NULL; break;
         case ST_OVAL_FILL:      draw_function = NULL; break;
+        case ST_OVALP:          draw_function = NULL; break;
+        case ST_OVALP_FILL:     draw_function = NULL; break;
         case ST_FREEP:          goto free_draw;
             
         default:                print_error("disp_draw_2d_shape(): invalid shape type: %d\n", shape->type); return;
@@ -296,6 +298,17 @@ void disp_draw_2d_shape(struct shape *shape) {
     return;
     
 free_draw:
+    /**
+     * Freedraw는 void (int, int, int, int, unsigned short) 타입으로 맞추기가 좀 그래서
+     * 별도의 함수로 빼지 않고 이곳에 루틴으로 분리해놓았습니당.
+     */
+    NULL_CHECK("disp_draw_2d_shape()", shape->fdraw_points.next);
+    
+    struct point_node *cur;
+    list_for_each_entry(cur, &shape->fdraw_points, list) {
+        disp_draw_point(cur->x, cur->y, shape->color);
+    }
+    
     return;
 }
 

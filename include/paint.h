@@ -7,14 +7,22 @@
 
 #include <stdbool.h>
 
-#define MODE_LINE       1
-#define MODE_RECT       2
-#define MODE_OVAL       3
-#define MODE_SELECT     4
-#define MODE_ERASE      5
-#define MODE_CLEAR      6
+#include "metric.h"
+#include "debug.h"
 
-#define PAINT(NAME)     \
+#define MODE_LINE           1
+#define MODE_RECT           2
+#define MODE_OVAL           3
+#define MODE_SELECT         4
+#define MODE_ERASE          5
+#define MODE_CLEAR          6
+
+#define ACTION_NONE         0
+#define ACTION_DRAW         1
+#define ACTION_SELECT       2
+
+
+#define PAINT(NAME)         \
 struct paint NAME = {0}
 
 struct paint {
@@ -38,17 +46,30 @@ struct paint {
     /**
      * 현재 입력 상태를 저장합니다.
      */
-    bool            now_drawing;
+    unsigned char   touch_state;
+    
+    unsigned char   current_action;
+    bool            touch_started_from_canvas;
+    
+    int             touch_start_x;
+    int             touch_start_y;
+    
     int             last_x;
+    int             last_y;
 
     
 };
 
+
 /**
  * 터치에 반응하는 함수들입니다.
+ * 사용자는 이것만 호출하면 됩니다.
+ * 나머지는 얘네가 다~ 알아서~~ ^~^
  */
 void paint_touch_start(struct paint *context, int x, int y);
 void paint_touch_drag(struct paint *context, int x, int y);
 void paint_touch_end(struct paint *context, int x, int y);
+
+
 
 #endif /* paint_h */

@@ -52,7 +52,7 @@ int draw_read_test() {
      */
     LIST_HEAD(shapes_head);
     
-    struct shape *rect = shape_create(ST_RECTP, 0, 0, 50, 50, COLOR(255, 255, 255));
+    struct shape *rect = shape_create(ST_RECTP, 0, 0, 50, 50, COLOR(70, 70, 70));
     shapes_list_add(&shapes_head, rect);
     
     struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 50));
@@ -100,7 +100,7 @@ int draw_read_test() {
         
         ts_read = touch_read(ts_fd, &te);
         
-        if (te.touch_state == STATE_TOUCH_DOWN) {
+        if (te.touch_state == TOUCH_STATE_BEGIN) {
             /**
              * 이제 막 터치가 시작될 때.
              * 이전 터치 좌표를 현재 터치 시작 좌표로 덮어씁니다.
@@ -109,7 +109,7 @@ int draw_read_test() {
             last_y = te.y;
             touched = 1;
         }
-        else if (te.touch_state == STATE_TOUCH_UP) {
+        else if (te.touch_state == TOUCH_STATE_DONE) {
             /**
              * 터치가 막 끝났을 때.
              */
@@ -119,14 +119,14 @@ int draw_read_test() {
         /**
          * 적당히 출력해줍니다.
          */
-        if (te.touch_state == STATE_TOUCH_DOWN) printf("\n============================= TOUCH START =============================\n");
+        if (te.touch_state == TOUCH_STATE_BEGIN) printf("\n============================= TOUCH START =============================\n");
         printf("[%ld] X: %5d,\tY: %5d,\tPressure: %5d,\tState: %d\n", line_num++, te.x, te.y, te.pressure, te.touch_state);
-        if (te.touch_state == STATE_TOUCH_UP) printf("============================= TOUCH FINISH =============================\n\n");
+        if (te.touch_state == TOUCH_STATE_DONE) printf("============================= TOUCH FINISH =============================\n\n");
         
         /**
          * 이전 점과 현재 점 사이에 직선을 그려주고, 그 구간의 변화를 적용합니다.
          */
-        disp_draw_line(last_x, last_y, te.x, te.y, COLOR(0, 0, 0));
+        disp_draw_linep(last_x, last_y, te.x, te.y, COLOR(0, 0, 0));
         disp_commit_partialp(MIN(last_x, te.x) - 1, MIN(last_y, te.y) - 1, MAX(last_x, te.x) + 1, MAX(last_y, te.y) + 1);
         
         /**

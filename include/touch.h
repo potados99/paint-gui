@@ -12,9 +12,9 @@
  * 막 터치가 시작된 STATE_TOUCH_DOWN, 그대로 유지되는 STATE_NONE,
  * 그리고 터치가 끝난 STATE_TOUCH_UP 이렇게 3개입니당.
  */
-#define STATE_NONE 		    0x00
-#define STATE_TOUCH_DOWN 	0x01
-#define STATE_TOUCH_UP 		0x02
+#define TOUCH_STATE_BEGIN   1
+#define TOUCH_STATE_DRAG    0
+#define TOUCH_STATE_DONE    2
 
 #define TOUCH_EVENT(NAME)   \
 struct touch_event NAME = {0}

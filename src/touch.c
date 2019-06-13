@@ -43,7 +43,7 @@ int touch_read(int fd, struct touch_event *event) {
     /**
      * 별다른 일이 있기 전까지는 터치 상태는 기본 STATE_NONE입니다.
      */
-    event->touch_state = STATE_NONE;
+    event->touch_state = TOUCH_STATE_DRAG;
 
     /**
      * 리눅스의 터치 이벤트는 여러 정보를 전달합니다.
@@ -93,7 +93,7 @@ int touch_read(int fd, struct touch_event *event) {
                  * if 비교 안해도 돼요..
                  */
                 // if (ie.code == BTN_TOUCH)
-                event->touch_state = (ie.value ? STATE_TOUCH_DOWN : STATE_TOUCH_UP);
+                event->touch_state = (ie.value ? TOUCH_STATE_BEGIN : TOUCH_STATE_DONE);
                 break;
                 
             case EV_ABS:

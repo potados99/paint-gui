@@ -24,7 +24,7 @@ void            disp_set_direct(bool value);
 
 void 			disp_draw_point(int x, int y, unsigned short color);
 
-void			disp_draw_line(int x0, int y0 , int x1, int y1, unsigned short color);
+void			disp_draw_linep(int x0, int y0 , int x1, int y1, unsigned short color);
 
 void            disp_draw_rect(int x, int y, int width, int height, unsigned short color);
 void 			disp_draw_rect_fill(int x, int y, int width, int height, unsigned short color);

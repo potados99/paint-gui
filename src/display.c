@@ -46,28 +46,28 @@ do {                                                \
 
 static inline void _apply(int x, int y, int width, int height) {
     /**
-     * Points can be negative, but size cannot.
+     * 점은 음수일 수 있어도, 크기는 그러면 안됩니다.
      */
     SIZE_CHECK("_apply", width, height, DP_WIDTH, DP_HEIGHT);
   
     /**
-     * Cur area to fit in screen.
+     * 영역이 화면 안에 들어가도록 넘치는 부분을 자릅니다.
      */
     if (x >= DP_WIDTH || y >= DP_HEIGHT) {
         /**
-         * Meaningless.
+         * 의미없는 실행..리턴해줍니다.
          */
         return;
     }
     if (x + width < 0 || y + height < 0) {
         /**
-         * Meaningless, also.
+         * 얘도 의미없습니다...
          */
         return;
     }
-    
+   
     /**
-     * Bring start point into screen.
+     * 시작점이 화면 안에 위치하도록 잘라줌니다.
      */
     if (x < 0) {
         width += x;
@@ -79,9 +79,9 @@ static inline void _apply(int x, int y, int width, int height) {
     }
     
     /**
-     * Cut excess area at the right and the bottom.
+     * 너비와 높이가 화면 밖으로 넘치지 않도록 잘라줍니다.
      */
-    if (x + width >= DP_WIDTH) {
+   if (x + width >= DP_WIDTH) {
         width = DP_WIDTH - x;
     }
     if (y + height >= DP_HEIGHT) {

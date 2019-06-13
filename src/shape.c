@@ -55,9 +55,16 @@ void shape_delete(struct shape *shape) {
 
 void shapes_list_add(struct list_head *shapes_head, struct shape *shape) {
     NULL_CHECK("shape_move()", shapes_head);
-    NULL_CHECK("shape_move()", shapes_head);
 
     list_add_tail(&shape->list, shapes_head);
+}
+
+bool shape_point_in_shape_area(struct shape *shape, int x, int y) {
+    NULL_CHECK_RET("shape_point_in_shape_area()", shape, false);
+
+    SHAPE_VALUES_TO_TWO_POINTS(shape, x0, y0, x1, y1);
+    
+    return (IN_RANGE(x, x0, x1) && IN_RANGE(y, y0, y1));
 }
 
 void shape_move(struct shape *shape, int delta_x, int delta_y) {
@@ -65,6 +72,13 @@ void shape_move(struct shape *shape, int delta_x, int delta_y) {
     
     shape->offset[0] += delta_x;
     shape->offset[1] += delta_y;
+}
+
+void shape_transform(struct shape *shape, int delta_width, int delta_height) {
+    NULL_CHECK("shape_transform()", shape);
+
+    shape->value[2] += delta_width;
+    shape->value[3] += delta_height;
 }
 
 void shape_add_point(struct shape *shape, int x, int y) {

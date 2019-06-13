@@ -288,12 +288,27 @@ void disp_draw_2d_shape(struct shape *shape) {
         default:                print_error("disp_draw_2d_shape(): invalid shape type: %d\n", shape->type); return;
     }
     
-    draw_function(shape->value[0] + shape->offset[0],
-                  shape->value[1] + shape->offset[1],
-                  shape->value[2] + shape->offset[0],
-                  shape->value[3] + shape->offset[1],
-                  shape->color);
-    
+    if (SHAPE_BY_TWO_POINTS(shape->type)) {
+        /**
+         * 이 도형이 점 두개로 다루는 녀석이면, 두 점에 모두 offset을 더해준다.
+         */
+        draw_function(shape->value[0] + shape->offset[0],
+                      shape->value[1] + shape->offset[1],
+                      shape->value[2] + shape->offset[0],
+                      shape->value[3] + shape->offset[1],
+                      shape->color);
+    }
+    else {
+        /**
+         * 아니라면, 시작점에만 offset을 더해준다.
+         */
+        draw_function(shape->value[0] + shape->offset[0],
+                      shape->value[1] + shape->offset[1],
+                      shape->value[2], /* width에는 offset을 더하지 않음. */
+                      shape->value[3], /* height에도 offset을 더하지 않음. */
+                      shape->color);
+    }
+
     return;
     
 free_draw:

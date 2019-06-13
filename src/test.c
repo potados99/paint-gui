@@ -9,6 +9,7 @@
 #include "shape.h"
 #include "test.h"
 #include "metric.h"
+#include "paint.h"
 
 int draw_read_test() {
     int                 ts_fd; /* 터치스크린 파일 기술자 */
@@ -48,7 +49,7 @@ int draw_read_test() {
     disp_commit();
     
     /**
-     * 도형들을 만들고 그려줍니다.
+     * 도형들을 만들어줍니다.
      */
     LIST_HEAD(shapes_head);
     
@@ -65,9 +66,11 @@ int draw_read_test() {
     shape_add_point(fdraw, 142, 137);
 	shape_add_point(fdraw, 156, 142);
 	shape_add_point(fdraw, 172, 150);
-    
 	shapes_list_add(&shapes_head, fdraw);
     
+    /**
+     * 만든 도형들을 그려줍니다.
+     */
     struct shape *cur;
     
     list_for_each_entry(cur, &shapes_head, list) {
@@ -263,6 +266,49 @@ int shape_creation_test(void) {
     list_for_each_entry_safe(cur, save, &shapes_head, list) {
         shape_delete(cur);
     }
+    
+    return 0;
+}
+
+int paint_usecase_test() {
+    int                 ts_fd; /* 터치스크린 파일 기술자 */
+    int                 dp_fd; /* 디스플레이 파일 기술자 */
+    int                 ts_read; /* 터치 읽은 결과 저장 */
+    int                 touched; /* 터치 상태 저장 */
+    int                 last_x = 0; /* 이전 터치 x좌표 저장 */
+    int                 last_y = 0; /* 이전 터치 y좌표 저장 */
+    unsigned long       line_num = 0;
+    
+    /**
+     * touch_event 구조체 선언 & 초기화
+     */
+    TOUCH_EVENT(te);
+    
+    /**
+     * 터치스크린 열기!
+     */
+    ts_fd = open(TS_FD_PATH, TS_OPEN_OPTION);
+    ASSERTDO(ts_fd != -1, print_error("open() error with %s.\n", TS_FD_PATH); return -1);
+    
+    /**
+     * 디스플레이 열기!
+     */
+    dp_fd = open(DP_FD_PATH, DP_OPEN_OPTION);
+    ASSERTDO(dp_fd != -1, print_error("open() error with %s.\n", DP_FD_PATH); return -1);
+    
+    /**
+     * mmap 해줍니다. 결과는 display.c에 전역변수로 들어가있습니다.
+     */
+    disp_map(dp_fd);
+    
+    /**
+     * 화면 전체를 흰색으로 칠합니다.
+     */
+    disp_draw_whole(COLOR(255, 255, 255));
+    disp_commit();
+    
+    struct paint *paint = paint_create(0, 0, 320, 240);
+    paint_test(paint);
     
     return 0;
 }

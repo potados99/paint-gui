@@ -7,6 +7,7 @@
 #define shape_h
 
 #include "metric.h"
+#include "macros.h"
 #include "list.h"
 
 #include <stdlib.h>
@@ -16,22 +17,35 @@
  * Shape 종류 (ST: Shape Type).
  * 이 프로그램에서, 도형의 위치와 범위는 시작점과 끝점 두개로 표현합니다.
  */
-#define ST_LINEP        1   /* 두 점으로 표현 */
-#define ST_RECT         2   /* 한 점과 길이+높이로 표현 */
-#define ST_RECT_FILL    3   /* 한 점과 길이+높이로 표현 */
-#define ST_RECTP        4   /* 두 점으로 표현*/
-#define ST_RECTP_FILL   5   /* 두 점으로 표현*/
-#define ST_OVAL         6   /* 한 점과 길이+높이로 표현 */
-#define ST_OVAL_FILL    7   /* 한 점과 길이+높이로 표현 */
-#define ST_OVALP        8   /* 두 점으로 표현*/
-#define ST_OVALP_FILL   9   /* 두 점으로 표현*/
-#define ST_FREEP        10  /* 두 점으로 표현 */
+#define ST_LINEP        0x11   /* 두 점으로 표현 */
+#define ST_RECT         0x02   /* 한 점과 길이+높이로 표현 */
+#define ST_RECT_FILL    0x03   /* 한 점과 길이+높이로 표현 */
+#define ST_RECTP        0x14   /* 두 점으로 표현*/
+#define ST_RECTP_FILL   0x15   /* 두 점으로 표현*/
+#define ST_OVAL         0x06   /* 한 점과 길이+높이로 표현 */
+#define ST_OVAL_FILL    0x07   /* 한 점과 길이+높이로 표현 */
+#define ST_OVALP        0x18   /* 두 점으로 표현*/
+#define ST_OVALP_FILL   0x19   /* 두 점으로 표현*/
+#define ST_FREEP        0x1A  /* 두 점으로 표현 */
+
+#define SHAPE_BY_TWO_POINTS(TYPE) \
+(TYPE & 0x10)
+
 
 /**
  * unsigned int 타입에 적절한 한 픽셀을 만드는 매크로입니다.
  */
 #define COLOR(R, G, B)  \
 (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
+
+#define COLOR_BLACK     COLOR(0, 0, 0)
+#define COLOR_RED       COLOR(255, 0, 0)
+#define COLOR_GREEN     COLOR(0, 255, 0)
+#define COLOR_BLUE      COLOR(0, 0, 255)
+#define COLOR_YELLOW    COLOR(255, 255, 0)
+#define COLOR_CYAN      COLOR(0, 255, 255)
+#define COLOR_MAGENTA   COLOR(255, 0, 255)
+#define COLOR_WHITE     COLOR(255, 255, 255)
 
 /**
  * zindex는 shape를 만들 때마다 계속해서 늘어나야 합니다.
@@ -40,23 +54,50 @@
 static unsigned int zindex_count = 0;
 
 /**
+ * 점+크기 영역을 점 2개 영역으로 바꾸어줍니다.
+ */
+#define SHAPE_VALUES_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)           \
+int X0 = SHAPE_PTR->value[0];                                           \
+int Y0 = SHAPE_PTR->value[1];                                           \
+int X1 = SHAPE_PTR->value[2];                                           \
+int Y1 = SHAPE_PTR->value[3];                                           \
+do {                                                                    \
+    if (!SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                        \
+        X1 = X0 + X1 - 1;                                               \
+        Y1 = Y0 + Y1 - 1;                                               \
+    }                                                                   \
+} while (0)
+
+/**
+ * 점 2개 영역을 점+크기 영역으로 바꾸어줍니다.
+ */
+#define SHAPE_VALUES_TO_POINT_AND_SIZE(SHAPE_PTR, X, Y, WIDTH, HEIGHT)  \
+int X = SHAPE_PTR->value[0];                                            \
+int Y = SHAPE_PTR->value[1];                                            \
+int WIDTH = SHAPE_PTR->value[2];                                        \
+int HEIGHT = SHAPE_PTR->value[3];                                       \
+do {                                                                    \
+    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                         \
+        WIDTH = WIDTH - X + 1;                                          \
+        HEIGHT = HEIGHT - Y + 1;                                        \
+    }                                                                   \
+} while (0)
+
+/**
  * 새로운 shape 구조체를 만드는 매크로입니다. 0으로 초기화 해줍니다.
  */
 #define SHAPE(NAME)                                                     \
 struct shape NAME = {0};                                                \
-do {                                                                    \
-NAME.zindex = zindex_count++;                                           \
-} while (0)
+NAME.zindex = zindex_count++;                                           
+
 
 /**
  * 새로운 shape 구조체를 힙에다 만들고 초기화합니다.
  */
 #define SHAPE_ALLOC(NAME)                                               \
 struct shape *NAME = (struct shape *)malloc(sizeof(struct shape));      \
-do {                                                                    \
 memset(NAME, 0, sizeof(struct shape));                                  \
-NAME->zindex = zindex_count++;                                           \
-} while (0)
+NAME->zindex = zindex_count++;
 
 /*
 #define SHAPE_FREE(PTR)                                                 \
@@ -140,9 +181,19 @@ void shape_delete(struct shape *shape);
 void shapes_list_add(struct list_head *shapes_head, struct shape *shape);
 
 /**
+ * 특정 점이 특정 shape 영역 내에 있는지 판단합니다.
+ */
+bool shape_point_in_shape_area(struct shape *shape, int x, int y);
+
+/**
  * shape를 평행이동합니다. shape 구조체 내의 offset 필드에 추가됩니다.
  */
 void shape_move(struct shape *shape, int delta_x, int delta_y);
+
+/**
+ * shape의 크기를 바꿉니다. value 배열에 직접 변경이 가해집니다.
+ */
+void shape_transform(struct shape *shape, int delta_width, int delta_height);
 
 /**
  * 자유 그리기 도형에 새로운 점을 추가해줍니다.

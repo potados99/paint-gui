@@ -32,7 +32,7 @@ static inline void _redraw_area(struct paint *context, int x0, int y0, int x1, i
     /**
      * 영역을 지우고 (배경색으로)
      */
-    disp_draw_rectp(x0, y0, x1, y1, context->back_color);
+    disp_draw_rectp_fill(x0, y0, x1, y1, context->back_color);
     
     /**
      * 새로 그리고

@@ -54,8 +54,6 @@ static inline void _move_shape_and_redraw(struct paint *context, struct shape *s
 
     shape_move(shape, delta_x, delta_y);
     
-    disp_draw_2d_shape(shape);
-    
     if (delta_x > 0) {
         redraw_x1 += delta_x;
     }
@@ -81,8 +79,6 @@ static inline void _transform_shape_and_redraw(struct paint *context, struct sha
 
     shape_transform(shape, delta_width, delta_height);
     
-    disp_draw_2d_shape(shape);
-
     _redraw_area(context, redraw_x0, redraw_y0, redraw_x1, redraw_y1);
     
     return;

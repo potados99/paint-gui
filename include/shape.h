@@ -63,9 +63,15 @@ int X1 = SHAPE_PTR->value[2];                                           \
 int Y1 = SHAPE_PTR->value[3];                                           \
 do {                                                                    \
     if (!SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                        \
-        X1 = X0 + X1 - 1;                                               \
-        Y1 = Y0 + Y1 - 1;                                               \
+        X1 += X0 - 1;                                                   \
+        Y1 += Y0 - 1;                                                   \
     }                                                                   \
+    else {                                                              \
+        X1 += SHAPE_PTR->offset[0];                                     \
+        Y1 += SHAPE_PTR->offset[1];                                     \
+    }                                                                   \
+    X0 += SHAPE_PTR->offset[0];                                         \
+    Y0 += SHAPE_PTR->offset[1];                                         \
 } while (0)
 
 /**
@@ -81,6 +87,8 @@ do {                                                                    \
         WIDTH = WIDTH - X + 1;                                          \
         HEIGHT = HEIGHT - Y + 1;                                        \
     }                                                                   \
+    X += SHAPE_PTR->offset[0];                                          \
+    Y += SHAPE_PTR->offset[1];                                          \
 } while (0)
 
 /**

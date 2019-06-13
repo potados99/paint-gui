@@ -230,7 +230,7 @@ void disp_draw_rect(int x, int y, int width, int height, unsigned short color) {
 
     disp_draw_line(x, y, x + width - 1, y, color);                      		/* 위쪽! */
     disp_draw_line(x, y + height - 1, x + width - 1, y + height - 1, color);    /* 아래쪽! */
-    disp_draw_line(x, y, x, y + height - 1, color);                     			/* 왼쪽! */
+    disp_draw_line(x, y, x, y + height - 1, color);                     		/* 왼쪽! */
     disp_draw_line(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
 }
 

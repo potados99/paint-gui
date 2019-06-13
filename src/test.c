@@ -52,16 +52,21 @@ int draw_read_test() {
      */
     LIST_HEAD(shapes_head);
     
-    struct shape *rect = shape_create(ST_RECTP, 0, 0, 50, 50, COLOR(70, 70, 70));
+    struct shape *rect = shape_create(ST_RECT_FILL, 140, 110, 50, 50, COLOR(0, 255, 0));
     shapes_list_add(&shapes_head, rect);
     
-    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 50));
+    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
     shape_add_point(fdraw, 100, 100);
-    shape_add_point(fdraw, 112, 120);
-    shape_add_point(fdraw, 125, 130);
-    shape_add_point(fdraw, 137, 140);
-    shape_add_point(fdraw, 150, 150);
-    shapes_list_add(&shapes_head, fdraw);
+	shape_add_point(fdraw, 102, 106);
+	shape_add_point(fdraw, 106, 112);
+	shape_add_point(fdraw, 112, 119);
+	shape_add_point(fdraw, 120, 125);
+	shape_add_point(fdraw, 130, 131);
+    shape_add_point(fdraw, 142, 137);
+	shape_add_point(fdraw, 156, 142);
+	shape_add_point(fdraw, 172, 150);
+    
+	shapes_list_add(&shapes_head, fdraw);
     
     struct shape *cur;
     
@@ -70,16 +75,29 @@ int draw_read_test() {
     }
     disp_commit();
     
-    for (int i = 0; i < 70; ++i) {
-        usleep(100000);
-        fdraw->offset[0]++;
+    for (int i = 0; i < 100; ++i) {
+        usleep(20000);
+ 
+		/**
+		 * 해당 구역을 지워줍니다.
+		 */
+		disp_draw_rectp_fill(fdraw->value[0] + fdraw->offset[0], 
+							 fdraw->value[1] + fdraw->offset[1], 
+							 fdraw->value[2] + fdraw->offset[0], 
+							 fdraw->value[3] + fdraw->offset[1], 
+							 COLOR(255, 255, 255));
         
+		/**
+		 * 도형에 offset을 추가하고 싹다 새로 그립니다.
+		 */
+		fdraw->offset[0]++;
+ 
         list_for_each_entry(cur, &shapes_head, list) {
             disp_draw_2d_shape(cur);
         }
         
         /**
-         * 바뀐 부분만 그립니다.
+         * 바뀐 부분만 적용합니다.
          */
         disp_commit_partialp(fdraw->value[0] + fdraw->offset[0] - 1,
                              fdraw->value[1],

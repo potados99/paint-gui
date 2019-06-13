@@ -190,8 +190,7 @@ void disp_map(int fd) {
 }
 
 void disp_unmap() {
-	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
-    
+	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);   
 }
 
 void disp_set_direct(bool value) {
@@ -255,11 +254,11 @@ void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short col
 }
 
 void disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color) {
-	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
+	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1, color);
 }
 
 void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
-    disp_draw_rect_fill(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0), color);
+    disp_draw_rect_fill(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1, color);
 }
 
 void disp_draw_whole(unsigned short color) {
@@ -304,19 +303,18 @@ free_draw:
      */
     NULL_CHECK("disp_draw_2d_shape()", shape->fdraw_points.next);
     
-    
     if (list_empty(&shape->fdraw_points))
         return;
     
     struct point_node   *cur = list_first_entry(&shape->fdraw_points, struct point_node, list);
-    int                 last_x = cur->x;
-    int                 last_y = cur->y;
+    int                 last_x = cur->x + shape->offset[0];
+    int                 last_y = cur->y + shape->offset[1];
     
     list_for_each_entry_continue(cur, &shape->fdraw_points, list) {
-        disp_draw_linep(last_x, last_y, cur->x, cur->y, shape->color);
+       disp_draw_linep(last_x, last_y, cur->x + shape->offset[0], cur->y + shape->offset[1], shape->color);
         
-        last_x = cur->x;
-        last_y = cur->y;
+        last_x = cur->x + shape->offset[0];
+        last_y = cur->y + shape->offset[1];
     }
     
     return;
@@ -335,7 +333,7 @@ void disp_commit_partial(int x, int y, int width, int height) {
 }
 
 void disp_commit_partialp(int x0, int y0, int x1, int y1) {
-	disp_commit_partial(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0), ABS(y1 - y0));
+	disp_commit_partial(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1);
 }
 
 void disp_cancel() {

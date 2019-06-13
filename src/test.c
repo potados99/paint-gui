@@ -206,34 +206,18 @@ int shape_creation_test(void) {
     /**
      * 사각형!
      */
-    SHAPE(rect0);
-    rect0.type = ST_RECT;
-    rect0.value[0] = 0;
-    rect0.value[1] = 0;
-    rect0.value[2] = 50;
-    rect0.value[3] = 50;
-    rect0.color = COLOR(255, 255, 255);
-    shapes_link(&shapes_head, &rect0);
+    struct shape *rect = shape_create(ST_RECT, 0, 0, 50, 50, COLOR(255, 255, 255));
+    shapes_list_add(&shapes_head, rect);
     
     /**
      * 자유그리기!
      */
-    SHAPE(free0);
-    free0.type = ST_FDRAW;
-    free0.value[0] = 100;
-    free0.value[1] = 100;
-    free0.value[2] = 150;
-    free0.value[3] = 150;
-    free0.color = COLOR(0, 0, 50);
-    struct shape *free0_allocated = shapes_link(&shapes_head, &free0);
-    free0_allocated->fdraw_points.prev = &free0_allocated->fdraw_points;
-    free0_allocated->fdraw_points.next = &free0_allocated->fdraw_points;
-    points_add(&free0_allocated->fdraw_points, 100, 100);
-    points_add(&free0_allocated->fdraw_points, 112, 112);
-    points_add(&free0_allocated->fdraw_points, 125, 125);
-    points_add(&free0_allocated->fdraw_points, 137, 137);
-    points_add(&free0_allocated->fdraw_points, 150, 150);
-
+    struct shape *fdraw = shape_create(ST_FDRAW, 0, 0, 0, 0, COLOR(0, 0, 50));
+    shape_add_point(fdraw, 100, 100);
+    shape_add_point(fdraw, 125, 125);
+    shape_add_point(fdraw, 150, 150);
+    shapes_list_add(&shapes_head, fdraw);
+    
     /**
      * 순회하며 출력하기!
      */
@@ -257,6 +241,9 @@ int shape_creation_test(void) {
         printf("Shape color: 0x%04x\n",
                cur_shape->color);
         
+        printf("Shape zindex: %d\n",
+               cur_shape->zindex);
+        
         /**
          * 마냑에 fdraw_points가 유효하다면은,,,
          */
@@ -274,6 +261,15 @@ int shape_creation_test(void) {
         }
         
         printf("============ SHAPE END ============\n\n");
+    }
+    
+    /**
+     * 삭제까지!
+     */
+    struct shape *cur;
+    struct shape *save;
+    list_for_each_entry_safe(cur, save, &shapes_head, list) {
+        shape_delete(cur);
     }
     
     return 0;

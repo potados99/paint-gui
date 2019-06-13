@@ -52,6 +52,7 @@ NAME.zindex = zindex_count++;                                           \
 struct shape *NAME = (struct shape *)malloc(sizeof(struct shape));      \
 do {                                                                    \
 memset(NAME, 0, sizeof(struct shape));                                  \
+NAME->zindex = zindex_count++;                                           \
 } while (0)
 
 /*
@@ -109,9 +110,34 @@ struct shape {
 };
 
 
+/**
+ * 생성과 할당이 여기서 일어납니다!
+ */
+struct shape *shape_create(unsigned char type,
+                           int v0,
+                           int v1,
+                           int v2,
+                           int v3,
+                           unsigned short color);
+
+/**
+ * shape를 한방에 싹 지워줍니다.
+ */
+void shape_delete(struct shape *shape);
+
+/**
+ * 힙에 존재하는 shape를 리스트 끝에 이어줍니다.
+ */
+void shapes_list_add(struct list_head *shapes_head, struct shape *shape);
+
+/**
+ * shape를 평행이동합니다. shape 구조체 내의 offset 필드에 추가됩니다.
+ */
 void shape_move(struct shape *shape, int delta_x, int delta_y);
 
-struct shape *shapes_link(struct list_head *shapes_head, struct shape *shape);
-
+/**
+ * 자유 그리기 도형에 새로운 점을 추가해줍니다.
+ */
+void shape_add_point(struct shape *shape, int x, int y);
 
 #endif /* shape_h */

@@ -29,6 +29,12 @@ const typeof( ((type *)0)->member ) *__mptr = (ptr);                    \
 #define LIST_HEAD(name)                                                 \
 struct list_head name = LIST_HEAD_INIT(name)
 
+#define LIST_HEAD_REINIT(name)                                          \
+do {                                                                    \
+(name).prev = &(name);                                                 \
+(name).next = &(name);                                                 \
+} while (0)
+
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
     list->next = list;

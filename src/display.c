@@ -304,9 +304,19 @@ free_draw:
      */
     NULL_CHECK("disp_draw_2d_shape()", shape->fdraw_points.next);
     
-    struct point_node *cur;
-    list_for_each_entry(cur, &shape->fdraw_points, list) {
-        disp_draw_point(cur->x, cur->y, shape->color);
+    
+    if (list_empty(&shape->fdraw_points))
+        return;
+    
+    struct point_node   *cur = list_first_entry(&shape->fdraw_points, struct point_node, list);
+    int                 last_x = cur->x;
+    int                 last_y = cur->y;
+    
+    list_for_each_entry_continue(cur, &shape->fdraw_points, list) {
+        disp_draw_linep(last_x, last_y, cur->x, cur->y, shape->color);
+        
+        last_x = cur->x;
+        last_y = cur->y;
     }
     
     return;

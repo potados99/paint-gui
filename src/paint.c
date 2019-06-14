@@ -73,15 +73,16 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
 }
 
 static inline void _move_shape_and_redraw(struct paint *context, struct shape *shape, int delta_x, int delta_y) {
-
-    SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(shape, redraw_x, redraw_y, redraw_w, redraw_h);
+    
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, before_x0, before_y0, before_x1, before_y1);
     shape_move(shape, delta_x, delta_y);
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, after_x0, after_y0, after_x1, after_y1);
     
     _redraw_areap(context,
-                  redraw_x,
-                  redraw_y,
-                  redraw_w + ABS(delta_x),
-                  redraw_h + ABS(delta_y));
+                  MIN(before_x0, after_x0),
+                  MIN(before_y0, after_y0),
+                  MAX(before_x1, after_x1),
+                  MAX(before_y1, after_y1));
 
     return;
 }

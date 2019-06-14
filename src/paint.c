@@ -78,10 +78,10 @@ static inline void _move_shape_and_redraw(struct paint *context, struct shape *s
     shape_move(shape, delta_x, delta_y);
     
     _redraw_areap(context,
-                  redraw_x + delta_x,
-                  redraw_y + delta_y,
-                  redraw_w,
-                  redraw_h);
+                  redraw_x,
+                  redraw_y,
+                  redraw_w + ABS(delta_x),
+                  redraw_h + ABS(delta_y));
 
     return;
 }

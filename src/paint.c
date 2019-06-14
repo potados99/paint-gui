@@ -6,6 +6,8 @@
 #include "machine_specific.h"
 #include "display.h"
 
+#include <unistd.h> /* for test */
+
 /********************************************************************************************/
 
 /**
@@ -223,6 +225,9 @@ void paint_touch_end(struct paint *context, int x, int y) {
 }
 
 void paint_test(struct paint *context) {
+    /**
+     * 도형 생성
+     */
     struct shape *rect = shape_create(ST_RECT_FILL, 140, 110, 50, 50, COLOR(0, 255, 0));
     shapes_list_add(&context->shapes, rect);
     
@@ -240,6 +245,9 @@ void paint_test(struct paint *context) {
     
     _redraw_areap(context, 0, 0, 319, 239);
     
+    /**
+     * 이동, 크기변환 테스트
+     */
     int init_x = 160;
     int init_y = 120;
     
@@ -251,11 +259,16 @@ void paint_test(struct paint *context) {
         _move_shape_and_redraw(context, selected, 2, 1);
     }
     
-    
     for (int i = 0; i < 100; ++i) {
         usleep(20000);
         
         _transform_shape_and_redraw(context, rect, -1, -1);
+    }
+    
+    for (int i = 0; i < 200; ++i) {
+        usleep(20000);
+        
+        _transform_shape_and_redraw(context, rect, 1, 1);
     }
     
 }

@@ -9,13 +9,16 @@
 /********************************************************************************************/
 
 /**
- * 유틸리티 함수들입니다!!
+ * 한 점이 캔버스 영역에 속하는지 검사합니다.
  */
 static inline bool _point_in_canvas(struct paint *context, int x, int y) {
     return (IN_RANGE(x, context->canvas_x, context->canvas_x + context->canvas_width - 1) &&
             IN_RANGE(y, context->canvas_y, context->canvas_y + context->canvas_height - 1));
 }
 
+/**
+ * paint 구조체에 적절한 초기값을 대입합니다.
+ */
 static inline void _init(struct paint *context) {
     context->mode = MODE_LINE;
     context->fill = false;
@@ -28,6 +31,9 @@ static inline void _init(struct paint *context) {
     LIST_HEAD_REINIT(context->shapes);
 }
 
+/**
+ * 한 점과 폭, 높이로 이루어진 범위 내의 도형들을 새로 그립니다.
+ */
 static inline void _redraw_area(struct paint *context, int x, int y, int width, int height) {
     ENSURE_SIZE_POSITIVE(x, y, width, height);
     
@@ -50,6 +56,9 @@ static inline void _redraw_area(struct paint *context, int x, int y, int width, 
     disp_commit_partial(x, y, width, height);
 }
 
+/**
+ * 두 점으로 이루어진 범위 내의 도형들을 새로 그립니다.
+ */
 static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, int y1) {
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
     
@@ -72,6 +81,9 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
     disp_commit_partialp(x0, y0, x1, y1);
 }
 
+/**
+ * 도형을 평행이동하고 새로 그립니다.
+ */
 static inline void _move_shape_and_redraw(struct paint *context, struct shape *shape, int delta_x, int delta_y) {
     
     SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, before_x0, before_y0, before_x1, before_y1);
@@ -87,6 +99,9 @@ static inline void _move_shape_and_redraw(struct paint *context, struct shape *s
     return;
 }
 
+/**
+ * 도형의 크기를 바꾸고 새로 그립니다.
+ */
 static inline void _transform_shape_and_redraw(struct paint *context, struct shape *shape, int delta_width, int delta_height) {
     
     SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, before_x0, before_y0, before_x1, before_y1);
@@ -102,6 +117,9 @@ static inline void _transform_shape_and_redraw(struct paint *context, struct sha
     return;
 }
 
+/**
+ * 지정된 좌표에 존재하는 도형을 선택합니다.
+ */
 static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     struct shape *cur;
 
@@ -232,5 +250,13 @@ void paint_test(struct paint *context) {
         
         _move_shape_and_redraw(context, selected, 1, 1);
     }
+    
+    
+    for (int i = 0; i < 100; ++i) {
+        usleep(20000);
+        
+        _transform_shape_and_redraw(context, rect, -1, -1);
+    }
+    
 }
 

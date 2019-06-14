@@ -82,8 +82,7 @@ int touch_read(int fd, struct touch_event *event) {
         switch (ie.type) {
             case EV_SYN:
                 /**
-                 * 끝입니다. 이제 처리합시다.
-                 * 브레이크를 두번 할수도 없고 해서 고투를 썼어요..
+                 * 끝입니다.
                  */
                	return 0;
                

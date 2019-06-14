@@ -54,41 +54,47 @@
 static unsigned int zindex_count = 0;
 
 /**
- * 점+크기 영역을 점 2개 영역으로 바꾸어줍니다.
+ * shape가 나타내는 offset을 포함한 실제 영역을 두 개의 양 끝점으로 표현해줍니다.
  */
-#define SHAPE_VALUES_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)           \
-int X0 = SHAPE_PTR->value[0];                                           \
-int Y0 = SHAPE_PTR->value[1];                                           \
-int X1 = SHAPE_PTR->value[2];                                           \
-int Y1 = SHAPE_PTR->value[3];                                           \
-do {                                                                    \
-    if (!SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                        \
-        X1 += X0 - 1;                                                   \
-        Y1 += Y0 - 1;                                                   \
-    }                                                                   \
-    else {                                                              \
-        X1 += SHAPE_PTR->offset[0];                                     \
-        Y1 += SHAPE_PTR->offset[1];                                     \
-    }                                                                   \
-    X0 += SHAPE_PTR->offset[0];                                         \
-    Y0 += SHAPE_PTR->offset[1];                                         \
+#define SHAPE_EXPORT_AREA_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)          \
+int X0 = SHAPE_PTR->value[0];                                               \
+int Y0 = SHAPE_PTR->value[1];                                               \
+int X1 = SHAPE_PTR->value[2];                                               \
+int Y1 = SHAPE_PTR->value[3];                                               \
+do {                                                                        \
+    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                             \
+        ENSURE_POINTS_ORDERED(X0, Y0, X1, Y1);                              \
+        X1 += SHAPE_PTR->offset[0];                                         \
+        Y1 += SHAPE_PTR->offset[1];                                         \
+    }                                                                       \
+    else {                                                                  \
+        ENSURE_SIZE_POSITIVE(X0, Y0, X1, Y1);                               \
+        X1 += X0 - (X1 > 0);                                                \
+        Y1 += Y0 - (Y1 > 0);                                                \
+    }                                                                       \
+    X0 += SHAPE_PTR->offset[0];                                             \
+    Y0 += SHAPE_PTR->offset[1];                                             \
 } while (0)
 
 /**
- * 점 2개 영역을 점+크기 영역으로 바꾸어줍니다.
+ * shape가 나타내는 offset을 포함한 실제 영역을 한 개의 점과 width와 height로 표현해줍니다.
  */
-#define SHAPE_VALUES_TO_POINT_AND_SIZE(SHAPE_PTR, X, Y, WIDTH, HEIGHT)  \
-int X = SHAPE_PTR->value[0];                                            \
-int Y = SHAPE_PTR->value[1];                                            \
-int WIDTH = SHAPE_PTR->value[2];                                        \
-int HEIGHT = SHAPE_PTR->value[3];                                       \
-do {                                                                    \
-    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                         \
-        WIDTH = WIDTH - X + 1;                                          \
-        HEIGHT = HEIGHT - Y + 1;                                        \
-    }                                                                   \
-    X += SHAPE_PTR->offset[0];                                          \
-    Y += SHAPE_PTR->offset[1];                                          \
+#define SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(SHAPE_PTR, X, Y, WIDTH, HEIGHT) \
+int X = SHAPE_PTR->value[0];                                                \
+int Y = SHAPE_PTR->value[1];                                                \
+int WIDTH = SHAPE_PTR->value[2];                                            \
+int HEIGHT = SHAPE_PTR->value[3];                                           \
+do {                                                                        \
+    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                             \
+        ENSURE_POINTS_ORDERED(X, Y, WIDTH, HEIGHT);                         \
+        WIDTH = WIDTH - X + 1;                                              \
+        HEIGHT = HEIGHT - Y + 1;                                            \
+    }                                                                       \
+    else {                                                                  \
+        ENSURE_SIZE_POSITIVE(X, Y, WIDTH, HEIGHT);                          \
+    }                                                                       \
+    X += SHAPE_PTR->offset[0];                                              \
+    Y += SHAPE_PTR->offset[1];                                              \
 } while (0)
 
 /**

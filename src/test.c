@@ -312,3 +312,22 @@ int paint_usecase_test() {
     
     return 0;
 }
+
+int area_test(void) {
+    /*
+    struct shape *s = shape_create(ST_RECT, 6, 6, -5, -5, 0);
+    printf("Created shape with value[4] = { 6, 6, -5, -5 }.\n\n");
+    */
+    struct shape *s = shape_create(ST_RECT, 5, 5, 0, 0, 0);
+    printf("Created shape with value[4] = { 5, 5, 0, 0 }.\n\n");
+    
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(s, x0, y0, x1, y1);
+    printf("Exportd that area to two points:\n");
+    printf("p0(%d, %d) and p1(%d, %d)\n\n", x0, y0, x1, y1);
+
+    SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(s, x, y, width, height);
+    printf("Exportd that area to point and size:\n");
+    printf("p(%d, %d) and s(%d, %d)\n\n", x, y, width, height);
+    
+    return 0;
+}

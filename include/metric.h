@@ -33,14 +33,38 @@
 /**
  * 두 점을 가지고, X방향 길이와 Y방향 길이를 구합니다.
  */
-#define DELTA_X(P0, P1)     ABS(X(P1) - X(P0))
-#define DELTA_Y(P0, P1)    ABS(Y(P1) - Y(P0))
+#define DELTA_X(P0, P1)         ABS(X(P1) - X(P0))
+#define DELTA_Y(P0, P1)         ABS(Y(P1) - Y(P0))
 
 /**
  * 두 점을 가지고, 가로 길이 차이와 세로 길이 차이를 구합니다.
  */
 #define DELTA_WIDTH(P0, P1)     ABS(WIDTH(P1) - WIDTH(P0))
 #define DELTA_HEIGHT(P0, P1)    ABS(HEIGHT(P1) - HEIGHT(P0))
+
+/**
+ * 폭과 높이 모두 양수임이 확실하게 해줍니다.
+ */
+#define ENSURE_SIZE_POSITIVE(X, Y, WIDTH, HEIGHT)   \
+do {                                                \
+    if (WIDTH < 0) {                                \
+        X += WIDTH + 1;                             \
+        WIDTH = -WIDTH;                             \
+    }                                               \
+    if (HEIGHT < 0) {                               \
+        Y += HEIGHT + 1;                            \
+        HEIGHT = -HEIGHT;                           \
+    }                                               \
+} while (0)
+
+/**
+ * (x0, y0)이 좌상단, (x1, y1)이 우상단임을 확실하게 해줍니다.
+ */
+#define ENSURE_POINTS_ORDERED(X0, Y0, X1, Y1)       \
+do {                                                \
+    ENSURE_RIGHT_BIGGER(X0, X1);                    \
+    ENSURE_RIGHT_BIGGER(Y0, Y1);                    \
+} while (0)
 
 /**
  * 정수 X가 START <= X <= END인지 검사합니다.

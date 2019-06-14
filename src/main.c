@@ -14,6 +14,8 @@ int main(int argc, const char *argv[]) {
     
     paint_usecase_test();
     
+    //area_test();
+    
 	return 0;
 }
 

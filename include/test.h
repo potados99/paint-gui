@@ -9,5 +9,6 @@ int draw_read_test(void);
 int list_test(void);
 int shape_creation_test(void);
 int paint_usecase_test(void);
+int area_test(void);
 
 #endif /* test_h */

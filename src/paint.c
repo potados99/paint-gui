@@ -28,7 +28,31 @@ static inline void _init(struct paint *context) {
     LIST_HEAD_REINIT(context->shapes);
 }
 
-static inline void _redraw_area(struct paint *context, int x0, int y0, int x1, int y1) {
+static inline void _redraw_area(struct paint *context, int x, int y, int width, int height) {
+    ENSURE_SIZE_POSITIVE(x, y, width, height);
+    
+    /**
+     * 영역을 지우고 (배경색으로)
+     */
+    disp_draw_rect_fill(x, y, width, height, context->back_color);
+    
+    /**
+     * 새로 그리고
+     */
+    struct shape *cur;
+    list_for_each_entry(cur, &context->shapes, list) {
+        disp_draw_2d_shape(cur);
+    }
+    
+    /**
+     * 그 변화를 commit합니다.
+     */
+    disp_commit_partial(x, y, width, height);
+}
+
+static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, int y1) {
+    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
+    
     /**
      * 영역을 지우고 (배경색으로)
      */
@@ -50,36 +74,29 @@ static inline void _redraw_area(struct paint *context, int x0, int y0, int x1, i
 
 static inline void _move_shape_and_redraw(struct paint *context, struct shape *shape, int delta_x, int delta_y) {
 
-    SHAPE_VALUES_TO_TWO_POINTS(shape, redraw_x0, redraw_y0, redraw_x1, redraw_y1);
-
+    SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(shape, redraw_x, redraw_y, redraw_w, redraw_h);
     shape_move(shape, delta_x, delta_y);
     
-    if (delta_x > 0) {
-        redraw_x1 += delta_x;
-    }
-    else {
-        redraw_x0 += delta_x;
-    }
-    
-    if (delta_y > 0) {
-        redraw_y1 += delta_y;
-    }
-    else {
-        redraw_y0 += delta_y;
-    }
-    
-    _redraw_area(context, redraw_x0, redraw_y0, redraw_x1, redraw_y1);
+    _redraw_areap(context,
+                  redraw_x + delta_x,
+                  redraw_y + delta_y,
+                  redraw_w,
+                  redraw_h);
 
     return;
 }
 
 static inline void _transform_shape_and_redraw(struct paint *context, struct shape *shape, int delta_width, int delta_height) {
     
-    SHAPE_VALUES_TO_TWO_POINTS(shape, redraw_x0, redraw_y0, redraw_x1, redraw_y1);
-
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, before_x0, before_y0, before_x1, before_y1);
     shape_transform(shape, delta_width, delta_height);
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, after_x0, after_y0, after_x1, after_y1);
     
-    _redraw_area(context, redraw_x0, redraw_y0, redraw_x1, redraw_y1);
+    _redraw_areap(context,
+                  MIN(before_x0, after_x0),
+                  MIN(before_y0, after_y0),
+                  MAX(before_x1, after_x1),
+                  MAX(before_y1, after_y1));
     
     return;
 }
@@ -202,7 +219,7 @@ void paint_test(struct paint *context) {
     shape_add_point(fdraw, 172, 150);
     shapes_list_add(&context->shapes, fdraw);
     
-    _redraw_area(context, 0, 0, 319, 239);
+    _redraw_areap(context, 0, 0, 319, 239);
     
     int init_x = 160;
     int init_y = 120;

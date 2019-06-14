@@ -62,7 +62,7 @@ void shapes_list_add(struct list_head *shapes_head, struct shape *shape) {
 bool shape_point_in_shape_area(struct shape *shape, int x, int y) {
     NULL_CHECK_RET("shape_point_in_shape_area()", shape, false);
 
-    SHAPE_VALUES_TO_TWO_POINTS(shape, x0, y0, x1, y1);
+    SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, x0, y0, x1, y1);
     
     return (IN_RANGE(x, x0, x1) && IN_RANGE(y, y0, y1));
 }

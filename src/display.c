@@ -48,8 +48,8 @@ static inline void _apply(int x, int y, int width, int height) {
     /**
      * 점은 음수일 수 있어도, 크기는 그러면 안됩니다.
      */
-    SIZE_CHECK("_apply", width, height, DP_WIDTH, DP_HEIGHT);
-  
+    ENSURE_SIZE_POSITIVE(x, y, width, height);
+    
     /**
      * 영역이 화면 안에 들어가도록 넘치는 부분을 자릅니다.
      */
@@ -226,15 +226,16 @@ void disp_draw_linep(int x0, int y0 , int x1, int y1, unsigned short color) {
 
 void disp_draw_rect(int x, int y, int width, int height, unsigned short color) {
     print_trace("disp_draw_rect(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
-
-    disp_draw_linep(x, y, x + width - 1, y, color);                      		/* 위쪽! */
-    disp_draw_linep(x, y + height - 1, x + width - 1, y + height - 1, color);    /* 아래쪽! */
-    disp_draw_linep(x, y, x, y + height - 1, color);                     		/* 왼쪽! */
-    disp_draw_linep(x + width - 1, y, x + width - 1, y + height - 1, color);     /* 오른쪽! */
+    
+    ENSURE_SIZE_POSITIVE(x, y, width, height);
+    
+    disp_draw_rectp(x, y, x + width - 1, y + height - 1, color);
 }
 
 void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short color) {
     print_trace("disp_draw_rect_fill(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
+    
+    ENSURE_SIZE_POSITIVE(x, y, width, height);
 
 	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
 	register int 	offset = x + (DP_WIDTH * y);
@@ -254,11 +255,22 @@ void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short col
 }
 
 void disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color) {
-	disp_draw_rect(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1, color);
+    print_trace("disp_draw_rectp(): draw rect from point(%d, %d) to (%d, %d).\n", x0, y0, x1, y1);
+    
+    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
+    
+    disp_draw_linep(x0, y0, x1, y0, color); /* 상 */
+    disp_draw_linep(x0, y1, x1, y1, color); /* 하 */
+    disp_draw_linep(x0, y0, x0, y1, color); /* 좌 */
+    disp_draw_linep(x1, y0, x1, y1, color); /* 우 */
 }
 
 void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
-    disp_draw_rect_fill(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1, color);
+    print_trace("disp_draw_rectp_fill(): draw rect from point(%d, %d) to (%d, %d).\n", x0, y0, x1, y1);
+    
+    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
+
+    disp_draw_rect_fill(x0, y0, x1 - x0 + 1, y1 - y0 + 1, color);
 }
 
 void disp_draw_whole(unsigned short color) {
@@ -343,12 +355,15 @@ void disp_commit() {
 
 void disp_commit_partial(int x, int y, int width, int height) {
     print_trace("disp_commit_partial(): commit changes partially, at point(%d, %d), size(%d, %d).\n", x, y, width, height);
-
+    
     _apply(x, y, width, height);
 }
 
 void disp_commit_partialp(int x0, int y0, int x1, int y1) {
-	disp_commit_partial(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1);
+    ENSURE_RIGHT_BIGGER(x0, x1);
+    ENSURE_RIGHT_BIGGER(y0, y1);
+    
+	disp_commit_partial(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
 }
 
 void disp_cancel() {

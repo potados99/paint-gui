@@ -248,7 +248,7 @@ void paint_test(struct paint *context) {
     for (int i = 0; i < 50; ++i) {
         usleep(20000);
         
-        _move_shape_and_redraw(context, selected, 1, 1);
+        _move_shape_and_redraw(context, selected, 2, 1);
     }
     
     

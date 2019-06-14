@@ -228,13 +228,14 @@ void paint_test(struct paint *context) {
     /**
      * 도형 생성
      */
-    struct shape *rect = shape_create(ST_RECT_FILL, 140, 110, 50, 50, COLOR(0, 255, 0));
-    shapes_list_add(&context->shapes, rect);
     
-    struct shape *line = shape_create(ST_LINEP, 90, 110, 290, 250, COLOR(0, 255, 0));
+    struct shape *line = shape_create(ST_LINEP, 90, 200, 290, 90, COLOR(255, 0, 0));
     shapes_list_add(&context->shapes, line);
     
-    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
+    struct shape *rect = shape_create(ST_RECT_FILL, 140, 110, 50, 50, COLOR(0, 255, 0));
+    shapes_list_add(&context->shapes, rect);
+  
+	struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
     shape_add_point(fdraw, 100, 100);
     shape_add_point(fdraw, 102, 106);
     shape_add_point(fdraw, 106, 112);
@@ -274,10 +275,16 @@ void paint_test(struct paint *context) {
         _transform_shape_and_redraw(context, rect, 1, 1);
     }
     
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 30; ++i) {
         usleep(20000);
         
-        _transform_shape_and_redraw(context, line, 1, 0);
+        _transform_shape_and_redraw(context, rect, -2, -1);
+    }
+     
+    for (int i = 0; i < 120; ++i) {
+        usleep(20000);
+        
+        _transform_shape_and_redraw(context, line, 0, -1);
     }
     
 }

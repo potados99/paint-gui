@@ -37,8 +37,7 @@ static inline void _init(struct paint *context) {
  */
 static inline bool _point_in_canvas(struct paint *context, int x, int y) {
     return POINT_IN_AREA(POINT(context->canvas_x, context->canvas_y),
-                         SIZE(context->canvas_x + context->canvas_width - 1,
-                               context->canvas_y + context->canvas_height - 1),
+                         SIZE(context->canvas_width, context->canvas_height),
                          x, y);
 }
 

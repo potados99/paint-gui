@@ -32,17 +32,38 @@ do {                                                                            
     }                                                                                   \
 } while (0)                                                                             \
 
-#define GET_BIT(PTR, OFFSET, BIT_WIDTH)                                                 \
-((*(PTR + (OFFSET / (BIT_WIDTH)))) & (1 << ((BIT_WIDTH) - 1 - (OFFSET % (BIT_WIDTH)))))
+/**
+ * 8비트 정수용 비트단위 읽기/쓰기 매크로입니다!
+ */
+#define GET_BIT8(PTR, OFFSET)                                                 \
+((*(PTR + ((OFFSET) / 8))) & (1 << (7 - ((OFFSET) % 8))))
 
-#define SET_BIT(PTR, OFFSET, BIT_WIDTH)                                                 \
+#define SET_BIT8(PTR, OFFSET)                                                 \
 do {                                                                                    \
-*(PTR + (OFFSET / (BIT_WIDTH))) |= (1 << ((BIT_WIDTH) - 1 - (OFFSET % (BIT_WIDTH))));   \
+*(PTR + ((OFFSET) / 8)) |= (1 << (7 - ((OFFSET) % 8)));   \
 } while (0)
 
-#define UNSET_BIT(PTR, OFFSET, BIT_WIDTH)                                               \
+#define UNSET_BIT8(PTR, OFFSET)                                               \
 do {                                                                                    \
-*(PTR + (OFFSET / (BIT_WIDTH))) &= ~(1 << ((BIT_WIDTH) - 1 - (OFFSET % (BIT_WIDTH))));  \
+*(PTR + ((OFFSET) / 8)) &= ~(1 << (7 - ((OFFSET) % 8)));  \
 } while (0)
+
+/**
+ * 32비트 정수용 비트단위 읽기/쓰기 매크로입니다!
+ */
+#define GET_BIT32(PTR, OFFSET)                                                 \
+((*(PTR + ((OFFSET) / 32))) & (1 << (31 - ((OFFSET) % 32))))
+
+#define SET_BIT32(PTR, OFFSET)                                                 \
+do {                                                                                    \
+*(PTR + ((OFFSET) / 32)) |= (1 << (31 - ((OFFSET) % 32)));   \
+} while (0)
+
+#define UNSET_BIT32(PTR, OFFSET)                                               \
+do {                                                                                    \
+*(PTR + ((OFFSET) / 32)) &= ~(1 << (31 - ((OFFSET) % 32)));  \
+} while (0)
+
+
 
 #endif /* macros_h */

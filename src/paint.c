@@ -142,7 +142,7 @@ static inline void _draw_ui(void) {
     int index = 0;
     for (i = 0; i < DP_HEIGHT; i++) {
         for (j = 0; j < DP_WIDTH; j++) {
-            if (GET_BIT(UI_IMAGE, index, sizeof(char) << 3)) {
+            if (GET_BIT8(UI_IMAGE, index)) {
                 pixel = COLOR(204, 204, 0);
             }
             else {

@@ -233,7 +233,7 @@ static inline void _mark_button(const struct button *btn) {
      */
     disp_set_direct(true);
     
-    disp_draw_rect(btn->x - 1, btn->y - 1, btn->width + 2, btn->height + 2, UI_DEFAULT_TEXT_COLOR);
+    disp_draw_rect(btn->x - 2, btn->y - 2, btn->width + 4, btn->height + 4, UI_DEFAULT_TEXT_COLOR);
     
     disp_set_direct(false);
 }

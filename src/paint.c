@@ -456,6 +456,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 case MODE_RECT: {
                     shape = shapes_list_peek_last(&context->shapes);
                     
+                    print_info("transform rect by (%d, %d)\n", x - context->last_x, y - context->last_y);
                     _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
                     
                     return;

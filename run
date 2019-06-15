@@ -1,8 +1,5 @@
 #!/bin/bash
 
-make clean
-make
-
 ./paint
 while (true); do
     ./paint "$@"

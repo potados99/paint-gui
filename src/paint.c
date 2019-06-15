@@ -637,15 +637,21 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
 
 
 struct paint *paint_create(void) {
-    PAINT_ALLOC(new_paint);
+    print_info("paint_create()\n");
+
+	PAINT_ALLOC(new_paint);
     
     _init(new_paint);
+	
+	print_info("paint_create(): initialized.\n");
     
     _draw_ui();
     
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_LINE));
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_C7));
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_PEN));
+
+	print_info("paint_create(): ready.\n");
 
     return new_paint;
 }

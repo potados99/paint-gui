@@ -574,7 +574,12 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
          * 이것이 마지막 터치이다.
          */
         case TOUCH_STATE_DONE: {
-   
+            
+            /**
+             * 필요없는 수정사항은 취소하기!
+             */
+            disp_cancel();
+            
             switch (context->draw_mode) {
                 case MODE_LINE: {
                     print_info("_on_canvas_touched(): line drawing done.\n");
@@ -609,11 +614,6 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
             }
-            
-            /**
-             * 필요없는 수정사항은 취소하기!
-             */
-            disp_cancel();
             
             return;
         }

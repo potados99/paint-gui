@@ -584,6 +584,8 @@ void paint_touch_start(struct paint *context, int x, int y) {
          * 캔버스에서 새로운 무언가를 합니다.
          */
         _on_canvas_touched(context, x, y);
+        
+        print_info("paint_touch_start(): new touch from canvas.\n");
     }
     else {
         /**

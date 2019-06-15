@@ -610,6 +610,11 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 }
             }
             
+            /**
+             * 필요없는 수정사항은 취소하기!
+             */
+            disp_cancel();
+            
             return;
         }
             

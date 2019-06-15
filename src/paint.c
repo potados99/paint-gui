@@ -247,7 +247,7 @@ static inline void _mark_button(struct button *btn) {
         if (UI_GROUP(btn->id) == UI_GROUP(buttons[i].id)) {
             disp_set_direct(true);
             
-            disp_draw_rect(buttons[i].x - 1, buttons[i].y - 1, buttons[i].width + 2, buttons[i].height + 2, UI_DEFAULT_BACK_COLOR);
+            disp_draw_rect(buttons[i].x - 2, buttons[i].y - 2, buttons[i].width + 4, buttons[i].height + 4, UI_DEFAULT_BACK_COLOR);
             
             disp_set_direct(false);
         }

@@ -6,6 +6,7 @@
 #include "machine_specific.h"
 
 #include <fcntl.h>
+#include <unistd.h>
 
 void do_it(void) {
     int                 ts_fd;      /* 터치스크린 파일 기술자 */
@@ -44,6 +45,22 @@ void do_it(void) {
      */
     while (1) {
         ts_read = touch_read(ts_fd, &te);
+        
+#ifdef NONBLOCK_READ
+        if (ts_read == 1) {
+            usleep(10000);
+            continue;
+        }
+        else if (ts_read == -1) {
+            print_error("do_it(): error while touch_read().\n");
+            return;
+        }
+#else
+        if (ts_read == -1) {
+            print_error("do_it(): error while touch_read().\n");
+            return;
+        }
+#endif
         
         if (te.touch_state == TOUCH_STATE_BEGIN) {
             paint_touch_start(mypaint, te.x, te.y);

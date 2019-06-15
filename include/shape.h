@@ -33,12 +33,6 @@
 (TYPE & 0x10)
 
 /**
- * zindex는 shape를 만들 때마다 계속해서 늘어나야 합니다.
- * 그래서 전역 static 변수로 만들어서 계속 늘려줍니다.
- */
-static unsigned int zindex_count = 0;
-
-/**
  * shape가 나타내는 offset을 포함한 실제 영역을 두 개의 양 끝점으로 표현해줍니다.
  * 이미 존재하는 함수를 받아서 사용합니다.
  */
@@ -104,8 +98,6 @@ SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE_REUSE(SHAPE_PTR, X, Y, WIDTH, HEIGHT);
  */
 #define SHAPE(NAME)                                                     \
 struct shape NAME = {0};                                                \
-NAME.zindex = zindex_count++;                                           
-
 
 /**
  * 새로운 shape 구조체를 힙에다 만들고 초기화합니다.
@@ -113,17 +105,6 @@ NAME.zindex = zindex_count++;
 #define SHAPE_ALLOC(NAME)                                               \
 struct shape *NAME = (struct shape *)malloc(sizeof(struct shape));      \
 memset(NAME, 0, sizeof(struct shape));                                  \
-NAME->zindex = zindex_count++;
-
-/*
-#define SHAPE_FREE(PTR)                                                 \
-do {                                                                    \
-if (PTR->fdraw_points.head != NULL) {                                   \
-points_free(&PTR->fdraw_points);                                        \
-}                                                                       \
-free(PTR);                                                              \
-} while (0)
-*/
 
 /**
  * 이 프로그램에 필요한 모든 도형을 표현할 수 있는 구조체입니다.
@@ -151,12 +132,6 @@ struct shape {
      * offset은 음수일 수도, 양수일 수도 있습니다!
      */
     int                 offset[2];
-    
-    /**
-     * 도형의 높낮이(z축)를 저장합니다. 숫자가 높을수록 사용자와 가깝습니다.
-     * 65535를 설마 넘겠어...
-     */
-    unsigned short      zindex;
     
     /**
      * 예..그냥 한 픽셀 컬러입니다.

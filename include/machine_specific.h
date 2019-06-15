@@ -11,7 +11,12 @@
 #define TS_FD_PATH                   "/dev/input/event1"
 #define DP_FD_PATH                   "/dev/fb2"
 
+#ifdef NONBLOCK_READ
 #define TS_OPEN_OPTION               O_RDONLY
+#else
+#define TS_OPEN_OPTION               O_RDONLY | O_NONBLOCK
+#endif
+
 #define DP_OPEN_OPTION               O_RDWR
 
 #define DP_WIDTH                     320

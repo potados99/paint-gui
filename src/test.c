@@ -15,8 +15,6 @@
 int draw_read_test() {
     int                 ts_fd; /* 터치스크린 파일 기술자 */
     int                 dp_fd; /* 디스플레이 파일 기술자 */
-    int                 ts_read; /* 터치 읽은 결과 저장 */
-    int                 touched; /* 터치 상태 저장 */
     int                 last_x = 0; /* 이전 터치 x좌표 저장 */
     int                 last_y = 0; /* 이전 터치 y좌표 저장 */
     unsigned long       line_num = 0;
@@ -120,7 +118,7 @@ int draw_read_test() {
      */
     while (1) {
         
-        ts_read = touch_read(ts_fd, &te);
+        touch_read(ts_fd, &te);
         
         if (te.touch_state == TOUCH_STATE_BEGIN) {
             /**
@@ -129,13 +127,11 @@ int draw_read_test() {
              */
             last_x = te.x;
             last_y = te.y;
-            touched = 1;
         }
         else if (te.touch_state == TOUCH_STATE_DONE) {
             /**
              * 터치가 막 끝났을 때.
              */
-            touched = 0;
         }
         
         /**
@@ -237,9 +233,6 @@ int shape_creation_test(void) {
         printf("Shape color: 0x%04x\n",
                cur_shape->color);
         
-        printf("Shape zindex: %d\n",
-               cur_shape->zindex);
-        
         /**
          * 마냑에 fdraw_points가 유효하다면은,,,
          */
@@ -326,7 +319,6 @@ int area_test(void) {
 int button_test(void) {
     int                 ts_fd; /* 터치스크린 파일 기술자 */
     int                 dp_fd; /* 디스플레이 파일 기술자 */
-    int                 ts_read; /* 터치 읽은 결과 저장 */
     
     /**
      * touch_event 구조체 선언 & 초기화
@@ -354,7 +346,7 @@ int button_test(void) {
     struct paint *mypaint = paint_create();
 
     while (1) {
-        ts_read = touch_read(ts_fd, &te);
+        touch_read(ts_fd, &te);
         
         if (te.touch_state == TOUCH_STATE_BEGIN) {
             paint_touch_start(mypaint, te.x, te.y);

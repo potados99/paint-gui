@@ -379,6 +379,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
 
             switch (context->draw_mode) {
                 case MODE_LINE: {
+                    
                     shape = shape_create(ST_LINEP, x, y, x, y, context->draw_color);
                     _add_shape(context, shape);
                     
@@ -397,7 +398,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
                 case MODE_RECT: {
-                    shape = shape_create(ST_RECTP, x, y, x, y, context->draw_color);
+                    shape = shape_create(context->fill ? ST_RECTP_FILL : ST_RECTP, x, y, x, y, context->draw_color);
                     _add_shape(context, shape);
                     
                     disp_set_direct(true);

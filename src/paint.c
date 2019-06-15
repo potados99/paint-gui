@@ -136,7 +136,7 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     return NULL;
 }
 
-static inline void _draw_ui(void) {
+static inline void _draw_ui_background(void) {
     register int offset = 0;
     
     disp_set_direct(true);
@@ -149,6 +149,73 @@ static inline void _draw_ui(void) {
     
     disp_set_direct(false);
 }
+
+static inline void _draw_ui_canvas(void) {
+    disp_set_direct(true);
+    disp_draw_rect_fill(65, 4, 192, 232, COLOR_WHITE);
+    disp_set_direct(false);
+}
+
+static inline void _draw_ui_color_palette(void) {
+    disp_set_direct(true);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C0_LOCATION),
+                        Y(UI_PALETTE_C0_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_WHITE);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C1_LOCATION),
+                        Y(UI_PALETTE_C1_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_MAGENTA);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C2_LOCATION),
+                        Y(UI_PALETTE_C2_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_RED);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C3_LOCATION),
+                        Y(UI_PALETTE_C3_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_GREEN);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C4_LOCATION),
+                        Y(UI_PALETTE_C4_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_YELLOW);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C5_LOCATION),
+                        Y(UI_PALETTE_C5_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_BLUE);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C6_LOCATION),
+                        Y(UI_PALETTE_C6_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_CYAN);
+    
+    disp_draw_rect_fill(X(UI_PALETTE_C7_LOCATION),
+                        Y(UI_PALETTE_C7_LOCATION),
+                        UI_PALETTE_ITEM_WIDTH,
+                        UI_PALETTE_ITEM_HEIGHT,
+                        COLOR_BLACK);
+
+    disp_set_direct(false);
+}
+
+static inline void _draw_ui(void) {
+    _draw_ui_background();
+    _draw_ui_canvas();
+    _draw_ui_color_palette();
+}
+
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
 

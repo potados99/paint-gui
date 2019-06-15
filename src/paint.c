@@ -294,7 +294,7 @@ void paint_touch_start(struct paint *context, int x, int y) {
          * 캔버스에서 새로운 무언가를 합니다.
          */
         
-        print_info("paint_touch_start(): touch inside canvas. current mode is %d.\n", context->mode);
+        print_info("paint_touch_start(): touch inside canvas. current mode is %d.\n", context->draw_mode);
         
         switch (context->draw_mode) {
             case MODE_LINE:

@@ -481,8 +481,8 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 }
                 case MODE_FDRAW: {
                     shape = shapes_list_peek_last(&context->shapes);
-                    
-                    points_add(&shape->fdraw_points, x, y);
+                                        
+                    shape_add_point(shape, x, y);
                     
                     disp_set_direct(true);
                     disp_draw_linep(context->last_x, context->last_y, x, y, context->draw_color);
@@ -632,7 +632,7 @@ void paint_touch_drag(struct paint *context, int x, int y) {
          * 이 프로그램에서, 캔버스 밖에서 발생한 터치를 시작점으로 하는 드래그는
          * 필요가 없습니다. 따라서 무시합니다!
          */
-        print_info("paint_touch_drag(): ignoring drag.\n");
+        print_trace("paint_touch_drag(): ignore drag.\n");
         return;
     }
     

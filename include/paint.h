@@ -2,6 +2,7 @@
  * paint.h
  * 그림판 구실을 하게 만들어줄 함수들입니다.
  */
+
 #ifndef paint_h
 #define paint_h
 
@@ -57,14 +58,9 @@ struct paint {
      * 현재 입력 상태를 저장합니다.
      */
     unsigned char   touch_state;
-    
-    unsigned char   current_action;
     bool            touch_started_from_canvas;
     
     struct shape    *selected_shape;
-    
-    int             touch_start_x;
-    int             touch_start_y;
     
     int             last_x;
     int             last_y;

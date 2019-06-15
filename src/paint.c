@@ -23,7 +23,6 @@ static inline void _init(struct paint *context) {
     context->canvas_color = UI_DEFAULT_CANVAS_COLOR;
     
     context->touch_state = TOUCH_STATE_DONE;
-    context->current_action = ACTION_NONE;
     
     LIST_HEAD_REINIT(context->shapes);
 }
@@ -195,6 +194,8 @@ static inline void _draw_ui(void) {
  * 버튼에 선택되었음을 알리는 시각 효과를 추가합니다.
  */
 static inline void _mark_button(const struct button *btn) {
+    ASSERTDO(btn != NULL, return);
+    
     if (!(btn->type & (BT_MARKABLE))) {
         /**
          * 마크 불가능한 버튼이면 아무 일도 하지 않습니다!
@@ -249,57 +250,57 @@ static inline void _on_button_clicked(struct paint *context, const struct button
             
         case UI_BTN_LINE: {
             if (context->fill) {
-                print_info("_on_button_clicked(): Cannot draw line with fill mode.\n");
+                print_info("_on_button_clicked(): cannot draw line with fill mode.\n");
                 return;
             }
             context->draw_mode = MODE_LINE;
-            print_info("_on_button_clicked(): Set draw mode to line.\n");
+            print_info("_on_button_clicked(): set draw mode to line.\n");
             break;
         }
             
         case UI_BTN_RECT: {
             context->draw_mode = MODE_RECT;
-            print_info("_on_button_clicked(): Set draw mode to rect.\n");
+            print_info("_on_button_clicked(): set draw mode to rect.\n");
             break;
         }
             
         case UI_BTN_OVAL: {
             context->draw_mode = MODE_OVAL;
-            print_info("_on_button_clicked(): Set draw mode to oval.\n");
+            print_info("_on_button_clicked(): set draw mode to oval.\n");
             break;
         }
             
         case UI_BTN_FDRAW: {
             if (context->fill) {
-                print_info("_on_button_clicked(): Cannot do free draw with fill mode.\n");
+                print_info("_on_button_clicked(): cannot do free draw with fill mode.\n");
                 return;
             }
             context->draw_mode = MODE_FDRAW;
-            print_info("_on_button_clicked(): Set draw mode to free draw.\n");
+            print_info("_on_button_clicked(): set draw mode to free draw.\n");
             break;
         }
             
         case UI_BTN_SELECT: {
             context->draw_mode = MODE_SELECT;
-            print_info("_on_button_clicked(): Set draw mode to select.\n");
+            print_info("_on_button_clicked(): set draw mode to select.\n");
             break;
         }
             
         case UI_BTN_ERASE: {
             context->draw_mode = MODE_ERASE;
-            print_info("_on_button_clicked(): Set draw mode to erase.\n");
+            print_info("_on_button_clicked(): set draw mode to erase.\n");
             break;
         }
             
         case UI_BTN_CLEAR: {
             _clear_canvas(context);
-            print_info("_on_button_clicked(): Clear canvas and remove all shapes.\n");
+            print_info("_on_button_clicked(): clear canvas and remove all shapes.\n");
             break;
         }
             
         case UI_BTN_PEN: {
             context->fill = false;
-            print_info("_on_button_clicked(): Set fill mode to pen(non-fill).\n");
+            print_info("_on_button_clicked(): set fill mode to pen(non-fill).\n");
             break;
         }
             
@@ -623,8 +624,6 @@ void paint_touch_start(struct paint *context, int x, int y) {
     print_trace("paint_touch_start(): touch start at (%d, %d)\n", x, y);
 
     context->touch_state = TOUCH_STATE_BEGIN;
-    context->touch_start_x = x;
-    context->touch_start_y = y;
     
     /**
      * 터치가 시작될 때, 이 터치가 캔버스(그림이 그려지는 부분) 안으로부터 시작된 터치인지 확인하는 flag를
@@ -668,13 +667,6 @@ void paint_touch_drag(struct paint *context, int x, int y) {
         print_trace("paint_touch_drag(): ignore drag.\n");
         return;
     }
-    
-    if (context->draw_mode == MODE_ERASE) {
-        /**
-         * 지우기 동작은 터치가 맨 처음 닿는 지점에 그 순간에 한번만 일어납니다!
-         */
-        return;
-    }
 
     /**
      * 캔버스에서 해야 할 일은 이 친구에게~
@@ -690,11 +682,6 @@ void paint_touch_end(struct paint *context, int x, int y) {
     print_trace("paint_touch_end(): touch end at (%d, %d)\n", x, y);
 
     context->touch_state = TOUCH_STATE_DONE;
-    
-    /**
-     * 터치가 끝났으면 어쨌든 그리는 중은 아닌 것이므로 false로 set해줍니다. 확실하게!!
-     */
-    context->current_action = ACTION_NONE;
     
     /**
      * 캔버스에서 해야 할 일은 이 친구에게~

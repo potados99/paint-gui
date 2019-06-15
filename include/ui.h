@@ -1,3 +1,7 @@
+/**
+ * ui.h
+ * 프로그램에서 사용할 ui 요소들에 대한 정보를 모아두었습니다.
+ */
 
 #ifndef ui_h
 #define ui_h
@@ -7,7 +11,7 @@
 #include "color.h"
 
 /**
- * UI 요소들의 위치와 크기, 색상입니다.
+ * UI 요소(버튼으로 쓰임)들의 위치와 크기, 색상입니다.
  */
 #define UI_BUTTON_LINE_LOCATION     POINT(5, 15)
 #define UI_BUTTON_RECT_LOCATION     POINT(5, 45)
@@ -71,22 +75,39 @@
 #define UI_BTN_C6                   0x27
 #define UI_BTN_C7                   0x28
 
+/**
+ * 버튼의 타입을 이루는 요소들입니다.
+ * 버튼의 타입은 마크 가능 여부와 색상 보유 여부를 나타냅니다.
+ * 예시: type이 BT_MARKABLE | BT_COLORABLE이면 해당 버튼은
+ * 선택되었음으로 마크할 수도 있고 색상을 가져 색칠할 수 있습니다.
+ */
 #define BT_MARKABLE                 0x01
-#define BT_COLORABLE                0x04
+#define BT_COLORABLE                0x02
 
 #define UI_NUMBER_OF_BUTTONS        17
 
 struct button {
     int             type;
+    
     int             x;
     int             y;
+    
     int             width;
     int             height;
+    
     unsigned short  color;
+    
     int             id;
 };
 
+/**
+ * ui 비트맵 이미지입니다.
+ */
 extern const unsigned char ui_image[DP_WIDTH * DP_HEIGHT];
+
+/**
+ * 프로그램에서 사용할 버튼들의 컬렉션입니다.
+ */
 extern const struct button ui_buttons[UI_NUMBER_OF_BUTTONS];
 
 /**

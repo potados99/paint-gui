@@ -1,65 +1,33 @@
-/**
- * TODO: 각 파일 include 정리
- */
+/*******************************************************************
+ * 2019년 1학기 임베디드시스템 기말 팀 과제
+ *
+ * 프로젝트 이름 :     paint-gui
+ * 프로젝트 시작 :     2019.06.03
+ * 프로젝트 종료 :     2019.06.17
+ * 프로젝트 진행 :     공동 기획 및 설계, 영역별 개인 역할분담
+ * 프로젝트 구성 :     { 김00, 송00, 이00, 홍00 }
+ *
+ * 프로그램 구조 :
+ * 프로그램은 크게 입출력과 처리 부분으로 나뉘어집니다.
+ * 사용자로부터 터치 입력을 받아서 처리한 뒤 디스플레이로 출력하는 흐름을 가집니다.
+ * 함수 호출 구조는 다음과 같습니다.
+ *
+ *  main()
+ *      -> do_it()                                  (at routine.h)
+ *          -> touch_read()                         (at touch.h)
+ *              -> paint_touch_***()                (at paint.h)
+ *                  -> ...                          (at paint.c)
+ *                      -> disp_draw_***()          (at display.h)
+ *                      -> disp_commit()            (at display.h)
+ *
+ * README.md에 자세한 설명이 실려있습니다.
+ *******************************************************************/
 
-#include "touch.h"
-#include "display.h"
-#include "paint.h"
-#include "machine_specific.h"
-
-#include <fcntl.h>
+#include "routine.h" /* do_it() */
 
 int main(int argc, const char *argv[]) {
-    int                 ts_fd;      /* 터치스크린 파일 기술자 */
-    int                 dp_fd;      /* 디스플레이 파일 기술자 */
-    int                 ts_read;    /* 터치 읽은 결과 저장 */
-    
-    /**
-     * touch_event 구조체 선언 & 초기화
-     */
-    TOUCH_EVENT(te);
-    
-    /**
-     * 터치스크린 열기!
-     */
-    ts_fd = open(TS_FD_PATH, TS_OPEN_OPTION);
-    ASSERTDO(ts_fd != -1, print_error("open() error with %s.\n", TS_FD_PATH); return -1);
-    
-    /**
-     * 디스플레이 열기!
-     */
-    dp_fd = open(DP_FD_PATH, DP_OPEN_OPTION);
-    ASSERTDO(dp_fd != -1, print_error("open() error with %s.\n", DP_FD_PATH); return -1);
-    
-    /**
-     * 디스플레이 사용 준비!
-     */
-    disp_map(dp_fd);
-    
-    /**
-     * 그림판 실체화!
-     */
-    struct paint *mypaint = paint_create();
-    
-    /**
-     * 무한루프!!!!!
-     */
-    while (1) {
-        ts_read = touch_read(ts_fd, &te);
-        
-        if (te.touch_state == TOUCH_STATE_BEGIN) {
-            paint_touch_start(mypaint, te.x, te.y);
-        }
-        else if (te.touch_state == TOUCH_STATE_DRAG) {
-            paint_touch_drag(mypaint, te.x, te.y);
-        }
-        else if (te.touch_state == TOUCH_STATE_DONE) {
-            paint_touch_end(mypaint, te.x, te.y);
-        }
-    }
-    
-    /* 닿을수없는곳 */
-    
+    do_it();
+
 	return 0;
 }
 

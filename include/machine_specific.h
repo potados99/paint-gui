@@ -2,7 +2,7 @@
  * machine_specific.h
  * 기기별로 다른 변수들을 모아 놓았습니다.
  * 다른 곳에 두기에는 너무 제 Odroid-C1에 국한된 것들이 많아서
- * 여기에 배치했습니당.
+ * 여기에 배치했습니다.
  */
 
 #ifndef machine_specific_h

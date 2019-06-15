@@ -9,19 +9,21 @@
  * display라는 모듈 또는 객체를 만들어 그곳에 보관할 수도 있지만,
  * 있어봤자 디스플레이는 한개인데...
  */
-static unsigned short   *dp_mem;                /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
+static unsigned short   *dp_mem = NULL;         /* 실제 디스플레이의 파일 기술자에 map될 메모리 주소를 담는 변수. */
 static unsigned short 	dp_buf[DP_MEM_SIZE];    /* 디스플레이에 쓰기 전, 변화를 저장하는 버퍼 역할의 변수.*/
 static unsigned long 	bitmap[DP_BITMAP_SIZE]; /* 변화가 생긴 지점을 저장하는 메타데이터 역할의 변수. */
 
 static bool             direct;                 /* 직접 쓰기 모드의 활성화 여부를 저장하는 변수. */
 
 
-/********************************************************************************************/
+/*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (시작)] *************************/
 /**
- * 여기에 속하는 함수 또는 매크로들은 1초에 적어도 수십번씩 실행될 것들이라
- * 퍼포먼스가 매우매우 중요합니다...
+ * 이 친구들은 퍼포먼스가 중요한 친구들입니다.
  */
 
+/**
+ * 임시 버퍼에 쓰인 변경사항을 실제 디스플레이에 적용합니다.
+ */
 static inline void _apply(int x, int y, int width, int height) {
     /**
      * 점은 음수일 수 있어도, 크기는 그러면 안됩니다.
@@ -66,7 +68,6 @@ static inline void _apply(int x, int y, int width, int height) {
         height = DP_HEIGHT - y;
     }
     
-    
     print_trace("_apply(): apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
 	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
@@ -96,8 +97,13 @@ static inline void _apply(int x, int y, int width, int height) {
 
 }
 
+/**
+ * 변경사항을 임시 버퍼에 씁니다.
+ * 바로 디스플레이로 가지는 않습니다.
+ */
 static inline void _modify(int offset,  unsigned short color) {
-    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_info("_modify: offset{%d} out of range.\n", offset); return);
+    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_info("_modify(): offset{%d} out of range.\n", offset); return);
+    ASSERTDO(dp_mem != NULL, print_error("_modify(): dp_mem is null. call disp_map before use!\n"); return);
 
     print_trace("_modify(): modify pixel at offset %d to %d.\n", offset, color);
 
@@ -110,6 +116,9 @@ static inline void _modify(int offset,  unsigned short color) {
     }
 }
 
+/**
+ * 선에 기울기에 따라 두 함수를 사용합니다.
+ */
 static inline void _line_low(int x0, int y0, int x1, int y1, unsigned short color) {
     int dx = x1 - x0;
     int dy = y1 - y0;
@@ -134,7 +143,6 @@ static inline void _line_low(int x0, int y0, int x1, int y1, unsigned short colo
         D += 2*dy;
     }
 }
-
 static inline void _line_high(int x0, int y0, int x1, int y1, unsigned short color) {
     int dx = x1 - x0;
     int dy = y1 - y0;
@@ -159,7 +167,8 @@ static inline void _line_high(int x0, int y0, int x1, int y1, unsigned short col
         D += 2*dx;
     }
 }
-/********************************************************************************************/
+
+/*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
 
 
 void disp_map(int fd) {

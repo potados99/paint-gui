@@ -1,9 +1,13 @@
+/**
+ * color.h
+ * 색상을 만드는 매크로와 미리 정의된 색상들을 모아두었습니다.
+ */
 
 #ifndef color_h
 #define color_h
 
 /**
- * unsigned int 타입에 적절한 한 픽셀을 만드는 매크로입니다.
+ * unsigned int 타입의 픽셀을 만드는 매크로입니다.
  */
 #define COLOR(R, G, B)  \
 (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))

@@ -86,7 +86,14 @@ struct button {
     int             id;
 };
 
-extern unsigned char UI_IMAGE[DP_WIDTH * DP_HEIGHT];
-extern struct button buttons[UI_NUMBER_OF_BUTTONS];
+extern const unsigned char ui_image[DP_WIDTH * DP_HEIGHT];
+extern const struct button ui_buttons[UI_NUMBER_OF_BUTTONS];
+
+/**
+ * 주어진 값(좌표 또는 id)으로 버튼을 찾습니다. 없으면 NULL!
+ */
+const struct button *ui_find_button_by_coordinate(int x, int y);
+const struct button *ui_find_button_by_id(int id);
 
 #endif /* ui_h */
+

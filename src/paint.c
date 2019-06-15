@@ -152,7 +152,7 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
     do {
         disp_draw_point(offset % DP_WIDTH,
                         offset / DP_WIDTH,
-                        GET_BIT8(UI_IMAGE, offset) ? back_color : ui_color);
+                        GET_BIT8(ui_image, offset) ? back_color : ui_color);
    	} while (++offset < DP_MEM_SIZE);
     
     disp_set_direct(false);
@@ -180,11 +180,11 @@ static inline void _draw_ui_buttons(void) {
     disp_set_direct(true);
     
     for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
-        if (buttons[i].type & BT_COLORABLE) {
+        if (ui_buttons[i].type & BT_COLORABLE) {
             /**
              * 색칠 가능한 버튼들을 그려줍니다.
              */
-            disp_draw_rect_fill(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height, buttons[i].color);
+            disp_draw_rect_fill(ui_buttons[i].x, ui_buttons[i].y, ui_buttons[i].width, ui_buttons[i].height, ui_buttons[i].color);
         }
     }
     
@@ -206,32 +206,7 @@ static inline void _draw_ui(void) {
     _draw_ui_buttons();
 }
 
-/**
- * 현재 좌표에 해당하는 ui 요소를 가져옵니다.
- */
-static inline struct button *_find_button_by_coordinate(int x, int y) {
-    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
-        if (POINT_IN_AREA(POINT(buttons[i].x, buttons[i].y),
-                          SIZE(buttons[i].width, buttons[i].height),
-                          x, y)) {
-            return (buttons + i);
-        }
-    }
-    
-    return NULL;
-}
-
-static inline struct button *_find_button_by_id(int id) {
-    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
-        if (buttons[i].id == id) {
-            return (buttons + i);
-        }
-    }
-    
-    return NULL;
-}
-
-static inline void _mark_button(struct button *btn) {
+static inline void _mark_button(const struct button *btn) {
     if (!(btn->type & (BT_MARKABLE))) {
         /**
          * 마크 불가능한 버튼이면 아무 일도 하지 않습니다!
@@ -244,10 +219,10 @@ static inline void _mark_button(struct button *btn) {
          * 모든 버튼들을 순회하면서, 파라미터로 들어온 버튼과 같은 그룹에 속하는 버튼이 있으면,
          * 마크를 지워줍니다!
          */
-        if (UI_GROUP(btn->id) == UI_GROUP(buttons[i].id)) {
+        if (UI_GROUP(btn->id) == UI_GROUP(ui_buttons[i].id)) {
             disp_set_direct(true);
             
-            disp_draw_rect(buttons[i].x - 2, buttons[i].y - 2, buttons[i].width + 4, buttons[i].height + 4, UI_DEFAULT_BACK_COLOR);
+            disp_draw_rect(ui_buttons[i].x - 2, ui_buttons[i].y - 2, ui_buttons[i].width + 4, ui_buttons[i].height + 4, UI_DEFAULT_BACK_COLOR);
             
             disp_set_direct(false);
         }
@@ -322,7 +297,7 @@ void paint_touch_start(struct paint *context, int x, int y) {
          * UI 버튼을 처리합니다.
          */
         
-        struct button *btn = _find_button_by_coordinate(x, y);
+        const struct button *btn = ui_find_button_by_coordinate(x, y);
         ASSERTDO(btn != NULL , return);
         
         switch (btn->id) {

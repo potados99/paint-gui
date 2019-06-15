@@ -1,6 +1,8 @@
 #!/bin/bash
 
+./setup
+
 ./paint
 while (true); do
-    ./paint "$@"
+    ./paint
 done

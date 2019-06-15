@@ -86,7 +86,7 @@ static inline void _apply(int x, int y, int width, int height) {
 	do {
 		if (GET_BIT32(bitmap, offset)) {
 
-            print_trace("_apply(): write to display memory at offset{%d max} %d.\n", offset_max, offset);
+            print_trace("_apply(): write to display memory at offset %d. (until %d).\n", offset, offset_max);
 
 			*(dp_mem + offset) = *(dp_buf + offset);
 		

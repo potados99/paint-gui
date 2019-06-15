@@ -137,22 +137,17 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
 }
 
 static inline void _draw_ui(void) {
-    int i, j;
-    unsigned short pixel;
-    int index = 0;
-    for (i = 0; i < DP_HEIGHT; i++) {
-        for (j = 0; j < DP_WIDTH; j++) {
-            if (GET_BIT8(UI_IMAGE, index)) {
-                pixel = COLOR(204, 204, 0);
-            }
-            else {
-                pixel = COLOR_BLACK;
-            }
-            disp_draw_point(j, i, pixel);
-            index++;
-        }
-    }
-    disp_commit();
+    register int offset = 0;
+    
+    disp_set_direct(true);
+
+    do {
+        disp_draw_point(offset % DP_WIDTH,
+                        offset / DP_HEIGHT,
+                        GET_BIT8(UI_IMAGE, offset) ? COLOR(204, 204, 0) : COLOR_BLACK);
+    } while (offset < DP_MEM_SIZE);
+    
+    disp_set_direct(false);
 }
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/

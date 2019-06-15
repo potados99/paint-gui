@@ -388,6 +388,12 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     
                     print_info("_on_canvas_touched(): new line created at (%d, %d).\n", x, y);
                     
+                    SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(shape, x, y, w, h);
+                    SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(shape, x0, y0, x1, y1);
+
+                    print_info("line info: p(%d, %d), s(%d, %d)\n", x, y, w, h);
+                    print_info("line info: p0(%d, %d), p1(%d, %d)\n", x0, y0, x1, y1);
+
                     return;
                 }
                 case MODE_RECT: {
@@ -426,6 +432,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 }
                 case MODE_ERASE: {
                     shape = _pick_shape(context, x, y);
+                    ASSERTDO(shape != NULL, return);
                     
                     SHAPE_EXPORT_AREA_TO_TWO_POINTS_REUSE(shape, x0, y0, x1, y1);
                     shape_delete(shape);

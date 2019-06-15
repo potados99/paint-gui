@@ -289,8 +289,21 @@ void disp_draw_2d_shape(struct shape *shape) {
     }
     
     if (SHAPE_BY_TWO_POINTS(shape->type)) {
-        SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, x0, y0, x1, y1);
-        draw_function(x0, y0, x1, y1, shape->color);
+        if (shape->type == ST_LINEP) {
+            /**
+             * 선은 두 점이 반드시 좌상단과 우하단을 대표하지 않습니다.
+             * 따라서 변환 없이 그냥 넘겨야 합니다.
+             */
+            draw_function(shape->value[0] + shape->offset[0],
+                          shape->value[1] + shape->offset[1],
+                          shape->value[2] + shape->offset[0],
+                          shape->value[3] + shape->offset[1],
+                          shape->color);
+        }
+        else {
+            SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, x0, y0, x1, y1);
+            draw_function(x0, y0, x1, y1, shape->color);
+        }
     }
     else {
         SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, x, y, width, height);

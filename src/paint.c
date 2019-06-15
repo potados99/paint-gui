@@ -481,7 +481,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 }
                 case MODE_FDRAW: {
                     shape = shapes_list_peek_last(&context->shapes);
-                                        
+                    
                     shape_add_point(shape, x, y);
                     
                     disp_set_direct(true);

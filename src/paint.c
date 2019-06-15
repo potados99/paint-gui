@@ -152,11 +152,13 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
 
 static inline void _draw_ui_canvas(void) {
     disp_set_direct(true);
+    
     disp_draw_rect_fill(X(UI_CANVAS_LOCATION), 
 						Y(UI_CANVAS_LOCATION), 
 						WIDTH(UI_CANVAS_SIZE), 
 						HEIGHT(UI_CANVAS_SIZE), 
 						UI_DEFAULT_CANVAS_COLOR);
+    
     disp_set_direct(false);
 }
 
@@ -171,56 +173,54 @@ static inline void _draw_ui_color_palette(void) {
     
     disp_draw_rect_fill(X(UI_PALETTE_C1_LOCATION),
                         Y(UI_PALETTE_C1_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_MAGENTA);
     
     disp_draw_rect_fill(X(UI_PALETTE_C2_LOCATION),
                         Y(UI_PALETTE_C2_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_RED);
     
     disp_draw_rect_fill(X(UI_PALETTE_C3_LOCATION),
                         Y(UI_PALETTE_C3_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_GREEN);
     
     disp_draw_rect_fill(X(UI_PALETTE_C4_LOCATION),
                         Y(UI_PALETTE_C4_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_YELLOW);
     
     disp_draw_rect_fill(X(UI_PALETTE_C5_LOCATION),
                         Y(UI_PALETTE_C5_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_BLUE);
     
     disp_draw_rect_fill(X(UI_PALETTE_C6_LOCATION),
                         Y(UI_PALETTE_C6_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_CYAN);
     
     disp_draw_rect_fill(X(UI_PALETTE_C7_LOCATION),
                         Y(UI_PALETTE_C7_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_BLACK);
 
     disp_set_direct(false);
 }
 
 static inline void _draw_ui(void) {
-	disp_clear();
-	usleep(100000);
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
-	usleep(100000);
+	usleep(300000);
     _draw_ui_canvas();
-	usleep(100000);
+	usleep(300000);
     _draw_ui_color_palette();
 }
 

@@ -18,31 +18,31 @@
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
 
-#define SWAP(X, Y)                          \
-do {                                        \
-    __typeof__ (X) _temp = X;               \
-    X = Y;                                  \
-    Y = _temp;                              \
+#define SWAP(X, Y)                                                  \
+do {                                                                \
+    __typeof__ (X) _temp = X;                                       \
+    X = Y;                                                          \
+    Y = _temp;                                                      \
 } while(0)
 
-#define ENSURE_RIGHT_BIGGER(LEFT, RIGHT)    \
-do {                                        \
-    if (LEFT > RIGHT) {                     \
-        SWAP(LEFT, RIGHT);                  \
-    }                                       \
-} while (0)                                 \
+#define ENSURE_RIGHT_BIGGER(LEFT, RIGHT)                            \
+do {                                                                \
+    if (LEFT > RIGHT) {                                             \
+        SWAP(LEFT, RIGHT);                                          \
+    }                                                               \
+} while (0)                                                         \
 
-#define GET_BIT(PTR, OFFSET)                        \
-((*(PTR + (OFFSET / 32))) & (1 << (OFFSET % 32)))
+#define GET_BIT(PTR, OFFSET, BIT_WIDTH)                             \
+((*(PTR + (OFFSET / (BIT_WIDTH)))) & (1 << (OFFSET % (BIT_WIDTH))))
 
-#define SET_BIT(PTR, OFFSET)                        \
-do {                                                \
-*(PTR + (OFFSET / 32)) |= (1 << (OFFSET % 32));     \
+#define SET_BIT(PTR, OFFSET, BIT_WIDTH)                             \
+do {                                                                \
+*(PTR + (OFFSET / (BIT_WIDTH))) |= (1 << (OFFSET % (BIT_WIDTH)));   \
 } while (0)
 
-#define UNSET_BIT(PTR, OFFSET)                      \
-do {                                                \
-*(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
+#define UNSET_BIT(PTR, OFFSET, BIT_WIDTH)                           \
+do {                                                                \
+*(PTR + (OFFSET / (BIT_WIDTH))) &= ~(1 << (OFFSET % (BIT_WIDTH)));  \
 } while (0)
 
 #endif /* macros_h */

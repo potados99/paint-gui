@@ -32,5 +32,17 @@ do {                                        \
     }                                       \
 } while (0)                                 \
 
+#define GET_BIT(PTR, OFFSET)                        \
+((*(PTR + (OFFSET / 32))) & (1 << (OFFSET % 32)))
+
+#define SET_BIT(PTR, OFFSET)                        \
+do {                                                \
+*(PTR + (OFFSET / 32)) |= (1 << (OFFSET % 32));     \
+} while (0)
+
+#define UNSET_BIT(PTR, OFFSET)                      \
+do {                                                \
+*(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
+} while (0)
 
 #endif /* macros_h */

@@ -5,10 +5,12 @@
 #include "shape.h"
 #include "machine_specific.h"
 #include "display.h"
+#include "ui.h"
+#include "macros.h"
 
 #include <unistd.h> /* for test */
 
-/********************************************************************************************/
+/*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (시작) ] *************************/
 
 /**
  * 한 점이 캔버스 영역에 속하는지 검사합니다.
@@ -133,7 +135,28 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     
     return NULL;
 }
-/********************************************************************************************/
+
+static inline void _draw_ui(void) {
+    int i, j;
+    unsigned short pixel;
+    int index = 0;
+    for (i = 0; i<240; i++) {
+        for (j = 0; j<320; j++) {
+            if (GET_BIT(UI_IMAGE, index)) {
+                pixel = COLOR(204, 204, 0);
+            }
+            else {
+                pixel = COLOR_BLACK;
+            }
+            disp_draw_point(j, i, pixel);
+            index++;
+        }
+    }
+    disp_commit();
+}
+
+/*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
+
 
 struct paint *paint_create(int x, int y, int width, int height) {
     PAINT_ALLOC(new_paint);
@@ -225,6 +248,9 @@ void paint_touch_end(struct paint *context, int x, int y) {
 }
 
 void paint_test(struct paint *context) {
+    _draw_ui();
+    return;
+    
     /**
      * 도형 생성
      */

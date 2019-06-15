@@ -31,18 +31,6 @@ static bool             direct;                 /* 직접 쓰기 모드의 활�
  * 여기에 속하는 함수 또는 매크로들은 1초에 적어도 수십번씩 실행될 것들이라
  * 퍼포먼스가 매우매우 중요합니다...
  */
-#define GET_BIT(PTR, OFFSET)                        \
-((*(PTR + (OFFSET / 32))) & (1 << (OFFSET % 32)))
-
-#define SET_BIT(PTR, OFFSET)                        \
-do {                                                \
-*(PTR + (OFFSET / 32)) |= (1 << (OFFSET % 32));     \
-} while (0)
-
-#define UNSET_BIT(PTR, OFFSET)                      \
-do {                                                \
-*(PTR + (OFFSET / 32)) &= ~(1 << (OFFSET % 32));    \
-} while (0)
 
 static inline void _apply(int x, int y, int width, int height) {
     /**

@@ -478,6 +478,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 }
                 case MODE_SELECT: {
                     shape = context->selected_shape;
+                    ASSERTDO(shape != NULL, return);
                     
                     _move_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
                     
@@ -611,7 +612,7 @@ void paint_touch_drag(struct paint *context, int x, int y) {
          * 이 프로그램에서, 캔버스 밖에서 발생한 터치를 시작점으로 하는 드래그는
          * 필요가 없습니다. 따라서 무시합니다!
          */
-        print_trace("paint_touch_drag(): ignoring drag.\n");
+        print_info("paint_touch_drag(): ignoring drag.\n");
         return;
     }
     

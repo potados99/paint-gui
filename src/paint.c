@@ -576,6 +576,10 @@ struct paint *paint_create(void) {
     
     _draw_ui();
     
+    _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_LINE));
+    _on_button_clicked(new_paint, ui_find_button_by_id(UI_PALETTE_C7_COLOR));
+    _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_PEN));
+
     return new_paint;
 }
 

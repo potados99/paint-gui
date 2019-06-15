@@ -10,6 +10,7 @@
 #include "test.h"
 #include "metric.h"
 #include "paint.h"
+#include "color.h"
 
 int draw_read_test() {
     int                 ts_fd; /* 터치스크린 파일 기술자 */
@@ -273,16 +274,6 @@ int shape_creation_test(void) {
 int paint_usecase_test() {
     int                 ts_fd; /* 터치스크린 파일 기술자 */
     int                 dp_fd; /* 디스플레이 파일 기술자 */
-    int                 ts_read; /* 터치 읽은 결과 저장 */
-    int                 touched; /* 터치 상태 저장 */
-    int                 last_x = 0; /* 이전 터치 x좌표 저장 */
-    int                 last_y = 0; /* 이전 터치 y좌표 저장 */
-    unsigned long       line_num = 0;
-    
-    /**
-     * touch_event 구조체 선언 & 초기화
-     */
-    TOUCH_EVENT(te);
     
     /**
      * 터치스크린 열기!
@@ -307,7 +298,7 @@ int paint_usecase_test() {
     disp_draw_whole(COLOR(255, 255, 255));
     disp_commit();
     
-    struct paint *paint = paint_create(0, 0, 320, 240);
+    struct paint *paint = paint_create();
     paint_test(paint);
     
     return 0;
@@ -330,4 +321,53 @@ int area_test(void) {
     printf("p(%d, %d) and s(%d, %d)\n\n", x, y, width, height);
     
     return 0;
+}
+
+int button_test(void) {
+    int                 ts_fd; /* 터치스크린 파일 기술자 */
+    int                 dp_fd; /* 디스플레이 파일 기술자 */
+    int                 ts_read; /* 터치 읽은 결과 저장 */
+    
+    /**
+     * touch_event 구조체 선언 & 초기화
+     */
+    TOUCH_EVENT(te);
+    
+    /**
+     * 터치스크린 열기!
+     */
+    ts_fd = open(TS_FD_PATH, TS_OPEN_OPTION);
+    ASSERTDO(ts_fd != -1, print_error("open() error with %s.\n", TS_FD_PATH); return -1);
+    
+    /**
+     * 디스플레이 열기!
+     */
+    dp_fd = open(DP_FD_PATH, DP_OPEN_OPTION);
+    ASSERTDO(dp_fd != -1, print_error("open() error with %s.\n", DP_FD_PATH); return -1);
+    
+    /**
+     * mmap 해줍니다. 결과는 display.c에 전역변수로 들어가있습니다.
+     */
+    disp_map(dp_fd);
+    
+
+    struct paint *mypaint = paint_create();
+
+    /**
+     * 터치를 읽어서 각 점과 점 사이에 직선을 그려줍니다.
+     */
+    while (1) {
+        
+        ts_read = touch_read(ts_fd, &te);
+        
+        if (te.touch_state == TOUCH_STATE_BEGIN) {
+            paint_touch_start(mypaint, te.x, te.y);
+        }
+        else if (te.touch_state == TOUCH_STATE_DONE) {
+
+        }
+        else if (te.touch_state == TOUCH_STATE_DONE) {
+            
+        }
+    }
 }

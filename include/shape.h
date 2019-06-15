@@ -9,6 +9,7 @@
 #include "metric.h"
 #include "macros.h"
 #include "list.h"
+#include "color.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -30,22 +31,6 @@
 
 #define SHAPE_BY_TWO_POINTS(TYPE) \
 (TYPE & 0x10)
-
-
-/**
- * unsigned int 타입에 적절한 한 픽셀을 만드는 매크로입니다.
- */
-#define COLOR(R, G, B)  \
-(((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))
-
-#define COLOR_BLACK     COLOR(0, 0, 0)
-#define COLOR_RED       COLOR(255, 0, 0)
-#define COLOR_GREEN     COLOR(0, 255, 0)
-#define COLOR_BLUE      COLOR(0, 0, 255)
-#define COLOR_YELLOW    COLOR(255, 255, 0)
-#define COLOR_CYAN      COLOR(0, 255, 255)
-#define COLOR_MAGENTA   COLOR(255, 0, 255)
-#define COLOR_WHITE     COLOR(255, 255, 255)
 
 /**
  * zindex는 shape를 만들 때마다 계속해서 늘어나야 합니다.

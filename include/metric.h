@@ -42,6 +42,9 @@
 #define DELTA_WIDTH(P0, P1)     ABS(WIDTH(P1) - WIDTH(P0))
 #define DELTA_HEIGHT(P0, P1)    ABS(HEIGHT(P1) - HEIGHT(P0))
 
+#define POINT_IN_AREA(LOCATION, SIZE, _X, _Y)       \
+(IN_RANGE(_X, X(LOCATION), (X(LOCATION) + WIDTH(SIZE) - 1))) && (IN_RANGE(_Y, Y(LOCATION), (Y(LOCATION) + HEIGHT(SIZE) - 1)))
+
 /**
  * 폭과 높이 모두 양수임이 확실하게 해줍니다.
  */
@@ -69,7 +72,7 @@ do {                                                \
 /**
  * 정수 X가 START <= X <= END인지 검사합니다.
  */
-#define IN_RANGE(X, START, END) ((X >= START) && (X <= END))
+#define IN_RANGE(X, START, END) ((X >= (START)) && (X <= (END)))
 
 /**
  * point_node 구조체를 할당해서 초기화해줍니다.

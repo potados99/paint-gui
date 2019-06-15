@@ -15,9 +15,10 @@
 #define MODE_LINE           1
 #define MODE_RECT           2
 #define MODE_OVAL           3
-#define MODE_SELECT         4
-#define MODE_ERASE          5
-#define MODE_CLEAR          6
+#define MODE_FDRAW          4
+#define MODE_SELECT         5
+#define MODE_ERASE          6
+#define MODE_CLEAR          7
 
 #define ACTION_NONE         0
 #define ACTION_DRAW         1
@@ -43,10 +44,10 @@ struct paint {
      * 그림판의 기본적인 맥락(context)입니당.
      * 그리기 모드, 채우기 여부, 색상입니다.
      */
-    unsigned char       mode;
+    unsigned char       draw_mode;
     bool                fill;
     unsigned short      draw_color;
-    unsigned short      back_color;
+    unsigned short      canvas_color;
     
     /**
      * 캔버스에 그려진 도형들을 저장할 list head입니다
@@ -72,8 +73,7 @@ struct paint {
  * paint 구조체를 새로 만들어서 돌려줍니다.
  * 할당도 초기화도 다해주는 착한녀석..^^ 그냥 갖다 쓰기만 하면 돼요..ㅎㅎ
  */
-struct paint *paint_create(int x, int y, int width, int height);
-struct paint *paint_createp(int x0, int y0, int x1, int y1);
+struct paint *paint_create(void);
 
 /**
  * 터치에 반응하는 함수들입니다.

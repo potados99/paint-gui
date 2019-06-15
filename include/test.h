@@ -10,5 +10,6 @@ int list_test(void);
 int shape_creation_test(void);
 int paint_usecase_test(void);
 int area_test(void);
+int button_test(void);
 
 #endif /* test_h */

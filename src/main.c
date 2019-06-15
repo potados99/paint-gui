@@ -12,9 +12,11 @@ int main(int argc, const char *argv[]) {
     
     //shape_creation_test();
     
-    paint_usecase_test();
+    // paint_usecase_test();
     
     //area_test();
+    
+    button_test();
     
 	return 0;
 }

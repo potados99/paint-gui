@@ -24,10 +24,15 @@ static inline bool _point_in_canvas(struct paint *context, int x, int y) {
  * paint 구조체에 적절한 초기값을 대입합니다.
  */
 static inline void _init(struct paint *context) {
-    context->mode = MODE_LINE;
+    context->canvas_x = X(UI_CANVAS_LOCATION);
+    context->canvas_y = Y(UI_CANVAS_LOCATION);
+    context->canvas_width = WIDTH(UI_CANVAS_SIZE);
+    context->canvas_height = HEIGHT(UI_CANVAS_SIZE);
+
+    context->draw_mode = MODE_LINE;
     context->fill = false;
     context->draw_color = PAINT_DEFAULT_DRAW_COLOR;
-    context->back_color = PAINT_DEFAULT_BACK_COLOR;
+    context->canvas_color = PAINT_DEFAULT_BACK_COLOR;
     
     context->touch_state = TOUCH_STATE_DONE;
     context->current_action = ACTION_NONE;
@@ -44,7 +49,7 @@ static inline void _redraw_area(struct paint *context, int x, int y, int width, 
     /**
      * 영역을 지우고 (배경색으로)
      */
-    disp_draw_rect_fill(x, y, width, height, context->back_color);
+    disp_draw_rect_fill(x, y, width, height, context->canvas_color);
     
     /**
      * 새로 그리고
@@ -69,7 +74,7 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
     /**
      * 영역을 지우고 (배경색으로)
      */
-    disp_draw_rectp_fill(x0, y0, x1, y1, context->back_color);
+    disp_draw_rectp_fill(x0, y0, x1, y1, context->canvas_color);
     
     /**
      * 새로 그리고
@@ -136,6 +141,9 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     return NULL;
 }
 
+/**
+ * ui의 배경색을 칠하고 그 위에 윤곽과 글씨를 씁니다.
+ */
 static inline void _draw_ui_background(unsigned short back_color, unsigned short ui_color) {
     register int offset = 0;
     
@@ -150,18 +158,24 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
     disp_set_direct(false);
 }
 
-static inline void _draw_ui_canvas(void) {
+/**
+ * 캔버스를 그립니다.
+ */
+static inline void _draw_ui_canvas(unsigned short canvas_color) {
     disp_set_direct(true);
     
     disp_draw_rect_fill(X(UI_CANVAS_LOCATION), 
 						Y(UI_CANVAS_LOCATION), 
 						WIDTH(UI_CANVAS_SIZE), 
 						HEIGHT(UI_CANVAS_SIZE), 
-						UI_DEFAULT_CANVAS_COLOR);
+						canvas_color);
     
     disp_set_direct(false);
 }
 
+/**
+ * 색상 선택 팔레트를 그립니다.
+ */
 static inline void _draw_ui_color_palette(void) {
     disp_set_direct(true);
     
@@ -219,30 +233,97 @@ static inline void _draw_ui_color_palette(void) {
 static inline void _draw_ui(void) {
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
 	usleep(300000);
-    _draw_ui_canvas();
+    _draw_ui_canvas(UI_DEFAULT_CANVAS_COLOR);
 	usleep(300000);
     _draw_ui_color_palette();
 }
 
+static inline int _pick_ui_element(int x, int y) {
+
+    if (POINT_IN_AREA(UI_BUTTON_LINE_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // LINE
+        return UI_BTN_LINE;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_RECT_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // RECTANGLE
+        return UI_BTN_RECT;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_OVAL_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // OVAL
+        return UI_BTN_OVAL;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_FDRAW_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // FREE DRAW
+        return UI_BTN_FDRAW;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_SELECT_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // SELECT
+        return UI_BTN_SELECT;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_ERASE_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // ERASE
+        return UI_BTN_ERASE;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_CLEAR_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
+        // CLEAR
+        return UI_BTN_CLEAR;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_PEN_LOCATION, UI_BUTTON_ITEM_SIZE_SMALL, x, y)) {
+        // PEN
+        return UI_BTN_PEN;
+    }
+    else if (POINT_IN_AREA(UI_BUTTON_FILL_LOCATION, UI_BUTTON_ITEM_SIZE_SMALL, x, y)) {
+        // FILL
+        return UI_BTN_FILL;
+    }
+
+    else if (POINT_IN_AREA(UI_PALETTE_C0_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 0 (white)
+        return UI_BTN_C0;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C1_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 1 (magenta)
+        return UI_BTN_C1;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C2_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 2 (red)
+        return UI_BTN_C2;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C3_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 3 (green)
+        return UI_BTN_C3;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C4_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 4 (yellow)
+        return UI_BTN_C4;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C5_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 5 (blue)
+        return UI_BTN_C5;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C6_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 6 (cyan)
+        return UI_BTN_C6;
+    }
+    else if (POINT_IN_AREA(UI_PALETTE_C7_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
+        // COLOR 7 (black)
+        return UI_BTN_C7;
+    }
+  
+    return UI_BTN_NONE;
+}
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
 
 
-struct paint *paint_create(int x, int y, int width, int height) {
+struct paint *paint_create(void) {
     PAINT_ALLOC(new_paint);
-    
-    new_paint->canvas_x = x;
-    new_paint->canvas_y = y;
-    new_paint->canvas_width = width;
-    new_paint->canvas_height = height;
     
     _init(new_paint);
     
+    _draw_ui();
+    
     return new_paint;
-}
-
-struct paint *paint_createp(int x0, int y0, int x1, int y1) {
-    return paint_create(MIN(x0, x1), MIN(y0, y1), ABS(x1 - x0) + 1, ABS(y1 - y0) + 1);
 }
 
 void paint_touch_start(struct paint *context, int x, int y) {
@@ -257,24 +338,118 @@ void paint_touch_start(struct paint *context, int x, int y) {
      */
     context->touch_started_from_canvas = _point_in_canvas(context, x, y);
     
-    switch (context->mode) {
-        case MODE_LINE:
-            break;
-        case MODE_RECT:
-            break;
-        case MODE_OVAL:
-            break;
-        case MODE_SELECT:
-            break;
-        case MODE_ERASE:
-            break;
-        case MODE_CLEAR:
-            break;
-        default:
-            print_error("paint_touch_start(): mode not selecteed.\n");
-            return;
+    if (context->touch_started_from_canvas) {
+        /**
+         * 캔버스에서 새로운 무언가를 합니다.
+         */
+        
+        print_info("paint_touch_start(): touch inside canvas. current mode is %d.\n", context->mode);
+        
+        switch (context->draw_mode) {
+            case MODE_LINE:
+                break;
+            case MODE_RECT:
+                break;
+            case MODE_OVAL:
+                break;
+            case MODE_FDRAW:
+                break;
+            case MODE_SELECT:
+                break;
+            case MODE_ERASE:
+                break;
+            case MODE_CLEAR:
+                break;
+            default:
+                print_error("paint_touch_start(): mode not selecteed.\n");
+                return;
+        }
     }
-    
+    else {
+        /**
+         * UI 버튼을 처리합니다.
+         */
+        switch (_pick_ui_element(x, y)) {
+            case UI_BTN_LINE:
+                context->draw_mode = MODE_LINE;
+                print_info("Set draw mode to line.\n");
+                break;
+            case UI_BTN_RECT:
+                context->draw_mode = MODE_RECT;
+                print_info("Set draw mode to rect.\n");
+                break;
+            case UI_BTN_OVAL:
+                context->draw_mode = MODE_OVAL;
+                print_info("Set draw mode to oval.\n");
+                break;
+            case UI_BTN_FDRAW:
+                context->draw_mode = MODE_FDRAW;
+                print_info("Set draw mode to free draw.\n");
+                break;
+            case UI_BTN_SELECT:
+                context->draw_mode = MODE_SELECT;
+                print_info("Set draw mode to select.\n");
+                break;
+            case UI_BTN_ERASE:
+                context->draw_mode = MODE_ERASE;
+                print_info("Set draw mode to erase.\n");
+                break;
+            case UI_BTN_CLEAR:
+                context->draw_mode = MODE_CLEAR;
+                print_info("Set draw mode to clear.\n");
+                break;
+                
+            case UI_BTN_PEN:
+                context->fill = false;
+                print_info("Set fill mode to pen(non-fill).\n");
+                break;
+            case UI_BTN_FILL:
+                context->fill = true;
+                print_info("Set fill mode to fill.\n");
+                break;
+                
+            case UI_BTN_C0:
+                context->draw_color = UI_PALETTE_C0_COLOR;
+                print_info("Set draw color to c0.\n");
+                break;
+            case UI_BTN_C1:
+                context->draw_color = UI_PALETTE_C1_COLOR;
+                print_info("Set draw color to c1.\n");
+                break;
+            case UI_BTN_C2:
+                context->draw_color = UI_PALETTE_C2_COLOR;
+                print_info("Set draw color to c2.\n");
+                break;
+            case UI_BTN_C3:
+                context->draw_color = UI_PALETTE_C3_COLOR;
+                print_info("Set draw color to c3.\n");
+                break;
+            case UI_BTN_C4:
+                context->draw_color = UI_PALETTE_C4_COLOR;
+                print_info("Set draw color to c4.\n");
+                break;
+            case UI_BTN_C5:
+                context->draw_color = UI_PALETTE_C5_COLOR;
+                print_info("Set draw color to c5.\n");
+                break;
+            case UI_BTN_C6:
+                context->draw_color = UI_PALETTE_C6_COLOR;
+                print_info("Set draw color to c6.\n");
+                break;
+            case UI_BTN_C7:
+                context->draw_color = UI_PALETTE_C7_COLOR;
+                print_info("Set draw color to c7.\n");
+                break;
+
+            default:
+                /**
+                 * 아무것도 선택하지 않았어요,,, 허공을 찔렀네요.
+                 * 무시!
+                 */
+                return;
+            }
+    }
+
     
     
     

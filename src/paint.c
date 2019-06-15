@@ -244,13 +244,9 @@ static inline void _draw_ui(void) {
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
 
 	usleep(300000);
-<<<<<<< HEAD
+    
     _draw_ui_canvas(UI_DEFAULT_CANVAS_COLOR);
-=======
 
-    _draw_ui_canvas();
-
->>>>>>> abb8db938081a415bac69f4a16a93cd44f449e66
 	usleep(300000);
 
     _draw_ui_color_palette();

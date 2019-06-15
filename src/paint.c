@@ -63,7 +63,12 @@ static inline void _redraw_area(struct paint *context, int x, int y, int width, 
     /**
      * 그 변화를 commit합니다.
      */
-    disp_commit_partial(x, y, width, height);
+    disp_commit_partial(MAX(x, context->canvas_x),
+                        MAX(y, context->canvas_y),
+                        MIN(width, context->canvas_width),
+                        MIN(height, context->canvas_height));
+    
+    disp_cancel();
 }
 
 /**
@@ -88,7 +93,12 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
     /** 
      * 그 변화를 commit합니다.
      */
-    disp_commit_partialp(x0, y0, x1, y1);
+    disp_commit_partialp(MAX(x0, context->canvas_x),
+                         MAX(y0, context->canvas_y),
+                         MIN(x1, context->canvas_x + context->canvas_width - 1),
+                         MIN(y1, context->canvas_y + context->canvas_height - 1));
+    
+    disp_cancel();
 }
 
 /**

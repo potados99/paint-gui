@@ -52,19 +52,19 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
      */
     if (x0 < context->canvas_x0 && x1 < context->canvas_x0) {
         /* 왼쪽으로 완전히 사라짐 */
-        return;
+        goto finish;
     }
     else if (x0 > context->canvas_x1 && x1 > context->canvas_x1) {
         /* 오른쪽으로 완전히 사라짐 */
-        return;
+        goto finish;
     }
     else if (y0 < context->canvas_y0 && y1 < context->canvas_y0) {
         /* 위쪽으로 완전히 사라짐 */
-        return;
+        goto finish;
     }
     else if (y0 > context->canvas_y1 && y1 > context->canvas_y1) {
         /* 아래쪽으로 완전히 사라짐 */
-        return;
+        goto finish;
     }
     
     /**
@@ -89,6 +89,7 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
                          MIN(x1, context->canvas_x1),
                          MIN(y1, context->canvas_y1));
     
+finish:
     disp_cancel();
 }
 

@@ -12,13 +12,12 @@
 #include "metric.h"
 #include "debug.h"
 
-#define MODE_LINE           1
-#define MODE_RECT           2
-#define MODE_OVAL           3
-#define MODE_FDRAW          4
-#define MODE_SELECT         5
-#define MODE_ERASE          6
-#define MODE_CLEAR          7
+#define MODE_LINE           0x11
+#define MODE_RECT           0x12
+#define MODE_OVAL           0x13
+#define MODE_FDRAW          0x14
+#define MODE_SELECT         0x05
+#define MODE_ERASE          0x06
 
 #define ACTION_NONE         0
 #define ACTION_DRAW         1
@@ -61,6 +60,8 @@ struct paint {
     
     unsigned char   current_action;
     bool            touch_started_from_canvas;
+    
+    struct shape    *selected_shape;
     
     int             touch_start_x;
     int             touch_start_y;

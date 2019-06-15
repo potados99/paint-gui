@@ -40,47 +40,64 @@ static unsigned int zindex_count = 0;
 
 /**
  * shape가 나타내는 offset을 포함한 실제 영역을 두 개의 양 끝점으로 표현해줍니다.
+ * 이미 존재하는 함수를 받아서 사용합니다.
  */
-#define SHAPE_EXPORT_AREA_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)          \
-int X0 = SHAPE_PTR->value[0];                                               \
-int Y0 = SHAPE_PTR->value[1];                                               \
-int X1 = SHAPE_PTR->value[2];                                               \
-int Y1 = SHAPE_PTR->value[3];                                               \
-do {                                                                        \
-    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                             \
-        ENSURE_POINTS_ORDERED(X0, Y0, X1, Y1);                              \
-        X1 += SHAPE_PTR->offset[0];                                         \
-        Y1 += SHAPE_PTR->offset[1];                                         \
-    }                                                                       \
-    else {                                                                  \
-        ENSURE_SIZE_POSITIVE(X0, Y0, X1, Y1);                               \
-        X1 += X0 - (X1 > 0);                                                \
-        Y1 += Y0 - (Y1 > 0);                                                \
-    }                                                                       \
-    X0 += SHAPE_PTR->offset[0];                                             \
-    Y0 += SHAPE_PTR->offset[1];                                             \
+#define SHAPE_EXPORT_AREA_TO_TWO_POINTS_REUSE(SHAPE_PTR, X0, Y0, X1, Y1)            \
+X0 = SHAPE_PTR->value[0];                                                           \
+Y0 = SHAPE_PTR->value[1];                                                           \
+X1 = SHAPE_PTR->value[2];                                                           \
+Y1 = SHAPE_PTR->value[3];                                                           \
+do {                                                                                \
+    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                                     \
+        ENSURE_POINTS_ORDERED(X0, Y0, X1, Y1);                                      \
+        X1 += SHAPE_PTR->offset[0];                                                 \
+        Y1 += SHAPE_PTR->offset[1];                                                 \
+    }                                                                               \
+    else {                                                                          \
+        ENSURE_SIZE_POSITIVE(X0, Y0, X1, Y1);                                       \
+        X1 += X0 - (X1 > 0);                                                        \
+        Y1 += Y0 - (Y1 > 0);                                                        \
+    }                                                                               \
+    X0 += SHAPE_PTR->offset[0];                                                     \
+    Y0 += SHAPE_PTR->offset[1];                                                     \
 } while (0)
 
 /**
  * shape가 나타내는 offset을 포함한 실제 영역을 한 개의 점과 width와 height로 표현해줍니다.
+ * 이미 존재하는 변수를 받아서 사용합니다.
  */
-#define SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(SHAPE_PTR, X, Y, WIDTH, HEIGHT) \
-int X = SHAPE_PTR->value[0];                                                \
-int Y = SHAPE_PTR->value[1];                                                \
-int WIDTH = SHAPE_PTR->value[2];                                            \
-int HEIGHT = SHAPE_PTR->value[3];                                           \
-do {                                                                        \
-    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                             \
-        ENSURE_POINTS_ORDERED(X, Y, WIDTH, HEIGHT);                         \
-        WIDTH = WIDTH - X + 1;                                              \
-        HEIGHT = HEIGHT - Y + 1;                                            \
-    }                                                                       \
-    else {                                                                  \
-        ENSURE_SIZE_POSITIVE(X, Y, WIDTH, HEIGHT);                          \
-    }                                                                       \
-    X += SHAPE_PTR->offset[0];                                              \
-    Y += SHAPE_PTR->offset[1];                                              \
+#define SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE_REUSE(SHAPE_PTR, X, Y, WIDTH, HEIGHT)   \
+X = SHAPE_PTR->value[0];                                                            \
+Y = SHAPE_PTR->value[1];                                                            \
+WIDTH = SHAPE_PTR->value[2];                                                        \
+HEIGHT = SHAPE_PTR->value[3];                                                       \
+do {                                                                                \
+    if (SHAPE_BY_TWO_POINTS(SHAPE_PTR->type)) {                                     \
+        ENSURE_POINTS_ORDERED(X, Y, WIDTH, HEIGHT);                                 \
+        WIDTH = WIDTH - X + 1;                                                      \
+        HEIGHT = HEIGHT - Y + 1;                                                    \
+    }                                                                               \
+    else {                                                                          \
+        ENSURE_SIZE_POSITIVE(X, Y, WIDTH, HEIGHT);                                  \
+    }                                                                               \
+    X += SHAPE_PTR->offset[0];                                                      \
+    Y += SHAPE_PTR->offset[1];                                                      \
 } while (0)
+
+/**
+ * 위와 같으나 여기서는 변수를 새로 할당해줍니다.
+ */
+#define SHAPE_EXPORT_AREA_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)                  \
+int X0, Y0, X1, Y1;                                                                 \
+SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE_REUSE(SHAPE_PTR, X0, Y0, X1, Y1);
+
+/**
+ * 얘도 마찬가지!
+ */
+#define SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(SHAPE_PTR, X, Y, WIDTH, HEIGHT)         \
+int X, Y, WIDTH, HEIGHT;                                                            \
+SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE_REUSE(SHAPE_PTR, X, Y, WIDTH, HEIGHT);
+
 
 /**
  * 새로운 shape 구조체를 만드는 매크로입니다. 0으로 초기화 해줍니다.
@@ -178,6 +195,11 @@ void shape_delete(struct shape *shape);
  * 힙에 존재하는 shape를 리스트 끝에 이어줍니다.
  */
 void shapes_list_add(struct list_head *shapes_head, struct shape *shape);
+
+/**
+ * 리스트 맨 끝에 있는 shape를 뽑아줍니다.
+ */
+struct shape *shapes_list_peek_last(struct list_head *shapes_head);
 
 /**
  * 특정 점이 특정 shape 영역 내에 있는지 판단합니다.

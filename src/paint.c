@@ -13,14 +13,6 @@
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (시작) ] *************************/
 
 /**
- * 한 점이 캔버스 영역에 속하는지 검사합니다.
- */
-static inline bool _point_in_canvas(struct paint *context, int x, int y) {
-    return (IN_RANGE(x, context->canvas_x, context->canvas_x + context->canvas_width - 1) &&
-            IN_RANGE(y, context->canvas_y, context->canvas_y + context->canvas_height - 1));
-}
-
-/**
  * paint 구조체에 적절한 초기값을 대입합니다.
  */
 static inline void _init(struct paint *context) {
@@ -28,7 +20,7 @@ static inline void _init(struct paint *context) {
     context->canvas_y = Y(UI_CANVAS_LOCATION);
     context->canvas_width = WIDTH(UI_CANVAS_SIZE);
     context->canvas_height = HEIGHT(UI_CANVAS_SIZE);
-
+    
     context->draw_mode = MODE_LINE;
     context->fill = false;
     context->draw_color = PAINT_DEFAULT_DRAW_COLOR;
@@ -38,6 +30,16 @@ static inline void _init(struct paint *context) {
     context->current_action = ACTION_NONE;
     
     LIST_HEAD_REINIT(context->shapes);
+}
+
+/**
+ * 한 점이 캔버스 영역에 속하는지 검사합니다.
+ */
+static inline bool _point_in_canvas(struct paint *context, int x, int y) {
+    return POINT_IN_AREA(POINT(context->canvas_x, context->canvas_y),
+                         SIZE(context->canvas_x + context->canvas_width - 1,
+                               context->canvas_y + context->canvas_height - 1),
+                         x, y);
 }
 
 /**
@@ -142,6 +144,13 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
 }
 
 /**
+ * paint 구조체의 shape 연결리스트에 파라미터로 받은 도형을 추가해줍니다.
+ */
+static inline void _add_shape(struct paint *context, struct shape *shape) {
+    shapes_list_add(&context->shapes, shape);
+}
+
+/**
  * ui의 배경색을 칠하고 그 위에 윤곽과 글씨를 씁니다.
  */
 static inline void _draw_ui_background(unsigned short back_color, unsigned short ui_color) {
@@ -206,6 +215,9 @@ static inline void _draw_ui(void) {
     _draw_ui_buttons();
 }
 
+/**
+ * 버튼에 선택되었음을 알리는 시각 효과를 추가합니다.
+ */
 static inline void _mark_button(const struct button *btn) {
     if (!(btn->type & (BT_MARKABLE))) {
         /**
@@ -238,6 +250,248 @@ static inline void _mark_button(const struct button *btn) {
     disp_set_direct(false);
 }
 
+static inline void _clear_canvas(struct paint *context) {
+    struct shape *cur;
+    struct shape *save;
+    list_for_each_entry_safe(cur, save, &context->shapes, list) {
+        shape_delete(cur);
+    }
+    
+    _draw_ui_canvas(UI_DEFAULT_CANVAS_COLOR);
+}
+
+/**
+ * 버튼이 눌렸을 때 적절한 행동을 합니다.
+ */
+static inline void _on_button_clicked(struct paint *context, const struct button *btn) {
+    switch (btn->id) {
+        case UI_BTN_LINE:
+            if (context->fill) {
+                print_info("_on_button_clicked(): Cannot draw line with fill mode.\n");
+                return;
+            }
+            context->draw_mode = MODE_LINE;
+            print_info("_on_button_clicked(): Set draw mode to line.\n");
+            break;
+        case UI_BTN_RECT:
+            context->draw_mode = MODE_RECT;
+            print_info("_on_button_clicked(): Set draw mode to rect.\n");
+            break;
+        case UI_BTN_OVAL:
+            context->draw_mode = MODE_OVAL;
+            print_info("_on_button_clicked(): Set draw mode to oval.\n");
+            break;
+        case UI_BTN_FDRAW:
+            if (context->fill) {
+                print_info("_on_button_clicked(): Cannot do free draw with fill mode.\n");
+                return;
+            }
+            context->draw_mode = MODE_FDRAW;
+            print_info("_on_button_clicked(): Set draw mode to free draw.\n");
+            break;
+        case UI_BTN_SELECT:
+            context->draw_mode = MODE_SELECT;
+            print_info("_on_button_clicked(): Set draw mode to select.\n");
+            break;
+        case UI_BTN_ERASE:
+            context->draw_mode = MODE_ERASE;
+            print_info("_on_button_clicked(): Set draw mode to erase.\n");
+            break;
+        case UI_BTN_CLEAR:
+            _clear_canvas(context);
+            print_info("_on_button_clicked(): Clear canvas and remove all shapes.\n");
+            break;
+            
+        case UI_BTN_PEN:
+            context->fill = false;
+            print_info("_on_button_clicked(): Set fill mode to pen(non-fill).\n");
+            break;
+        case UI_BTN_FILL:
+            if (context->draw_mode == MODE_LINE || context->draw_mode == MODE_FDRAW) {
+                print_info("_on_button_clicked(): Cannot draw line or do free draw with fill mode.\n");
+                return;
+            }
+            context->fill = true;
+            print_info("_on_button_clicked(): Set fill mode to fill.\n");
+            break;
+            
+        case UI_BTN_C0:
+            context->draw_color = UI_PALETTE_C0_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c0.\n");
+            break;
+        case UI_BTN_C1:
+            context->draw_color = UI_PALETTE_C1_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c1.\n");
+            break;
+        case UI_BTN_C2:
+            context->draw_color = UI_PALETTE_C2_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c2.\n");
+            break;
+        case UI_BTN_C3:
+            context->draw_color = UI_PALETTE_C3_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c3.\n");
+            break;
+        case UI_BTN_C4:
+            context->draw_color = UI_PALETTE_C4_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c4.\n");
+            break;
+        case UI_BTN_C5:
+            context->draw_color = UI_PALETTE_C5_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c5.\n");
+            break;
+        case UI_BTN_C6:
+            context->draw_color = UI_PALETTE_C6_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c6.\n");
+            break;
+        case UI_BTN_C7:
+            context->draw_color = UI_PALETTE_C7_COLOR;
+            print_info("_on_button_clicked(): Set draw color to c7.\n");
+            break;
+            
+        default:
+            /**
+             * 여기에 걸리면 그건 컴파일시점에 뭐가 틀린겁니다,,,,!!!
+             */
+            print_error("_on_button_clicked(): UNKNOWN BUTTON ID: %d\n", btn->id);
+            return;
+    }
+    
+    _mark_button(btn);
+}
+
+/**
+ * 캔버스로 터치 입력이 들어왔을 때 적절한 행동을 합니다.
+ */
+static inline void _on_canvas_touched(struct paint *context, int x, int y) {
+    
+    struct shape *shape;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
+    
+    switch (context->touch_state) {
+            
+        case TOUCH_STATE_BEGIN: {
+            /**
+             * 터치가 막 시작된 상황!!!!!
+             */
+            switch (context->draw_mode) {
+                case MODE_LINE: {
+                    shape = shape_create(ST_LINEP, x, y, x, y, context->draw_color);
+                    _add_shape(context, shape);
+                    
+                    disp_set_direct(true);
+                    disp_draw_2d_shape(shape);
+                    disp_set_direct(false);
+                    
+                    return;
+                }
+                case MODE_RECT: {
+                    shape = shape_create(ST_RECTP, x, y, x, y, context->draw_color);
+                    _add_shape(context, shape);
+                    
+                    disp_set_direct(true);
+                    disp_draw_2d_shape(shape);
+                    disp_set_direct(false);
+                    
+                    return;
+                }
+                case MODE_OVAL: {
+                    // shape = shape_create(ST_RECTP, x, y, x, y, context->draw_color);
+                    // _add_shape(context, shape);
+                    return;
+                }
+                case MODE_FDRAW: {
+                    shape = shape_create(ST_FREEP, x, y, x, y, context->draw_color);
+                    points_add(&shape->fdraw_points, x, y);
+                    _add_shape(context, shape);
+                    
+                    disp_set_direct(true);
+                    disp_draw_2d_shape(shape);
+                    disp_set_direct(false);
+
+                    return;
+                }
+                case MODE_SELECT: {
+                    context->selected_shape = _pick_shape(context, x, y);
+                    return;
+                }
+                case MODE_ERASE: {
+                    shape = _pick_shape(context, x, y);
+                    
+                    SHAPE_EXPORT_AREA_TO_TWO_POINTS_REUSE(shape, x0, y0, x1, y1);
+                    shape_delete(shape);
+                    
+                    _redraw_areap(context, x0, y0, x1, y1);
+                    return;
+                }
+                    
+                default:
+                    /* 임파서블!! */
+                    return;
+            }
+            
+            /* 사실 여기에 도달할 일이 없다. */
+            return;
+        }
+            
+        case TOUCH_STATE_DRAG: {
+            /**
+             * 터치 드래그중일때!!
+             */
+            switch (context->draw_mode) {
+                case MODE_LINE:
+                    break;
+                case MODE_RECT:
+                    break;
+                case MODE_OVAL:
+                    break;
+                case MODE_FDRAW:
+                    break;
+                case MODE_SELECT:
+                    break;
+                case MODE_ERASE:
+                    break;
+
+                default:
+                    return;
+            }
+            
+        }
+            break;
+            
+        case TOUCH_STATE_DONE: {
+            /**
+             * 터치가 끝날 때!! 이게 마지막 터치!!
+             */
+            switch (context->draw_mode) {
+                case MODE_LINE:
+                    break;
+                case MODE_RECT:
+                    break;
+                case MODE_OVAL:
+                    break;
+                case MODE_FDRAW:
+                    break;
+                case MODE_SELECT:
+                    break;
+                case MODE_ERASE:
+                    break;
+
+                default:
+                    return;
+            }
+            
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+
+}
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
 
@@ -257,6 +511,8 @@ void paint_touch_start(struct paint *context, int x, int y) {
     print_trace("paint_touch_start(): touch start at (%d, %d)\n", x, y);
 
     context->touch_state = TOUCH_STATE_BEGIN;
+    context->touch_start_x = x;
+    context->touch_start_y = y;
     
     /**
      * 터치가 시작될 때, 이 터치가 캔버스(그림이 그려지는 부분) 안으로부터 시작된 터치인지 확인하는 flag를
@@ -268,124 +524,19 @@ void paint_touch_start(struct paint *context, int x, int y) {
          * 터치가 캔버스 안에 속한다면,
          * 캔버스에서 새로운 무언가를 합니다.
          */
-        
-        print_info("paint_touch_start(): touch inside canvas. current mode is %d.\n", context->draw_mode);
-        
-        switch (context->draw_mode) {
-            case MODE_LINE:
-                break;
-            case MODE_RECT:
-                break;
-            case MODE_OVAL:
-                break;
-            case MODE_FDRAW:
-                break;
-            case MODE_SELECT:
-                break;
-            case MODE_ERASE:
-                break;
-            case MODE_CLEAR:
-                break;
-            default:
-                print_error("paint_touch_start(): mode not selecteed.\n");
-                return;
-        }
+        _on_canvas_touched(context, x, y);
     }
     else {
         /**
          * 터치가 캔버스 밖이라면,
          * UI 버튼을 처리합니다.
+         * 이건 터치가 시작될 때에만 처리해주면 됩니다!
          */
-        
         const struct button *btn = ui_find_button_by_coordinate(x, y);
-        ASSERTDO(btn != NULL , return);
+        ASSERTDO(btn != NULL, return);
         
-        switch (btn->id) {
-            case UI_BTN_LINE:
-                context->draw_mode = MODE_LINE;
-                print_info("Set draw mode to line.\n");
-                break;
-            case UI_BTN_RECT:
-                context->draw_mode = MODE_RECT;
-                print_info("Set draw mode to rect.\n");
-                break;
-            case UI_BTN_OVAL:
-                context->draw_mode = MODE_OVAL;
-                print_info("Set draw mode to oval.\n");
-                break;
-            case UI_BTN_FDRAW:
-                context->draw_mode = MODE_FDRAW;
-                print_info("Set draw mode to free draw.\n");
-                break;
-            case UI_BTN_SELECT:
-                context->draw_mode = MODE_SELECT;
-                print_info("Set draw mode to select.\n");
-                break;
-            case UI_BTN_ERASE:
-                context->draw_mode = MODE_ERASE;
-                print_info("Set draw mode to erase.\n");
-                break;
-            case UI_BTN_CLEAR:
-                context->draw_mode = MODE_CLEAR;
-                print_info("Set draw mode to clear.\n");
-                break;
-                
-            case UI_BTN_PEN:
-                context->fill = false;
-                print_info("Set fill mode to pen(non-fill).\n");
-                break;
-            case UI_BTN_FILL:
-                context->fill = true;
-                print_info("Set fill mode to fill.\n");
-                break;
-                
-            case UI_BTN_C0:
-                context->draw_color = UI_PALETTE_C0_COLOR;
-                print_info("Set draw color to c0.\n");
-                break;
-            case UI_BTN_C1:
-                context->draw_color = UI_PALETTE_C1_COLOR;
-                print_info("Set draw color to c1.\n");
-                break;
-            case UI_BTN_C2:
-                context->draw_color = UI_PALETTE_C2_COLOR;
-                print_info("Set draw color to c2.\n");
-                break;
-            case UI_BTN_C3:
-                context->draw_color = UI_PALETTE_C3_COLOR;
-                print_info("Set draw color to c3.\n");
-                break;
-            case UI_BTN_C4:
-                context->draw_color = UI_PALETTE_C4_COLOR;
-                print_info("Set draw color to c4.\n");
-                break;
-            case UI_BTN_C5:
-                context->draw_color = UI_PALETTE_C5_COLOR;
-                print_info("Set draw color to c5.\n");
-                break;
-            case UI_BTN_C6:
-                context->draw_color = UI_PALETTE_C6_COLOR;
-                print_info("Set draw color to c6.\n");
-                break;
-            case UI_BTN_C7:
-                context->draw_color = UI_PALETTE_C7_COLOR;
-                print_info("Set draw color to c7.\n");
-                break;
-
-            default:
-                /**
-                 * 아무것도 선택하지 않았어요,,, 허공을 찔렀네요.
-                 * 무시!
-                 */
-                return;
-            }
-        
-        _mark_button(btn);
+        _on_button_clicked(context, btn);
     }
-
-    
-    
-    
     
     context->last_x = x;
     context->last_y = y;
@@ -405,7 +556,19 @@ void paint_touch_drag(struct paint *context, int x, int y) {
         print_trace("paint_touch_drag(): ignoring drag.\n");
         return;
     }
+    
+    if (context->draw_mode == MODE_ERASE) {
+        /**
+         * 지우기 동작은 터치가 맨 처음 닿는 지점에 그 순간에 한번만 일어납니다!
+         */
+        return;
+    }
 
+    /**
+     * 캔버스에서 해야 할 일은 이 친구에게~
+     */
+    _on_canvas_touched(context, x, y);
+    
     context->last_x = x;
     context->last_y = y;
 }
@@ -420,6 +583,11 @@ void paint_touch_end(struct paint *context, int x, int y) {
      * 터치가 끝났으면 어쨌든 그리는 중은 아닌 것이므로 false로 set해줍니다. 확실하게!!
      */
     context->current_action = ACTION_NONE;
+    
+    /**
+     * 캔버스에서 해야 할 일은 이 친구에게~
+     */
+    _on_canvas_touched(context, x, y);
     
     context->last_x = x;
     context->last_y = y;

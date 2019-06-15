@@ -54,9 +54,16 @@ void shape_delete(struct shape *shape) {
 }
 
 void shapes_list_add(struct list_head *shapes_head, struct shape *shape) {
-    NULL_CHECK("shape_move()", shapes_head);
+    NULL_CHECK("shapes_list_add()", shapes_head);
 
     list_add_tail(&shape->list, shapes_head);
+}
+
+struct shape *shapes_list_peek_last(struct list_head *shapes_head) {
+    NULL_CHECK_RET("shapes_list_peek_last()", shapes_head, NULL);
+    ASSERTDO(!list_empty(shapes_head), return NULL);
+    
+    return list_last_entry(shapes_head, struct shape, list);
 }
 
 bool shape_point_in_shape_area(struct shape *shape, int x, int y) {

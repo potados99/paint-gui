@@ -217,10 +217,24 @@ static inline void _draw_ui_color_palette(void) {
 }
 
 static inline void _draw_ui(void) {
+	/**
+	 * 헤헷
+	 */
+
+	disp_set_direct(true);
+	disp_draw_whole(UI_DEFAULT_BACK_COLOR);
+	disp_set_direct(false);
+
+	usleep(300000);
+
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
+
 	usleep(300000);
+
     _draw_ui_canvas();
+
 	usleep(300000);
+
     _draw_ui_color_palette();
 }
 

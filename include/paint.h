@@ -41,6 +41,14 @@ struct paint {
     int                 canvas_height;
     
     /**
+     * 다른 포맷으로도 담아둡니다.
+     */
+    int                 canvas_x0;
+    int                 canvas_y0;
+    int                 canvas_x1;
+    int                 canvas_y1;
+    
+    /**
      * 그림판의 기본적인 맥락(context)입니당.
      * 그리기 모드, 채우기 여부, 색상입니다.
      */

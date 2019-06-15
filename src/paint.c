@@ -17,6 +17,11 @@ static inline void _init(struct paint *context) {
     context->canvas_width = WIDTH(UI_CANVAS_SIZE);
     context->canvas_height = HEIGHT(UI_CANVAS_SIZE);
     
+    context->canvas_x0 = X(UI_CANVAS_LOCATION);
+    context->canvas_y0 = Y(UI_CANVAS_LOCATION);
+    context->canvas_x1 = X(UI_CANVAS_LOCATION) + WIDTH(UI_CANVAS_SIZE) - 1;
+    context->canvas_y1 = Y(UI_CANVAS_LOCATION) + HEIGHT(UI_CANVAS_SIZE) - 1;
+
     context->draw_mode = MODE_LINE;
     context->fill = false;
     context->draw_color = PAINT_DEFAULT_DRAW_COLOR;
@@ -43,6 +48,26 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
     
     /**
+     * 영역검사를 합니다.
+     */
+    if (x0 < context->canvas_x0 && x1 < context->canvas_x0) {
+        /* 왼쪽으로 완전히 사라짐 */
+        return;
+    }
+    else if (x0 > context->canvas_x1 && x1 > context->canvas_x1) {
+        /* 오른쪽으로 완전히 사라짐 */
+        return;
+    }
+    else if (y0 < context->canvas_y0 && y1 < context->canvas_y0) {
+        /* 위쪽으로 완전히 사라짐 */
+        return;
+    }
+    else if (y0 > context->canvas_y1 && y1 > context->canvas_y1) {
+        /* 아래쪽으로 완전히 사라짐 */
+        return;
+    }
+    
+    /**
      * 영역을 지우고 (배경색으로)
      */
     disp_draw_rectp_fill(x0, y0, x1, y1, context->canvas_color);
@@ -59,10 +84,10 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
      * 그 변화를 commit합니다.
      * commit되는 변화는 캔버스 영역 이하이어야 합니다!!!!!! 안그러면 UI영역 침범임!!
      */
-    disp_commit_partialp(MAX(x0, context->canvas_x),
-                         MAX(y0, context->canvas_y),
-                         MIN(x1, context->canvas_x + context->canvas_width - 1),
-                         MIN(y1, context->canvas_y + context->canvas_height - 1));
+    disp_commit_partialp(MAX(x0, context->canvas_x0),
+                         MAX(y0, context->canvas_y0),
+                         MIN(x1, context->canvas_x1),
+                         MIN(y1, context->canvas_y1));
     
     disp_cancel();
 }

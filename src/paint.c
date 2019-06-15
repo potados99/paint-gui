@@ -145,8 +145,7 @@ static inline void _draw_ui(void) {
         disp_draw_point(offset % DP_WIDTH,
                         offset / DP_WIDTH,
                         GET_BIT8(UI_IMAGE, offset) ? COLOR(204, 204, 0) : COLOR_BLACK);
-		++offset; 
-   	} while (offset < DP_MEM_SIZE);
+   	} while (++offset < DP_MEM_SIZE);
     
     disp_set_direct(false);
 }

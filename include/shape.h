@@ -89,7 +89,7 @@ do {                                                                            
  */
 #define SHAPE_EXPORT_AREA_TO_TWO_POINTS(SHAPE_PTR, X0, Y0, X1, Y1)                  \
 int X0, Y0, X1, Y1;                                                                 \
-SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE_REUSE(SHAPE_PTR, X0, Y0, X1, Y1);
+SHAPE_EXPORT_AREA_TO_TWO_POINTS_REUSE(SHAPE_PTR, X0, Y0, X1, Y1);
 
 /**
  * 얘도 마찬가지!

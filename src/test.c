@@ -359,7 +359,7 @@ int button_test(void) {
         if (te.touch_state == TOUCH_STATE_BEGIN) {
             paint_touch_start(mypaint, te.x, te.y);
         }
-        else if (te.touch_state == TOUCH_STATE_DONE) {
+        else if (te.touch_state == TOUCH_STATE_DRAG) {
             paint_touch_drag(mypaint, te.x, te.y);
         }
         else if (te.touch_state == TOUCH_STATE_DONE) {

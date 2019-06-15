@@ -102,7 +102,7 @@ static inline void _apply(int x, int y, int width, int height) {
  * 바로 디스플레이로 가지는 않습니다.
  */
 static inline void _modify(int offset,  unsigned short color) {
-    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_info("_modify(): offset{%d} out of range.\n", offset); return);
+    ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_trace("_modify(): offset{%d} out of range.\n", offset); return);
     ASSERTDO(dp_mem != NULL, print_error("_modify(): dp_mem is null. call disp_map before use!\n"); return);
 
     print_trace("_modify(): modify pixel at offset %d to %d.\n", offset, color);

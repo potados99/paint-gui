@@ -184,7 +184,7 @@ static inline void _draw_ui_buttons(void) {
             /**
              * 색칠 가능한 버튼들을 그려줍니다.
              */
-            disp_draw_rect(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height, buttons[i].color);
+            disp_draw_rect_fill(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height, buttons[i].color);
         }
     }
     

@@ -344,7 +344,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C0_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C0_COLOR,
         UI_BTN_C0
     },
     {
@@ -354,7 +354,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C1_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C1_COLOR,
         UI_BTN_C1
     },
     {
@@ -364,7 +364,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C2_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C2_COLOR,
         UI_BTN_C2
     },
     {
@@ -374,7 +374,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C3_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C3_COLOR,
         UI_BTN_C3
     },
     {
@@ -384,7 +384,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C4_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C4_COLOR,
         UI_BTN_C4
     },
     {
@@ -394,7 +394,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C5_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C5_COLOR,
         UI_BTN_C5
     },
     {
@@ -404,7 +404,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C6_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C6_COLOR,
         UI_BTN_C6
     },
     {
@@ -414,7 +414,7 @@ struct button buttons[17] = {
         Y(UI_PALETTE_C7_LOCATION),
         WIDTH(UI_PALETTE_ITEM_SIZE),
         HEIGHT(UI_PALETTE_ITEM_SIZE),
-        0,
+        UI_PALETTE_C7_COLOR,
         UI_BTN_C7
     }
 };

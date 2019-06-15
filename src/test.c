@@ -360,10 +360,10 @@ int button_test(void) {
             paint_touch_start(mypaint, te.x, te.y);
         }
         else if (te.touch_state == TOUCH_STATE_DONE) {
-
+            paint_touch_drag(mypaint, te.x, te.y);
         }
         else if (te.touch_state == TOUCH_STATE_DONE) {
-            
+            paint_touch_end(mypaint, te.x, te.y);
         }
     }
 }

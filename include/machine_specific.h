@@ -12,9 +12,9 @@
 #define DP_FD_PATH                   "/dev/fb2"
 
 #ifdef NONBLOCK_READ
-#define TS_OPEN_OPTION               O_RDONLY
-#else
 #define TS_OPEN_OPTION               O_RDONLY | O_NONBLOCK
+#else
+#define TS_OPEN_OPTION               O_RDONLY
 #endif
 
 #define DP_OPEN_OPTION               O_RDWR

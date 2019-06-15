@@ -5,7 +5,6 @@
 
 #include <unistd.h>
 
-
 #ifdef __APPLE__
 ///////////////////// TEST ENVIRONMENT //////////////////////
 //

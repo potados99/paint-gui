@@ -136,13 +136,20 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     return NULL;
 }
 
+static inline int div_screen(unsigned char IMG_sc[240 * 320], int index) {
+    int ref = index / 8;
+    index %= 8;
+    unsigned char tmp = IMG_sc[ref];
+    return (int)((tmp >> (7 - index)) & 0x1);
+}
+
 static inline void _draw_ui(void) {
     int i, j;
     unsigned short pixel;
     int index = 0;
     for (i = 0; i < DP_HEIGHT; i++) {
         for (j = 0; j < DP_WIDTH; j++) {
-            if (GET_BIT(UI_IMAGE, index, sizeof(char) * 8)) {
+            if (div_screen(UI_IMAGE, index)) {
                 pixel = COLOR(204, 204, 0);
             }
             else {

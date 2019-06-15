@@ -84,13 +84,13 @@ static inline void _apply(int x, int y, int width, int height) {
 	register int 	n_line = 0;
 
 	do {
-		if (GET_BIT(bitmap, offset, sizeof(long) * 8)) {
+		if (GET_BIT(bitmap, offset, sizeof(long) << 3)) {
 
             print_trace("_apply(): write to display memory at offset{%d max} %d.\n", offset_max, offset);
 
 			*(dp_mem + offset) = *(dp_buf + offset);
 		
-            UNSET_BIT(bitmap, offset, sizeof(long) * 8);
+            UNSET_BIT(bitmap, offset, sizeof(long) << 3);
 		}
 
 
@@ -116,7 +116,7 @@ static inline void _modify(int offset,  unsigned short color) {
     }
     else {
         *(dp_buf + offset) = color;
-        SET_BIT(bitmap, offset, sizeof(long) * 8);
+        SET_BIT(bitmap, offset, sizeof(long) << 3);
     }
 }
 

@@ -230,6 +230,9 @@ static inline void _draw_ui_color_palette(void) {
     disp_set_direct(false);
 }
 
+/**
+ * 전체 ui를 그립니다.
+ */
 static inline void _draw_ui(void) {
 	/**
 	 * 헤헷
@@ -252,6 +255,9 @@ static inline void _draw_ui(void) {
     _draw_ui_color_palette();
 }
 
+/**
+ * 현재 좌표에 해당하는 ui 요소를 가져옵니다.
+ */
 static inline int _pick_ui_element(int x, int y) {
 
     if (POINT_IN_AREA(UI_BUTTON_LINE_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {

@@ -353,11 +353,7 @@ int button_test(void) {
 
     struct paint *mypaint = paint_create();
 
-    /**
-     * 터치를 읽어서 각 점과 점 사이에 직선을 그려줍니다.
-     */
     while (1) {
-        
         ts_read = touch_read(ts_fd, &te);
         
         if (te.touch_state == TOUCH_STATE_BEGIN) {

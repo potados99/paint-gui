@@ -24,7 +24,7 @@ static inline void _init(struct paint *context) {
     context->draw_mode = MODE_LINE;
     context->fill = false;
     context->draw_color = PAINT_DEFAULT_DRAW_COLOR;
-    context->canvas_color = PAINT_DEFAULT_BACK_COLOR;
+    context->canvas_color = UI_DEFAULT_CANVAS_COLOR;
     
     context->touch_state = TOUCH_STATE_DONE;
     context->current_action = ACTION_NONE;
@@ -386,6 +386,8 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_draw_2d_shape(shape);
                     disp_set_direct(false);
                     
+                    print_info("_on_canvas_touched(): new line created at (%d, %d).\n", x, y);
+                    
                     return;
                 }
                 case MODE_RECT: {
@@ -396,6 +398,8 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_draw_2d_shape(shape);
                     disp_set_direct(false);
                     
+                    print_info("_on_canvas_touched(): new rect created at (%d, %d).\n", x, y);
+
                     return;
                 }
                 case MODE_OVAL: {
@@ -411,6 +415,8 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_set_direct(true);
                     disp_draw_2d_shape(shape);
                     disp_set_direct(false);
+                    
+                    print_info("_on_canvas_touched(): new free draw created at (%d, %d).\n", x, y);
 
                     return;
                 }
@@ -456,7 +462,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                 case MODE_RECT: {
                     shape = shapes_list_peek_last(&context->shapes);
                     
-                    print_info("transform rect by (%d, %d)\n", x - context->last_x, y - context->last_y);
+                    // print_info("transform rect by (%d, %d)\n", x - context->last_x, y - context->last_y);
                     _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
                     
                     return;

@@ -35,33 +35,33 @@ do {                                                                            
 /**
  * 8비트 정수용 비트단위 읽기/쓰기 매크로입니다!
  */
-#define GET_BIT8(PTR, OFFSET)                                                 \
+#define GET_BIT8(PTR, OFFSET)                                                           \
 ((*(PTR + ((OFFSET) / 8))) & (1 << (7 - ((OFFSET) % 8))))
 
-#define SET_BIT8(PTR, OFFSET)                                                 \
+#define SET_BIT8(PTR, OFFSET)                                                           \
 do {                                                                                    \
-*(PTR + ((OFFSET) / 8)) |= (1 << (7 - ((OFFSET) % 8)));   \
+*(PTR + ((OFFSET) / 8)) |= (1 << (7 - ((OFFSET) % 8)));                                 \
 } while (0)
 
-#define UNSET_BIT8(PTR, OFFSET)                                               \
+#define UNSET_BIT8(PTR, OFFSET)                                                         \
 do {                                                                                    \
-*(PTR + ((OFFSET) / 8)) &= ~(1 << (7 - ((OFFSET) % 8)));  \
+*(PTR + ((OFFSET) / 8)) &= ~(1 << (7 - ((OFFSET) % 8)));                                \
 } while (0)
 
 /**
  * 32비트 정수용 비트단위 읽기/쓰기 매크로입니다!
  */
-#define GET_BIT32(PTR, OFFSET)                                                 \
+#define GET_BIT32(PTR, OFFSET)                                                          \
 ((*(PTR + ((OFFSET) / 32))) & (1 << (31 - ((OFFSET) % 32))))
 
-#define SET_BIT32(PTR, OFFSET)                                                 \
+#define SET_BIT32(PTR, OFFSET)                                                          \
 do {                                                                                    \
-*(PTR + ((OFFSET) / 32)) |= (1 << (31 - ((OFFSET) % 32)));   \
+*(PTR + ((OFFSET) / 32)) |= (1 << (31 - ((OFFSET) % 32)));                              \
 } while (0)
 
-#define UNSET_BIT32(PTR, OFFSET)                                               \
+#define UNSET_BIT32(PTR, OFFSET)                                                        \
 do {                                                                                    \
-*(PTR + ((OFFSET) / 32)) &= ~(1 << (31 - ((OFFSET) % 32)));  \
+*(PTR + ((OFFSET) / 32)) &= ~(1 << (31 - ((OFFSET) % 32)));                             \
 } while (0)
 
 

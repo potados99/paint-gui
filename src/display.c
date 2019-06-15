@@ -1,18 +1,8 @@
 #include "display.h"
-#include "metric.h"
 #include "machine_specific.h"
 #include "debug.h"
-#include "macros.h"
 
-#include <sys/ioctl.h>
-#include <sys/types.h> 
 #include <sys/mman.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <math.h>
-#include <string.h>
-#include <stdbool.h>
 
 /**
  * 이것들은 display.c에 종속되는 전역 변수로 두었습니다.

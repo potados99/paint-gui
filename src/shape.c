@@ -1,8 +1,5 @@
-
 #include "shape.h"
 #include "debug.h"
-
-#include <stdlib.h>
 
 struct shape *shape_create(unsigned char type,
                            int v0,

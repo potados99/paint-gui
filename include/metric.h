@@ -10,6 +10,7 @@
 #include "list.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * 32비트 usigned 정수로부터 상위(X) / 하위(Y) 16비트를 꺼내옵니다.

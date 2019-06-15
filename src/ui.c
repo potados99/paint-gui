@@ -1,6 +1,5 @@
 
 #include "ui.h"
-#include "machine_specific.h"
 #include "debug.h"
 
 const unsigned char ui_image[DP_WIDTH * DP_HEIGHT] = {

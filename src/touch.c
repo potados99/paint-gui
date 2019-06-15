@@ -1,14 +1,9 @@
 #include "touch.h"
 #include "machine_specific.h"
 #include "debug.h"
-#include "macros.h"
-#include "metric.h"
 #include "input-event-codes.h"
 
-#include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
 
 
 #ifdef __APPLE__

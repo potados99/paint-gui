@@ -1,10 +1,5 @@
-
 #include "metric.h"
 #include "debug.h"
-#include "list.h"
-
-#include <string.h>
-#include <stdlib.h>
 
 void points_add(struct list_head *points_head, int x, int y) {
     NULL_CHECK("points_add()", points_head);

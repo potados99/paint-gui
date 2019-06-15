@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo Number of source files: $(ls -l src/ | wc -l)
+echo Number of header files: $(ls -l include/ | wc -l)
+echo Total line count: $(expr $(cat src/* | wc -l) + $(cat include/* | wc -l))

@@ -372,10 +372,12 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
     
     switch (context->touch_state) {
             
+        /**
+         * 첫 번째 경우:
+         * 터치가 막 시작되었을 때.
+         */
         case TOUCH_STATE_BEGIN: {
-            /**
-             * 터치가 막 시작된 상황!!!!!
-             */
+
             switch (context->draw_mode) {
                 case MODE_LINE: {
                     shape = shape_create(ST_LINEP, x, y, x, y, context->draw_color);
@@ -427,69 +429,125 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
                     
-                default:
+                default: {
                     /* 임파서블!! */
+                    print_error("_on_canvas_touched(): UNKNOWN DRAW MODE: %d.\n", context->draw_mode);
                     return;
+                }
             }
             
             /* 사실 여기에 도달할 일이 없다. */
             return;
         }
             
+        /**
+         * 두 번째 경우:
+         * 터치를 유지하며 드래그중일 때
+         */
         case TOUCH_STATE_DRAG: {
-            /**
-             * 터치 드래그중일때!!
-             */
-            switch (context->draw_mode) {
-                case MODE_LINE:
-                    break;
-                case MODE_RECT:
-                    break;
-                case MODE_OVAL:
-                    break;
-                case MODE_FDRAW:
-                    break;
-                case MODE_SELECT:
-                    break;
-                case MODE_ERASE:
-                    break;
 
-                default:
+            switch (context->draw_mode) {
+                case MODE_LINE: {
+                    shape = shapes_list_peek_last(&context->shapes);
+                    
+                    _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
+                    
                     return;
+                }
+                case MODE_RECT: {
+                    shape = shapes_list_peek_last(&context->shapes);
+                    
+                    _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
+                    
+                    return;
+                }
+                case MODE_OVAL: {
+                    
+                    return;
+                }
+                case MODE_FDRAW: {
+                    shape = shapes_list_peek_last(&context->shapes);
+                    
+                    points_add(&shape->fdraw_points, x, y);
+                    
+                    disp_set_direct(true);
+                    disp_draw_linep(context->last_x, context->last_y, x, y, context->draw_color);
+                    disp_set_direct(false);
+                    
+                    return;
+                }
+                case MODE_SELECT: {
+                    shape = context->selected_shape;
+                    
+                    _move_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
+                    
+                    return;
+                }
+                case MODE_ERASE: {
+                    /* 해당없어요~ */
+                    return;
+                }
+
+                default: {
+                    /* 임파서블!! */
+                    print_error("_on_canvas_touched(): UNKNOWN DRAW MODE: %d.\n", context->draw_mode);
+                    return;
+                }
             }
             
+            return;
         }
-            break;
             
+        /**
+         * 세 번째 경우:
+         * 터치가 종료되었을 때.
+         * 이것이 마지막 터치이다.
+         */
         case TOUCH_STATE_DONE: {
-            /**
-             * 터치가 끝날 때!! 이게 마지막 터치!!
-             */
+   
             switch (context->draw_mode) {
-                case MODE_LINE:
-                    break;
-                case MODE_RECT:
-                    break;
-                case MODE_OVAL:
-                    break;
-                case MODE_FDRAW:
-                    break;
-                case MODE_SELECT:
-                    break;
-                case MODE_ERASE:
-                    break;
-
-                default:
+                case MODE_LINE: {
+                    
                     return;
+                }
+                case MODE_RECT: {
+                    
+                    return;
+                }
+                case MODE_OVAL: {
+                    
+                    return;
+                }
+                case MODE_FDRAW: {
+                    
+                    return;
+                }
+                case MODE_SELECT: {
+                    
+                    return;
+                }
+                case MODE_ERASE: {
+                    
+                    return;
+                }
+                    
+                default: {
+                    /* 임파서블!! */
+                    print_error("_on_canvas_touched(): UNKNOWN DRAW MODE: %d.\n", context->draw_mode);
+                    return;
+                }
             }
             
+            return;
         }
-            break;
             
-        default:
-            break;
-    }
-    
+        default: {
+            /* 이거는 있을쑤가 업따!!! */
+            print_error("_on_canvas_touched(): UNKNOWN TOUCH STATE.\n");
+            return;
+        }
+            
+    } /* end of switch */
 
 }
 

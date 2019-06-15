@@ -136,7 +136,7 @@ static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     return NULL;
 }
 
-static inline void _draw_ui_background(void) {
+static inline void _draw_ui_background(unsigned short back_color, unsigned short ui_color) {
     register int offset = 0;
     
     disp_set_direct(true);
@@ -144,7 +144,7 @@ static inline void _draw_ui_background(void) {
     do {
         disp_draw_point(offset % DP_WIDTH,
                         offset / DP_WIDTH,
-                        GET_BIT8(UI_IMAGE, offset) ? COLOR(204, 204, 0) : COLOR_BLACK);
+                        GET_BIT8(UI_IMAGE, offset) ? back_color : ui_color);
    	} while (++offset < DP_MEM_SIZE);
     
     disp_set_direct(false);
@@ -211,7 +211,7 @@ static inline void _draw_ui_color_palette(void) {
 }
 
 static inline void _draw_ui(void) {
-    _draw_ui_background();
+    _draw_ui_background(COLOR(204, 204, 0), COLOR_BLACK);
     _draw_ui_canvas();
     _draw_ui_color_palette();
 }

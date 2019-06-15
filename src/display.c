@@ -364,4 +364,6 @@ void disp_clear() {
     print_trace("disp_clear(): clear screen to black.\n");
 
     memset(dp_mem, 0, DP_MEM_SIZEB);
+	memset(dp_buf, 0, DP_MEM_SIZEB);
+	memset(bitmap, 0, DP_BITMAP_SIZEB);
 }

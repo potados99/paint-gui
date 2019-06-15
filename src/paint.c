@@ -152,7 +152,11 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
 
 static inline void _draw_ui_canvas(void) {
     disp_set_direct(true);
-    disp_draw_rect_fill(65, 4, 192, 232, COLOR_WHITE);
+    disp_draw_rect_fill(X(UI_CANVAS_LOCATION), 
+						Y(UI_CANVAS_LOCATION), 
+						WIDTH(UI_CANVAS_SIZE), 
+						HEIGHT(UI_CANVAS_SIZE), 
+						UI_DEFAULT_CANVAS_COLOR);
     disp_set_direct(false);
 }
 
@@ -161,8 +165,8 @@ static inline void _draw_ui_color_palette(void) {
     
     disp_draw_rect_fill(X(UI_PALETTE_C0_LOCATION),
                         Y(UI_PALETTE_C0_LOCATION),
-                        UI_PALETTE_ITEM_WIDTH,
-                        UI_PALETTE_ITEM_HEIGHT,
+                        WIDTH(UI_PALETTE_ITEM_SIZE),
+                        HEIGHT(UI_PALETTE_ITEM_SIZE),
                         COLOR_WHITE);
     
     disp_draw_rect_fill(X(UI_PALETTE_C1_LOCATION),
@@ -211,8 +215,12 @@ static inline void _draw_ui_color_palette(void) {
 }
 
 static inline void _draw_ui(void) {
-    _draw_ui_background(COLOR(204, 204, 0), COLOR_BLACK);
+	disp_clear();
+	usleep(100000);
+    _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
+	usleep(100000);
     _draw_ui_canvas();
+	usleep(100000);
     _draw_ui_color_palette();
 }
 

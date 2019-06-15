@@ -9,7 +9,6 @@
 /**
  * UI 요소들의 위치와 크기, 색상입니다.
  */
-
 #define UI_BUTTON_LINE_LOCATION     POINT(6, 16)
 #define UI_BUTTON_RECT_LOCATION     POINT(6, 46)
 #define UI_BUTTON_OVAL_LOCATION     POINT(6, 76)
@@ -49,6 +48,8 @@
 /**
  * 버튼 식별자입니다.
  */
+#define UI_GROUP(ID)                ((ID) >> 4)
+
 #define UI_BTN_NONE                 0x00
 
 #define UI_BTN_LINE                 0x01
@@ -70,7 +71,22 @@
 #define UI_BTN_C6                   0x27
 #define UI_BTN_C7                   0x28
 
+#define BT_MARKABLE                 0x01
+#define BT_COLORABLE                0x04
+
+#define UI_NUMBER_OF_BUTTONS        17
+
+struct button {
+    int             type;
+    int             x;
+    int             y;
+    int             width;
+    int             height;
+    unsigned short  color;
+    int             id;
+};
 
 extern unsigned char UI_IMAGE[DP_WIDTH * DP_HEIGHT];
+extern struct button buttons[UI_NUMBER_OF_BUTTONS];
 
 #endif /* ui_h */

@@ -1,5 +1,5 @@
 
-#include <stdio.h>
+#include "ui.h"
 #include "machine_specific.h"
 
 unsigned char UI_IMAGE[DP_WIDTH * DP_HEIGHT] = {
@@ -245,3 +245,176 @@ unsigned char UI_IMAGE[DP_WIDTH * DP_HEIGHT] = {
 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
+struct button buttons[17] = {
+    {
+        /* line */
+        BT_MARKABLE,
+        X(UI_BUTTON_LINE_LOCATION),
+        Y(UI_BUTTON_LINE_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_LINE
+    },
+    {
+        /* rect */
+        BT_MARKABLE,
+        X(UI_BUTTON_RECT_LOCATION),
+        Y(UI_BUTTON_RECT_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_RECT
+    },
+    {
+        /* oval */
+        BT_MARKABLE,
+        X(UI_BUTTON_OVAL_LOCATION),
+        Y(UI_BUTTON_OVAL_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_OVAL
+    },
+    {
+        /* free draw */
+        BT_MARKABLE,
+        X(UI_BUTTON_FDRAW_LOCATION),
+        Y(UI_BUTTON_FDRAW_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_FDRAW
+    },
+    {
+        /* select */
+        BT_MARKABLE,
+        X(UI_BUTTON_SELECT_LOCATION),
+        Y(UI_BUTTON_SELECT_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_SELECT
+    },
+    {
+        /* erase */
+        BT_MARKABLE,
+        X(UI_BUTTON_ERASE_LOCATION),
+        Y(UI_BUTTON_ERASE_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_ERASE
+    },
+    {
+        /* clear */
+        0,
+        X(UI_BUTTON_CLEAR_LOCATION),
+        Y(UI_BUTTON_CLEAR_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_BIG),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_BIG),
+        0,
+        UI_BTN_CLEAR
+    },
+    {
+        /* pen */
+        BT_MARKABLE,
+        X(UI_BUTTON_PEN_LOCATION),
+        Y(UI_BUTTON_PEN_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_SMALL),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_SMALL),
+        0,
+        UI_BTN_PEN
+    },
+    {
+        /* fill */
+        BT_MARKABLE,
+        X(UI_BUTTON_FILL_LOCATION),
+        Y(UI_BUTTON_FILL_LOCATION),
+        WIDTH(UI_BUTTON_ITEM_SIZE_SMALL),
+        HEIGHT(UI_BUTTON_ITEM_SIZE_SMALL),
+        0,
+        UI_BTN_FILL
+    },
+    
+    {
+        /* color 0 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C0_LOCATION),
+        Y(UI_PALETTE_C0_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C0
+    },
+    {
+       /* color 1 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C1_LOCATION),
+        Y(UI_PALETTE_C1_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C1
+    },
+    {
+       /* color 2 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C2_LOCATION),
+        Y(UI_PALETTE_C2_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C2
+    },
+    {
+       /* color 3 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C3_LOCATION),
+        Y(UI_PALETTE_C3_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C3
+    },
+    {
+       /* color 4 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C4_LOCATION),
+        Y(UI_PALETTE_C4_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C4
+    },
+    {
+       /* color 5 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C5_LOCATION),
+        Y(UI_PALETTE_C5_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C5
+    },
+    {
+       /* color 6 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C6_LOCATION),
+        Y(UI_PALETTE_C6_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C6
+    },
+    {
+       /* color 7 */
+        BT_MARKABLE | BT_COLORABLE,
+        X(UI_PALETTE_C7_LOCATION),
+        Y(UI_PALETTE_C7_LOCATION),
+        WIDTH(UI_PALETTE_ITEM_SIZE),
+        HEIGHT(UI_PALETTE_ITEM_SIZE),
+        0,
+        UI_BTN_C7
+    }
+};

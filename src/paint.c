@@ -174,59 +174,20 @@ static inline void _draw_ui_canvas(unsigned short canvas_color) {
 }
 
 /**
- * 색상 선택 팔레트를 그립니다.
+ * 버튼들을 그려줍니다.
  */
-static inline void _draw_ui_color_palette(void) {
+static inline void _draw_ui_buttons(void) {
     disp_set_direct(true);
     
-    disp_draw_rect_fill(X(UI_PALETTE_C0_LOCATION),
-                        Y(UI_PALETTE_C0_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_WHITE);
+    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
+        if (buttons[i].type & BT_COLORABLE) {
+            /**
+             * 색칠 가능한 버튼들을 그려줍니다.
+             */
+            disp_draw_rect(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height, buttons[i].color);
+        }
+    }
     
-    disp_draw_rect_fill(X(UI_PALETTE_C1_LOCATION),
-                        Y(UI_PALETTE_C1_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_MAGENTA);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C2_LOCATION),
-                        Y(UI_PALETTE_C2_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_RED);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C3_LOCATION),
-                        Y(UI_PALETTE_C3_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_GREEN);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C4_LOCATION),
-                        Y(UI_PALETTE_C4_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_YELLOW);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C5_LOCATION),
-                        Y(UI_PALETTE_C5_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_BLUE);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C6_LOCATION),
-                        Y(UI_PALETTE_C6_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_CYAN);
-    
-    disp_draw_rect_fill(X(UI_PALETTE_C7_LOCATION),
-                        Y(UI_PALETTE_C7_LOCATION),
-                        WIDTH(UI_PALETTE_ITEM_SIZE),
-                        HEIGHT(UI_PALETTE_ITEM_SIZE),
-                        COLOR_BLACK);
-
     disp_set_direct(false);
 }
 
@@ -234,16 +195,6 @@ static inline void _draw_ui_color_palette(void) {
  * 전체 ui를 그립니다.
  */
 static inline void _draw_ui(void) {
-	/**
-	 * 헤헷
-	 */
-
-	disp_set_direct(true);
-	disp_draw_whole(UI_DEFAULT_BACK_COLOR);
-	disp_set_direct(false);
-
-	usleep(300000);
-
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
 
 	usleep(300000);
@@ -252,86 +203,66 @@ static inline void _draw_ui(void) {
 
 	usleep(300000);
 
-    _draw_ui_color_palette();
+    _draw_ui_buttons();
 }
 
 /**
  * 현재 좌표에 해당하는 ui 요소를 가져옵니다.
  */
-static inline int _pick_ui_element(int x, int y) {
-
-    if (POINT_IN_AREA(UI_BUTTON_LINE_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // LINE
-        return UI_BTN_LINE;
+static inline struct button *_find_button_by_coordinate(int x, int y) {
+    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
+        if (POINT_IN_AREA(POINT(buttons[i].x, buttons[i].y),
+                          SIZE(buttons[i].width, buttons[i].height),
+                          x, y)) {
+            return (buttons + i);
+        }
     }
-    else if (POINT_IN_AREA(UI_BUTTON_RECT_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // RECTANGLE
-        return UI_BTN_RECT;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_OVAL_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // OVAL
-        return UI_BTN_OVAL;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_FDRAW_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // FREE DRAW
-        return UI_BTN_FDRAW;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_SELECT_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // SELECT
-        return UI_BTN_SELECT;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_ERASE_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // ERASE
-        return UI_BTN_ERASE;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_CLEAR_LOCATION, UI_BUTTON_ITEM_SIZE_BIG, x, y)) {
-        // CLEAR
-        return UI_BTN_CLEAR;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_PEN_LOCATION, UI_BUTTON_ITEM_SIZE_SMALL, x, y)) {
-        // PEN
-        return UI_BTN_PEN;
-    }
-    else if (POINT_IN_AREA(UI_BUTTON_FILL_LOCATION, UI_BUTTON_ITEM_SIZE_SMALL, x, y)) {
-        // FILL
-        return UI_BTN_FILL;
-    }
-
-    else if (POINT_IN_AREA(UI_PALETTE_C0_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 0 (white)
-        return UI_BTN_C0;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C1_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 1 (magenta)
-        return UI_BTN_C1;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C2_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 2 (red)
-        return UI_BTN_C2;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C3_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 3 (green)
-        return UI_BTN_C3;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C4_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 4 (yellow)
-        return UI_BTN_C4;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C5_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 5 (blue)
-        return UI_BTN_C5;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C6_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 6 (cyan)
-        return UI_BTN_C6;
-    }
-    else if (POINT_IN_AREA(UI_PALETTE_C7_LOCATION, UI_PALETTE_ITEM_SIZE, x, y)) {
-        // COLOR 7 (black)
-        return UI_BTN_C7;
-    }
-  
-    return UI_BTN_NONE;
+    
+    return NULL;
 }
+
+static inline struct button *_find_button_by_id(int id) {
+    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
+        if (buttons[i].id == id) {
+            return (buttons + i);
+        }
+    }
+    
+    return NULL;
+}
+
+static inline void _mark_button(struct button *btn) {
+    if (!(btn->type & (BT_MARKABLE))) {
+        /**
+         * 마크 불가능한 버튼이면 아무 일도 하지 않습니다!
+         */
+        return;
+    }
+
+    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
+        /**
+         * 모든 버튼들을 순회하면서, 파라미터로 들어온 버튼과 같은 그룹에 속하는 버튼이 있으면,
+         * 마크를 지워줍니다!
+         */
+        if (UI_GROUP(btn->id) == UI_GROUP(buttons[i].id)) {
+            disp_set_direct(true);
+            
+            disp_draw_rect(buttons[i].x - 1, buttons[i].y - 1, buttons[i].width + 2, buttons[i].height + 2, UI_DEFAULT_BACK_COLOR);
+            
+            disp_set_direct(false);
+        }
+    }
+    
+    /**
+     * 이제 파라미터로 들어온 버튼을 마크해줍니다!
+     */
+    disp_set_direct(true);
+    
+    disp_draw_rect(btn->x - 1, btn->y - 1, btn->width + 2, btn->height + 2, UI_DEFAULT_TEXT_COLOR);
+    
+    disp_set_direct(false);
+}
+
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
 
@@ -357,9 +288,9 @@ void paint_touch_start(struct paint *context, int x, int y) {
      * 업데이트해줍니다!
      */
     context->touch_started_from_canvas = _point_in_canvas(context, x, y);
-    
     if (context->touch_started_from_canvas) {
         /**
+         * 터치가 캔버스 안에 속한다면,
          * 캔버스에서 새로운 무언가를 합니다.
          */
         
@@ -387,9 +318,14 @@ void paint_touch_start(struct paint *context, int x, int y) {
     }
     else {
         /**
+         * 터치가 캔버스 밖이라면,
          * UI 버튼을 처리합니다.
          */
-        switch (_pick_ui_element(x, y)) {
+        
+        struct button *btn = _find_button_by_coordinate(x, y);
+        ASSERTDO(btn != NULL , return);
+        
+        switch (btn->id) {
             case UI_BTN_LINE:
                 context->draw_mode = MODE_LINE;
                 print_info("Set draw mode to line.\n");
@@ -468,6 +404,8 @@ void paint_touch_start(struct paint *context, int x, int y) {
                  */
                 return;
             }
+        
+        _mark_button(btn);
     }
 
     

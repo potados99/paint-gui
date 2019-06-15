@@ -108,13 +108,13 @@ void shape_add_point(struct shape *shape, int x, int y) {
     points_add(&shape->fdraw_points, x, y);
     
     /**
-     * 새로운 점의 x좌표가 기존 영역 밖에 있을 때에는
+     * 새로운 점의 좌표가 기존 영역 밖에 있을 때에는
      * 영역을 이에 맞게 넓혀줍니다.
      */
     if (x < shape->value[0]) {
         shape->value[0] = x;
     }
-    else if (x > shape->value[3]) {
+    else if (x > shape->value[2]) {
         shape->value[2] = x;
     }
     

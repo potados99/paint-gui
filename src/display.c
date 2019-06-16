@@ -318,7 +318,7 @@ void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
                     ovalChk=0;
             }
             
-            if(rowChk==i&&ovalChk!=1){
+            if(rowChk==i&& j<=x1-colChk[1]){
                 if(j<=x1-colChk[1]){
                     _modify(i * DP_WIDTH + j, color);
 

@@ -293,7 +293,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     
     d = bb - (b * aa) + (0.25 * aa); /* 1 구역에서 쓸 판별식의 초기값. */
     
-    while (dx < dy) {
+    while (dx <= dy) {
         ++x;
         dx += (2 * bb);
         
@@ -356,7 +356,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     
     d = aa - (a * bb) + (0.25 * bb); /* 2 구역에서 쓸 판별식의 초기값. */
 
-    while (dx > dy) {
+    while (dx >= dy) {
         
         ++y;
         dy += (2 * aa);

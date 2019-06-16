@@ -260,6 +260,130 @@ void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
     disp_draw_rect_fill(x0, y0, x1 - x0 + 1, y1 - y0 + 1, color);
 }
 
+static inline void _oval(int a, int b, int center_x, int center_y, bool fill, unsigned color) {
+    int aa = a * a; /* a의 제곱 */
+    int bb = b * b; /* b의 제곱 */
+    
+    int x; /* 현재 x */
+    int y; /* 현재 y */
+    int d; /* 판별식의 값 */
+    
+    /**
+     * 1사분면에서 타원 접선의 기울기가 -1이 되는 곳의 좌표.
+     */
+    int region_boundary_x = aa / root(aa + bb);
+    int region_boundary_y = bb / root(aa + bb);
+    
+    
+    /**
+     * 1구역과 2구역의 경계에서 시작.
+     */
+    x = region_boundary_x;
+    y = region_boundary_y;
+    
+    /**
+     * x 독립변수 구간 (1 구역).
+     */
+    while (x >= 0) {
+        /**
+         * 1사분면 x 독립변수 구간에서 -x방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
+         * (x - 1, y) 또는 (x - 1, y + 1) 둘 밖에 없으며, 두 점의 중간점은
+         * (x - 1, y + 0.5)이다. 따라서 판별식의 값은 F(x - 1, y + 0.5)이다.
+         */
+        d = (bb*(x - 1) + aa*(y + 0.5) - aa*bb);
+        
+        --x;
+        
+        if (d < 0) {
+            /**
+             * 중간점이 타원 안에 있는 경우이므로, 타원 밖과 가까운 (x - 1, y + 1)이 다음 점으로 적절.
+             */
+            ++y;
+        }
+        else {
+            /**
+             * 중간점이 타원 밖에 있는 경우이므로, 타원 안과 가까운 (x - 1, y)가 다음 점으로 적절.
+             */
+        }
+        
+        /**
+         * 그리자
+         */
+        if (fill) {
+            disp_draw_linep(x + center_x,
+                            y + center_y,
+                            x + center_x,
+                            -y + center_y, color);
+            
+            disp_draw_linep(-x + center_x,
+                            y + center_y,
+                            -x + center_x,
+                            -y + center_y, color);
+            
+        }
+        else {
+            disp_draw_point(x + center_x, y + center_y, color);
+            disp_draw_point(-x + center_x, y + center_y, color);
+            disp_draw_point(x + center_x, -y + center_y, color);
+            disp_draw_point(-x + center_x, -y + center_y, color);
+        }
+    }
+    
+    /**
+     * 1구역과 2구역의 경계에서 시작.
+     */
+    x = region_boundary_x;
+    y = region_boundary_y;
+    
+    /**
+     * y가 독립변수인 구간 (2구간).
+     */
+    while (y >= 0) {
+        /**
+         * 1사분면 y 독립변수 구간에서 -y방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
+         * (x, y - 1) 또는 (x + 1, y - 1) 둘밖에 없으며, 두 점의 중점은
+         * (x + 0.5, y - 1)이므로 판별식의 값은 F(x + 0.5, y - 1)이다.
+         */
+        d = (bb*(x + 1) + aa*(y - 0.5) - aa*bb);
+        
+        --y;
+        
+        if (d < 0) {
+            /**
+             * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x + 1, y - 1)을 선택.
+             */
+            ++x;
+        }
+        else {
+            /**
+             * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x, y - 1)을 선택.
+             */
+        }
+        
+        /**
+         * 그리자
+         */
+        if (fill) {
+            disp_draw_linep(x + center_x,
+                            y + center_y,
+                            -x + center_x,
+                            y + center_y, color);
+            
+            disp_draw_linep(x + center_x,
+                            -y + center_y,
+                            -x + center_x,
+                            -y + center_y, color);
+        }
+        else {
+            disp_draw_point(x + center_x, y + center_y, color);
+            disp_draw_point(-x + center_x, y + center_y, color);
+            disp_draw_point(x + center_x, -y + center_y, color);
+            disp_draw_point(-x + center_x, -y + center_y, color);
+        }
+    }
+    
+}
+
 void disp_draw_oval(int x, int y, int width, int height, unsigned short color) {
     
 }
@@ -271,79 +395,20 @@ void disp_draw_oval_fill(int x, int y, int width, int height, unsigned short col
 void disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color) {
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
     
-    int rx = (x1 - x0) / 2;
-    int ry = (y1 - y0) / 2;
-    int xc = x0 + rx;
-    int yc = y0 + ry;
-    
-    float dx, dy, d1, d2, x, y;
-    x = 0;
-    y = ry;
-    
-    // Initial decision parameter of region 1
-    d1 = (ry * ry)
-    - (rx * rx * ry)
-    + (0.25 * rx * rx);
-    dx = 2 * ry * ry * x;
-    dy = 2 * rx * rx * y;
-    
-    // For region 1
-    while (dx < dy) {
-        
-        // Print points based on 4-way symmetry
-        _modify((x + xc) + ((y + yc) * DP_WIDTH), color);
-        _modify((-x + xc) + ((y + yc) * DP_WIDTH), color);
-        _modify((x + xc) + ((-y + yc) * DP_WIDTH), color);
-        _modify((-x + xc) + ((-y + yc) * DP_WIDTH), color);
-
-        // Checking and updating value of
-        // decision parameter based on algorithm
-        if (d1 < 0) {
-            x++;
-            dx = dx + (2 * ry * ry);
-            d1 = d1 + dx + (ry * ry);
-        }
-        else {
-            x++;
-            y--;
-            dx = dx + (2 * ry * ry);
-            dy = dy - (2 * rx * rx);
-            d1 = d1 + dx - dy + (ry * ry);
-        }
-    }
-    
-    // Decision parameter of region 2
-    d2 = ((ry * ry) * ((x + 0.5) * (x + 0.5)))
-    + ((rx * rx) * ((y - 1) * (y - 1)))
-    - (rx * rx * ry * ry);
-    
-    // Plotting points of region 2
-    while (y >= 0) {
-        
-        // printing points based on 4-way symmetry
-        _modify((x + xc) + ((y + yc) * DP_WIDTH), color);
-        _modify((-x + xc) + ((y + yc) * DP_WIDTH), color);
-        _modify((x + xc) + ((-y + yc) * DP_WIDTH), color);
-        _modify((-x + xc) + ((-y + yc) * DP_WIDTH), color);
-        
-        // Checking and updating parameter
-        // value based on algorithm
-        if (d2 > 0) {
-            y--;
-            dy = dy - (2 * rx * rx);
-            d2 = d2 + (rx * rx) - dy;
-        }
-        else {
-            y--;
-            x++;
-            dx = dx + (2 * ry * ry);
-            dy = dy - (2 * rx * rx);
-            d2 = d2 + dx - dy + (rx * rx);
-        }
-    }
+    _oval((x1 - x0) / 2, (y1 - y0) / 2,
+          x0 + ((x1 - x0) / 2), y0 + ((y1 - y0) / 2),
+          false, color);
 }
 
 void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
+    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
+
+    _oval((x1 - x0) / 2, (y1 - y0) / 2,
+          x0 + ((x1 - x0) / 2), y0 + ((y1 - y0) / 2),
+          true, color);
+    
+    return;
+    
     int i, j;
     float tmp, ttmp;
     float centerX, centerY;

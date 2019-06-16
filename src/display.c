@@ -271,8 +271,8 @@ void disp_draw_oval_fill(int x, int y, int width, int height, unsigned short col
 void disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color) {
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
     
-    int rx = (x1 - x0 + 1) / 2;
-    int ry = (y1 - y0 + 1) / 2;
+    int rx = (x1 - x0) / 2;
+    int ry = (y1 - y0) / 2;
     int xc = x0 + rx;
     int yc = y0 + ry;
     

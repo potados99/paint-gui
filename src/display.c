@@ -266,14 +266,13 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     int aa = a * a; /* a의 제곱 */
     int bb = b * b; /* b의 제곱 */
     
-    float x;
-    float y;
+    int x;
+    int y;
     
-    float dx; /* x점에서 x의 변화량 */
-    float dy; /* y점에서 y의 변화량 */
+    int dx; /* x점에서 x의 변화량 */
+    int dy; /* y점에서 y의 변화량 */
 
-    float d; /* 판별식의 값 */
-
+    int d; /* 판별식의 값 */
     
     /**
      * x 독립변수 구간 (1 구역).
@@ -316,7 +315,6 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             disp_draw_point(-x + center_x, -y + center_y, color);
         }
   
-
         ++x;
         dx += (2 * bb);
         
@@ -336,8 +334,6 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             d += (dx - dy + bb);
         }
    }
-    
-    
 
     /**
      * y 독립변수 구간 (2 구역).

@@ -288,9 +288,10 @@ void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
     int         xxx;
     int         rowChk;
     int         ovalChk=0;
+    int         colChk[2]={0,};
     
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
-    
+
     centerX = (x0 + x1) / 2;
     centerY = (y0 + y1) / 2;
     A = x1 - centerX;
@@ -306,21 +307,28 @@ void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
             ttmp = (B*B)*(1 - (((j - centerX)*(j - centerX)) / (A*A)));
             
             if ((tmpX - tmp >= -xxx && tmpX - tmp <= xxx) || (tmpY - ttmp >= -xxx && tmpY - ttmp <= xxx) ) {
-                
-                rowChk = i;
-                ovalChk += 1;
-                
+                rowChk=i;
+                ovalChk+=1;
+                if(colChk[0]==0){
+                    colChk[0]=1;
+                    colChk[1]=j-x0;
+                }
                 _modify(i * DP_WIDTH + j, color);
-                
-                if (j == x0 || i == y1)
+                if(j==x0 ||i==y1 )
                     ovalChk=0;
             }
-            if(rowChk == i && ovalChk != 1){
-                _modify(i * DP_WIDTH + j, color);
+            
+            if(rowChk==i&&ovalChk!=1){
+                if(j<=x1-colChk[1]){
+                    _modify(i * DP_WIDTH + j, color);
+
+                }
             }
             else ovalChk=0;
         }
+        colChk[0]=0;
     }
+
 }
 
 void disp_draw_whole(unsigned short color) {

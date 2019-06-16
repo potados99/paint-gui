@@ -261,13 +261,11 @@ void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
 }
 
 static inline void _oval(int a, int b, int center_x, int center_y, bool fill, unsigned color) {
- printf("oval: a: %d, b: %d, x: %d, y: %d.\n", a, b, center_x, center_y);
-
     int aa = a * a; /* a의 제곱 */
     int bb = b * b; /* b의 제곱 */
     
-    int x;
-    int y;
+    int x;	/* 현재 x값 */
+    int y; /* 현재 y값 */
     
     int dx; /* x점에서 x의 변화량 */
     int dy; /* y점에서 y의 변화량 */
@@ -282,7 +280,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
      */
     
     /**
-     * (원점 0이라 치면, (0, b)에서 시작.)
+     * (0, b)에서 1구역 그리기 새로 시작.
      */
     x = 0;
     y = b;
@@ -343,8 +341,8 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
      */
     
     /**
-     * (원점 0이라 치면, (a, 0)에서 시작.)
-     */
+     * (a, 0)에서 2구역 그리기 새로 시작. 
+	 */
     x = a;
     y = 0;
     

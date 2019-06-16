@@ -370,6 +370,10 @@ void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
     A = x1 - centerX;
     B = y1 - centerY;
     
+    
+    a = (MIN(A, B) / MAX(A, B))*(0.495) + 0.005;
+    xxx = (x1 - x0 + y1 - y0)*a + b;
+    
     for (i = y0; i < y1; i++) {
         
         for (j = x0; j < x1; j++) {

@@ -266,13 +266,13 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     int aa = a * a; /* a의 제곱 */
     int bb = b * b; /* b의 제곱 */
     
-    int x;
-    int y;
+    float x;
+    float y;
     
-    int dx; /* x점에서 x의 변화량 */
-    int dy; /* y점에서 y의 변화량 */
+    float dx; /* x점에서 x의 변화량 */
+    float dy; /* y점에서 y의 변화량 */
 
-    int d; /* 판별식의 값 */
+    float d; /* 판별식의 값 */
 
     
     /**
@@ -294,26 +294,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     d = bb - (b * aa) + (0.25 * aa); /* 1 구역에서 쓸 판별식의 초기값. */
     
     while (dx <= dy) {
-        ++x;
-        dx += (2 * bb);
-        
-        if (d < 0) {
-            /**
-             * 중간점이 타원 안에 있는 경우이므로, 타원 밖과 가까운 (x + 1, y)가 다음 점으로 적절.
-             */
-
-            d += (dx + bb);
-        }
-        else {
-            /**
-             * 중간점이 타원 밖에 있는 경우이므로, 타원 안과 가까운 (x + 1, y - 1)이 다음 점으로 적절.
-             */
-            --y;
-            dy -= (2 * aa);
-            d += (dx - dy + bb);
-        }
-        
-        /**
+          /**
          * 그리자
          */
         if (fill) {
@@ -334,7 +315,27 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             disp_draw_point(x + center_x, -y + center_y, color);
             disp_draw_point(-x + center_x, -y + center_y, color);
         }
-    }
+  
+
+        ++x;
+        dx += (2 * bb);
+        
+        if (d < 0) {
+            /**
+             * 중간점이 타원 안에 있는 경우이므로, 타원 밖과 가까운 (x + 1, y)가 다음 점으로 적절.
+             */
+
+            d += (dx + bb);
+        }
+        else {
+            /**
+             * 중간점이 타원 밖에 있는 경우이므로, 타원 안과 가까운 (x + 1, y - 1)이 다음 점으로 적절.
+             */
+            --y;
+            dy -= (2 * aa);
+            d += (dx - dy + bb);
+        }
+   }
     
     
 
@@ -356,26 +357,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     
     d = aa - (a * bb) + (0.25 * bb); /* 2 구역에서 쓸 판별식의 초기값. */
 
-    while (dx >= dy) {
-        
-        ++y;
-        dy += (2 * aa);
-        
-        if (d < 0) {
-            /**
-             * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x, y + 1)을 선택.
-             */
-            d += (dy + aa);
-        }
-        else {
-            /**
-             * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x - 1, y + 1)을 선택.
-             */
-            --x;
-            dx -= (2 * bb);
-            d += (dy - dx + aa);
-        }
-        
+    while (dx >= dy) {      
         /**
          * 그리자
          */
@@ -396,7 +378,25 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             disp_draw_point(x + center_x, -y + center_y, color);
             disp_draw_point(-x + center_x, -y + center_y, color);
         }
-    }
+
+        ++y;
+        dy += (2 * aa);
+        
+        if (d < 0) {
+            /**
+             * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x, y + 1)을 선택.
+             */
+            d += (dy + aa);
+        }
+        else {
+            /**
+             * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x - 1, y + 1)을 선택.
+             */
+            --x;
+            dx -= (2 * bb);
+            d += (dy - dx + aa);
+        }
+   }
     
 }
 

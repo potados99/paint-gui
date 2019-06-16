@@ -273,25 +273,27 @@ void disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color) {
 }
 
 void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
-    int         i;
-    int         j;
-    float       tmp;
-    float       ttmp;
-    float       centerX;
-    float       centerY;
-    float       A;
-    float       B;
-    float       a = 0.5;
-    float       b = 2;
-    float       tmpX;
-    float       tmpY;
-    int         xxx;
-    int         rowChk;
-    int         ovalChk=0;
-    int         colChk[2]={0,};
+    int i, j;
+    float tmp, ttmp;
+    float centerX, centerY;
+    float  A, B, a = 0.1, b = 2;
+    float tmpX, tmpY;
+    short bufX = 0, bufY = 0;
+    int xxx;
+    int rowChk;
+    int colChk[2]={0,};
     
-    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
-
+    if (x0 > x1) {
+        tmp = x0;
+        x0 = x1;
+        x1 = tmp;
+    }
+    if (y0 > y1) {
+        tmp = y0;
+        y0 = y1;
+        y1 = tmp;
+    }
+    
     centerX = (x0 + x1) / 2;
     centerY = (y0 + y1) / 2;
     A = x1 - centerX;
@@ -306,25 +308,21 @@ void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
             tmpY = (i - centerY)*(i - centerY);
             ttmp = (B*B)*(1 - (((j - centerX)*(j - centerX)) / (A*A)));
             
-            if ((tmpX - tmp >= -xxx && tmpX - tmp <= xxx) || (tmpY - ttmp >= -xxx && tmpY - ttmp <= xxx) ) {
+            if (tmpX - tmp >= -xxx && tmpX - tmp <= xxx || tmpY - ttmp >= -xxx && tmpY - ttmp <= xxx ) {
+                
                 rowChk=i;
-                ovalChk+=1;
                 if(colChk[0]==0){
                     colChk[0]=1;
                     colChk[1]=j-x0;
                 }
-                _modify(i * DP_WIDTH + j, color);
-                if(j==x0 ||i==y1 )
-                    ovalChk=0;
+                _modify(i * 320 + j, color);
+
             }
             
-            if(rowChk==i&& j<=x1-colChk[1]){
-                if(j<=x1-colChk[1]){
-                    _modify(i * DP_WIDTH + j, color);
+            if(rowChk==i && j<=x1-colChk[1]){
+                _modify(i * 320 + j, color);
 
-                }
             }
-            else ovalChk=0;
         }
         colChk[0]=0;
     }

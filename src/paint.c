@@ -717,6 +717,14 @@ void paint_touch_end(struct paint *context, int x, int y) {
 
     context->touch_state = TOUCH_STATE_DONE;
     
+    if (!context->touch_started_from_canvas) {
+        /**
+         * 여기서도! 캔버스 밖에서 발생한 터치는 끝날때에도 무시합니다!
+         */
+        print_info("paint_touch_end(): touch from out of canvas finished.\n");
+        return;
+    }
+    
     /**
      * 캔버스에서 해야 할 일은 이 친구에게~
      */

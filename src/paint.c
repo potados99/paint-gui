@@ -475,6 +475,9 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     if (context->selected_shape) {
                         print_info("_on_canvas_touched(): selected object at (%d, %d).\n", x, y);
                     }
+                    else {
+                        print_info("_on_canvas_touched(): no object at (%d, %d).\n", x, y);
+                    }
 
                     return;
                 }

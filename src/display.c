@@ -264,131 +264,150 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     int aa = a * a; /* a의 제곱 */
     int bb = b * b; /* b의 제곱 */
     
-    int x;	/* 현재 x값 */
-    int y; /* 현재 y값 */
+    int xk;	/* 현재 x값 */
+    int yk; /* 현재 y값 */
     
-    int dx; /* x점에서 x의 변화량 */
-    int dy; /* y점에서 y의 변화량 */
+    int dx; /* 현재 점(xk, yk)에서 x의 변화량 */
+    int dy; /* 현재 점(xk, yk)에서 y의 변화량 */
 
-    int d; /* 판별식의 값 */
-    
+    int d1; /* 1 구역 판별식의 값 */
+    int d2; /* 2 구역 판별식의 값 */
+
     /**
      * x 독립변수 구간 (1 구역).
-     * 1사분면 x 독립변수 구간에서 +x방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
-     * (x + 1, y) 또는 (x + 1, y - 1) 둘 밖에 없으며, 두 점의 중간점은
-     * (x + 1, y - 0.5)이다. 따라서 판별식은 F(x + 1, y - 0.5)이다.
+     * 1사분면 x 독립변수 구간에서 +x방향으로 진행할 때, 현재 점(xk, yk)의 다음 점으로 가능한 후보는
+     * (xk + 1, yk) 또는 (xk + 1, yk - 1) 둘 밖에 없으며, 두 점의 중간점은
+     * (xk + 1, yk - 0.5)이다. 따라서 1 구역에서 판별식은 d1(x, y) = F(x + 1, y - 0.5)이다.
      */
+    
+    xk = 0;
+    yk = b;
+    
+    dx = 2 * bb * xk;
+    dy = 2 * aa * yk;
     
     /**
-     * (0, b)에서 1구역 그리기 새로 시작.
+     * 1 구역에서 쓸 판별식의 초기값.
+     * d1(0, b)의 값, 즉 F(1, b - 0.5)이다.
      */
-    x = 0;
-    y = b;
-    
-    dx = 2 * bb * x;
-    dy = 2 * aa * y;
-    
-    d = bb - (b * aa) + (0.25 * aa); /* 1 구역에서 쓸 판별식의 초기값. */
+    d1 = bb - (b * aa) + (0.25 * aa);
     
     while (dx < dy) {
-          /**
+        /**
          * 그리자
          */
         if (fill) {
-            disp_draw_linep(x + center_x,
-                            y + center_y,
-                            x + center_x,
-                            -y + center_y, color);
+            disp_draw_linep(xk + center_x,
+                            yk + center_y,
+                            xk + center_x,
+                            -yk + center_y, color);
             
-            disp_draw_linep(-x + center_x,
-                            y + center_y,
-                            -x + center_x,
-                            -y + center_y, color);
+            disp_draw_linep(-xk + center_x,
+                            yk + center_y,
+                            -xk + center_x,
+                            -yk + center_y, color);
             
         }
         else {
-            disp_draw_point(x + center_x, y + center_y, color);
-            disp_draw_point(-x + center_x, y + center_y, color);
-            disp_draw_point(x + center_x, -y + center_y, color);
-            disp_draw_point(-x + center_x, -y + center_y, color);
+            disp_draw_point(xk + center_x, yk + center_y, color);
+            disp_draw_point(-xk + center_x, yk + center_y, color);
+            disp_draw_point(xk + center_x, -yk + center_y, color);
+            disp_draw_point(-xk + center_x, -yk + center_y, color);
         }
   
-        ++x;
         dx += (2 * bb);
         
-        if (d < 0) {
+        if (d1 < 0) {
             /**
              * 중간점이 타원 안에 있는 경우이므로, 타원 밖과 가까운 (x + 1, y)가 다음 점으로 적절.
              */
 
-            d += (dx + bb);
+            /**
+             * d1에 dx + bb를 더하는 이유는...
+             *
+             * 일단 1 구역에서 사용한 판별식은 d1(x, y) = F(0, b - 0.5)입니다.
+             * 이번에 사용한 판별식은 d1(xk, yk) = F(xk + 1, yk - 0.5)입니다.
+             * 이번에 쓴 판별식의 값이 0보다 작으니 다음 판별식의 값은 d1(xk + 1, yk)입니다.
+             * 즉 다음 판별식의 값은 F(xk + 2, yk - 0.5)입니다.
+             * F(xk + 2, yk - 0.5)는
+             * F(xk + 1, yk - 0.5) + (F(xk + 2, yk - 0.5) - F(xk + 1, yk - 0.5))로도 구할 수 있습니다.
+             * 다시 말해서 d1(xk + 1, yk)은 d1(xk, yk) + (d1(xk + 1, yk) - d1(xk, yk))로도 구할 수 있습니다.
+             *
+             * d1의 함숫값을 새로 계산할 것 없이, d1(x + 1, y) - d1(x, y)에 해당하는 값만 더해주면 된다는 것입니다.
+             * 하여 계산한 d1(x + 1, y) - d1(x, y)은 2*bb*x + 2*bb에 해당하고, 이것은 dx + bb에 해당합니다!!!
+             *
+             * 이 설명은 d1의 함숫값이 0보다 클 때에도 같습니다.
+             * 구역 2의 d2에도 같은 설명을 적용할 수 있습니다.
+             */
+            d1 += (dx + bb);
         }
         else {
             /**
              * 중간점이 타원 밖에 있는 경우이므로, 타원 안과 가까운 (x + 1, y - 1)이 다음 점으로 적절.
              */
-            --y;
+            --yk;
             dy -= (2 * aa);
-            d += (dx - dy + bb);
+            d1 += (dx - dy + bb);
         }
    }
 
     /**
      * y 독립변수 구간 (2 구역).
-     * 1사분면 y 독립변수 구간에서 +y방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
-     * (x, y + 1) 또는 (x - 1, y + 1) 둘 밖에 없으며, 두 점의 중간점은
-     * (x - 0.5, y + 1)이다. 따라서 판별식은 F(x - 0.5, y + 1)이다.
+     * 1사분면 y 독립변수 구간에서 -y방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
+     * (xk, yk - 1) 또는 (xk - 1, yk - 1) 둘 밖에 없으며, 두 점의 중간점은
+     * (xk - 0.5, yk - 1)이다. 따라서 2 구역에서 판별식은 d(x, y) = F(x - 0.5, y - 1)이다.
      */
     
+    xk = a;
+    yk = 0;
+    
+    dx = 2 * bb * xk;
+    dy = 2 * aa * yk;
+    
     /**
-     * (a, 0)에서 2구역 그리기 새로 시작. 
-	 */
-    x = a;
-    y = 0;
-    
-    dx = 2 * bb * x;
-    dy = 2 * aa * y;
-    
-    d = aa - (a * bb) + (0.25 * bb); /* 2 구역에서 쓸 판별식의 초기값. */
+     * 2 구역에서 쓸 판별식의 초기값.
+     * d2(a, 0)의 값, 즉 F(a - 0.5, -1)이다.
+     */
+    d2 = aa - (a * bb) + (0.25 * bb);
 
     while (dx > dy) {      
         /**
          * 그리자
          */
         if (fill) {
-            disp_draw_linep(x + center_x,
-                            y + center_y,
-                            -x + center_x,
-                            y + center_y, color);
+            disp_draw_linep(xk + center_x,
+                            yk + center_y,
+                            -xk + center_x,
+                            yk + center_y, color);
             
-            disp_draw_linep(x + center_x,
-                            -y + center_y,
-                            -x + center_x,
-                            -y + center_y, color);
+            disp_draw_linep(xk + center_x,
+                            -yk + center_y,
+                            -xk + center_x,
+                            -yk + center_y, color);
         }
         else {
-            disp_draw_point(x + center_x, y + center_y, color);
-            disp_draw_point(-x + center_x, y + center_y, color);
-            disp_draw_point(x + center_x, -y + center_y, color);
-            disp_draw_point(-x + center_x, -y + center_y, color);
+            disp_draw_point(xk + center_x, yk + center_y, color);
+            disp_draw_point(-xk + center_x, yk + center_y, color);
+            disp_draw_point(xk + center_x, -yk + center_y, color);
+            disp_draw_point(-xk + center_x, -yk + center_y, color);
         }
 
-        ++y;
+        ++yk;
         dy += (2 * aa);
         
-        if (d < 0) {
+        if (d2 < 0) {
             /**
-             * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x, y + 1)을 선택.
+             * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x, y - 1)을 선택.
              */
-            d += (dy + aa);
+            d2 += (dy + aa);
         }
         else {
             /**
-             * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x - 1, y + 1)을 선택.
+             * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x - 1, y - 1)을 선택.
              */
-            --x;
+            --xk;
             dx -= (2 * bb);
-            d += (dy - dx + aa);
+            d2 += (dy - dx + aa);
         }
    }
     

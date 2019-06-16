@@ -62,32 +62,4 @@ ASSERTDO((X) != NULL, print_error(FUNC_NAME ": " #X " is NULL.\n"); return)
 #define NULL_CHECK_RET(FUNC_NAME, X, RET)                                                   \
 ASSERTDO((X) != NULL, print_error(FUNC_NAME ": " #X " is NULL.\n"); return RET)
 
-
-/**
- * 한 점의 X, Y 좌표가 각각 [0, X_MAX], [0, Y_MAX]에 속하는지 검사합니다.
- */
-#define POINT_CHECK(FUNC_NAME, X, Y, X_MAX, Y_MAX)                                          \
-do {                                                                                        \
-ASSERTDO(IN_RANGE(X, 0, X_MAX),                                                             \
-print_error(FUNC_NAME ": " #X "{%d} out of range.\n", X);                                   \
-return);                                                                                    \
-ASSERTDO(IN_RANGE(Y, 0, Y_MAX),                                                             \
-print_error(FUNC_NAME ": " #Y "{%d} out of range.\n", Y);                                   \
-return);                                                                                    \
-} while (0)
-
-/**
- * 한 크기의 길이와 높이가 각각 [0, W_MAX], [0, H_MAX]에 속하는지 검사합니다.
- */
-#define SIZE_CHECK(FUNC_NAME, W, H, W_MAX, H_MAX)                                           \
-do {                                                                                        \
-ASSERTDO(IN_RANGE(W, 0, W_MAX),                                                             \
-print_error(FUNC_NAME ": " #W "{%d} out of range.\n", W);                                   \
-return);                                                                                    \
-ASSERTDO(IN_RANGE(H, 0, H_MAX),                                                             \
-print_error(FUNC_NAME ": " #H "{%d} out of range.\n", H);                                   \
-return);                                                                                    \
-} while (0)
-
-
 #endif /* debug_h */

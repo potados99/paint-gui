@@ -261,6 +261,8 @@ void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
 }
 
 static inline void _oval(int a, int b, int center_x, int center_y, bool fill, unsigned color) {
+ printf("oval: a: %d, b: %d, x: %d, y: %d.\n", a, b, center_x, center_y);
+
     int aa = a * a; /* a의 제곱 */
     int bb = b * b; /* b의 제곱 */
     
@@ -283,8 +285,8 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     /**
      * (원점 0이라 치면, (0, b)에서 시작.)
      */
-    x = center_x;
-    y = center_y + b;
+    x = 0;
+    y = b;
     
     dx = 2 * bb * x;
     dy = 2 * aa * y;
@@ -292,24 +294,23 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     d = bb - (b * aa) + (0.25 * aa); /* 1 구역에서 쓸 판별식의 초기값. */
     
     while (dx < dy) {
-        
         ++x;
-        dx +=           2 * bb;
+        dx += (2 * bb);
         
         if (d < 0) {
             /**
              * 중간점이 타원 안에 있는 경우이므로, 타원 밖과 가까운 (x + 1, y)가 다음 점으로 적절.
              */
 
-            d +=        dx + bb;
+            d += (dx + bb);
         }
         else {
             /**
              * 중간점이 타원 밖에 있는 경우이므로, 타원 안과 가까운 (x + 1, y - 1)이 다음 점으로 적절.
              */
             --y;
-            dy -=       2 * aa;
-            d +=        dx - dy + bb;
+            dy -= (2 * aa);
+            d += (dx - dy + bb);
         }
         
         /**
@@ -336,7 +337,7 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     }
     
     
-    
+
     /**
      * y 독립변수 구간 (2 구역).
      * 1사분면 y 독립변수 구간에서 +y방향으로 진행할 때, 현재 점의 다음 점으로 가능한 후보는
@@ -347,8 +348,8 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     /**
      * (원점 0이라 치면, (a, 0)에서 시작.)
      */
-    x = center_x + a;
-    y = center_y;
+    x = a;
+    y = 0;
     
     dx = 2 * bb * x;
     dy = 2 * aa * y;
@@ -358,21 +359,21 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
     while (dx > dy) {
         
         ++y;
-        dy +=               2 * aa;
+        dy += (2 * aa);
         
         if (d < 0) {
             /**
              * 두 점의 중점이 타원 안에 있으므로, 타원 밖에 가까운 점인 (x, y + 1)을 선택.
              */
-            d +=            dy + aa;
+            d += (dy + aa);
         }
         else {
             /**
              * 두 점의 중점이 타원 밖에 있으므로, 타원 안에 가까운 점인 (x - 1, y + 1)을 선택.
              */
             --x;
-            dx -=           2 * bb;
-            d +=            dy - dx + aa;
+            dx -= (2 * bb);
+            d += (dy - dx + aa);
         }
         
         /**

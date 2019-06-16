@@ -260,6 +260,69 @@ void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
     disp_draw_rect_fill(x0, y0, x1 - x0 + 1, y1 - y0 + 1, color);
 }
 
+void disp_draw_oval(int x, int y, int width, int height, unsigned short color) {
+    
+}
+
+void disp_draw_oval_fill(int x, int y, int width, int height, unsigned short color) {
+    
+}
+
+void disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color) {
+    
+}
+
+void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
+    int         i;
+    int         j;
+    float       tmp;
+    float       ttmp;
+    float       centerX;
+    float       centerY;
+    float       A;
+    float       B;
+    float       a = 0.5;
+    float       b = 2;
+    float       tmpX;
+    float       tmpY;
+    int         xxx;
+    int         rowChk;
+    int         ovalChk=0;
+    
+    ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
+    
+    centerX = (x0 + x1) / 2;
+    centerY = (y0 + y1) / 2;
+    A = x1 - centerX;
+    B = y1 - centerY;
+    
+    for (i = y0; i < y1; i++) {
+        
+        for (j = x0; j < x1; j++) {
+            xxx = (x1 - x0 +  y1 - y0)*a+b;
+            tmpX = (j - centerX)*(j - centerX);
+            tmp = (A*A)*(1 - (((i - centerY)*(i - centerY)) / (B*B)));
+            tmpY = (i - centerY)*(i - centerY);
+            ttmp = (B*B)*(1 - (((j - centerX)*(j - centerX)) / (A*A)));
+            
+            if ((tmpX - tmp >= -xxx && tmpX - tmp <= xxx) || (tmpY - ttmp >= -xxx && tmpY - ttmp <= xxx) ) {
+                
+                rowChk = i;
+                ovalChk += 1;
+                
+                _modify(i * DP_WIDTH + j, color);
+                
+                if (j == x0 || i == y1)
+                    ovalChk=0;
+            }
+            if(rowChk == i && ovalChk != 1){
+                _modify(i * DP_WIDTH + j, color);
+            }
+            else ovalChk=0;
+        }
+    }
+}
+
 void disp_draw_whole(unsigned short color) {
     return disp_draw_rect_fill(0, 0, DP_WIDTH, DP_HEIGHT, color);
 }
@@ -278,10 +341,10 @@ void disp_draw_2d_shape(struct shape *shape) {
         case ST_RECT_FILL:      draw_function = disp_draw_rect_fill; break;
         case ST_RECTP:          draw_function = disp_draw_rectp; break;
         case ST_RECTP_FILL:     draw_function = disp_draw_rectp_fill; break;
-        case ST_OVAL:           draw_function = NULL; break;
-        case ST_OVAL_FILL:      draw_function = NULL; break;
-        case ST_OVALP:          draw_function = NULL; break;
-        case ST_OVALP_FILL:     draw_function = NULL; break;
+        case ST_OVAL:           draw_function = disp_draw_oval; break;
+        case ST_OVAL_FILL:      draw_function = disp_draw_oval_fill; break;
+        case ST_OVALP:          draw_function = disp_draw_ovalp; break;
+        case ST_OVALP_FILL:     draw_function = disp_draw_ovalp_fill; break;
         case ST_FREEP:          goto free_draw;
             
         default:                print_error("disp_draw_2d_shape(): invalid shape type: %d\n", shape->type); return;

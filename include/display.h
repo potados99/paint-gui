@@ -32,6 +32,12 @@ void 			disp_draw_rect_fill(int x, int y, int width, int height, unsigned short 
 void 			disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color);
 void            disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color);
 
+void            disp_draw_oval(int x, int y, int width, int height, unsigned short color);
+void            disp_draw_oval_fill(int x, int y, int width, int height, unsigned short color);
+
+void            disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color);
+void            disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color);
+
 void            disp_draw_whole(unsigned short color);
 
 void            disp_draw_2d_shape(struct shape *shape);

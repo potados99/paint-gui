@@ -446,7 +446,6 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
                 case MODE_OVAL: {
-                    /*
                     shape = shape_create(context->fill ? ST_OVALP_FILL : ST_OVALP, x, y, x, y, context->draw_color);
                     _add_shape(context, shape);
                     
@@ -455,7 +454,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_set_direct(false);
                     
                     print_info("_on_canvas_touched(): new oval created at (%d, %d).\n", x, y);
-                    */
+                    
                     return;
                 }
                 case MODE_FDRAW: {
@@ -526,11 +525,9 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
                 case MODE_OVAL: {
-                    /*
                      shape = shapes_list_peek_last(&context->shapes);
                      
                      _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
-                     */
                     
                     return;
                 }

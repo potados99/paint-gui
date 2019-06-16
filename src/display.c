@@ -315,6 +315,10 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             disp_draw_point(-xk + center_x, -yk + center_y, color);
         }
   
+        /**
+         * x는 독립변수니까 조건없이 그냥 더해줍니다.
+         */
+        ++xk;
         dx += (2 * bb);
         
         if (d1 < 0) {
@@ -392,6 +396,9 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
             disp_draw_point(-xk + center_x, -yk + center_y, color);
         }
 
+        /**
+         * y는 독립변수니까 조건없이 그냥 더해줍니다.
+         */
         ++yk;
         dy += (2 * aa);
         

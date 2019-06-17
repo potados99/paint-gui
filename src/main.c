@@ -26,6 +26,6 @@
 int main(int argc, const char *argv[]) {
     do_it();
 
-	return 0;
+    return 0;
 }
 

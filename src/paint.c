@@ -539,9 +539,8 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     
                     shape_add_point(shape, x, y);
                     
-                    disp_set_direct(true);
                     disp_draw_linep(context->last_x, context->last_y, x, y, context->draw_color);
-                    disp_set_direct(false);
+                    _redraw_areap(context, context->last_x, context->last_y, x, y);
                     
                     return;
                 }

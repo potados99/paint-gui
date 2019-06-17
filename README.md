@@ -1,7 +1,7 @@
 # paint-gui
 그림판입니다.
 
-<img src="./documents/at-a-glance.png" width="600"></img>
+<img src="./documents/at-a-glance.png" width="320"></img>
 
 ## 기능
 

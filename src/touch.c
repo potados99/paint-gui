@@ -33,23 +33,23 @@ int touch_read(int fd, struct touch_event *event) {
      * 리눅스니까 리눅스가 제공해주시는 input_event를 씁니다.
      */
     struct input_event 	ie;
-
+    
     /**
      * 별다른 일이 있기 전까지는 터치 상태는 기본 STATE_NONE입니다.
      */
     event->touch_state = TOUCH_STATE_DRAG;
-
+    
     /**
      * 리눅스의 터치 이벤트는 여러 정보를 전달합니다.
      * 한 번의 터치도 여러 이벤트로 나누어 전달되는데,
      * EV_SYN를 통해 하나의 이벤트가 종료되었음을 알립니다.
      */
     while (1) {
-
+        
         /**
          * 읽기
          */
-		if (read(fd, &ie, sizeof(struct input_event)) == -1)  {
+        if (read(fd, &ie, sizeof(struct input_event)) == -1)  {
 #ifdef NONBLOCK_READ
             /**
              * non-block 읽기에서, EAGAIN은 에러가 아닙니다.
@@ -78,8 +78,8 @@ int touch_read(int fd, struct touch_event *event) {
                 /**
                  * 끝입니다.
                  */
-               	return 0;
-               
+                return 0;
+                
             case EV_KEY:
                 /**
                  * 이 디스플레이가 지원하는 EV_KEY는 사실 BTN_TOUCH밖에 없습니다.

@@ -21,7 +21,7 @@ static inline void _init(struct paint *context) {
     context->canvas_y0 = Y(UI_CANVAS_LOCATION);
     context->canvas_x1 = X(UI_CANVAS_LOCATION) + WIDTH(UI_CANVAS_SIZE) - 1;
     context->canvas_y1 = Y(UI_CANVAS_LOCATION) + HEIGHT(UI_CANVAS_SIZE) - 1;
-
+    
     context->draw_mode = MODE_LINE;
     context->fill = false;
     context->draw_color = PAINT_DEFAULT_DRAW_COLOR;
@@ -80,7 +80,7 @@ static inline void _redraw_areap(struct paint *context, int x0, int y0, int x1, 
         disp_draw_2d_shape(cur);
     }
     
-    /** 
+    /**
      * 그 변화를 commit합니다.
      * commit되는 변화는 캔버스 영역 이하이어야 합니다!!!!!! 안그러면 UI영역 침범임!!
      */
@@ -107,7 +107,7 @@ static inline void _move_shape_and_redraw(struct paint *context, struct shape *s
                   MIN(before_y0, after_y0),
                   MAX(before_x1, after_x1),
                   MAX(before_y1, after_y1));
-
+    
     return;
 }
 
@@ -134,7 +134,7 @@ static inline void _transform_shape_and_redraw(struct paint *context, struct sha
  */
 static inline struct shape *_pick_shape(struct paint *context, int x, int y) {
     struct shape *cur;
-
+    
     list_for_each_entry_reverse(cur, &context->shapes, list) {
         if (shape_point_in_shape_area(cur, x, y)) {
             return cur;
@@ -158,12 +158,12 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
     register int offset = 0;
     
     disp_set_direct(true);
-
+    
     do {
         disp_draw_point(offset % DP_WIDTH,
                         offset / DP_WIDTH,
                         GET_BIT8(ui_image, offset) ? back_color : ui_color);
-   	} while (++offset < DP_MEM_SIZE);
+    } while (++offset < DP_MEM_SIZE);
     
     disp_set_direct(false);
 }
@@ -174,11 +174,11 @@ static inline void _draw_ui_background(unsigned short back_color, unsigned short
 static inline void _draw_ui_canvas(unsigned short canvas_color) {
     disp_set_direct(true);
     
-    disp_draw_rect_fill(X(UI_CANVAS_LOCATION), 
-						Y(UI_CANVAS_LOCATION), 
-						WIDTH(UI_CANVAS_SIZE), 
-						HEIGHT(UI_CANVAS_SIZE), 
-						canvas_color);
+    disp_draw_rect_fill(X(UI_CANVAS_LOCATION),
+                        Y(UI_CANVAS_LOCATION),
+                        WIDTH(UI_CANVAS_SIZE),
+                        HEIGHT(UI_CANVAS_SIZE),
+                        canvas_color);
     
     disp_set_direct(false);
 }
@@ -206,13 +206,13 @@ static inline void _draw_ui_buttons(void) {
  */
 static inline void _draw_ui(void) {
     _draw_ui_background(UI_DEFAULT_BACK_COLOR, UI_DEFAULT_TEXT_COLOR);
-
-	usleep(300000);
+    
+    usleep(300000);
     
     _draw_ui_canvas(UI_DEFAULT_CANVAS_COLOR);
-
-	usleep(300000);
-
+    
+    usleep(300000);
+    
     _draw_ui_buttons();
 }
 
@@ -228,7 +228,7 @@ static inline void _mark_button(const struct button *btn) {
          */
         return;
     }
-
+    
     for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
         /**
          * 모든 버튼들을 순회하면서, 파라미터로 들어온 버튼과 같은 그룹에 속하는 버튼이 있으면,
@@ -418,7 +418,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
          * 터치가 막 시작되었을 때.
          */
         case TOUCH_STATE_BEGIN: {
-
+            
             switch (context->draw_mode) {
                 case MODE_LINE: {
                     
@@ -442,7 +442,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_set_direct(false);
                     
                     print_info("_on_canvas_touched(): new rect created at (%d, %d).\n", x, y);
-
+                    
                     return;
                 }
                 case MODE_OVAL: {
@@ -467,7 +467,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     disp_set_direct(false);
                     
                     print_info("_on_canvas_touched(): new free draw created at (%d, %d).\n", x, y);
-
+                    
                     return;
                 }
                 case MODE_SELECT: {
@@ -478,7 +478,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     else {
                         print_info("_on_canvas_touched(): no object at (%d, %d).\n", x, y);
                     }
-
+                    
                     return;
                 }
                 case MODE_ERASE: {
@@ -491,7 +491,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     _redraw_areap(context, x0, y0, x1, y1);
                     
                     print_info("_on_canvas_touched(): erased object at (%d, %d).\n", x, y);
-
+                    
                     return;
                 }
                     
@@ -511,7 +511,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
          * 터치를 유지하며 드래그중일 때
          */
         case TOUCH_STATE_DRAG: {
-
+            
             switch (context->draw_mode) {
                 case MODE_LINE: {
                     shape = shapes_list_peek_last(&context->shapes);
@@ -528,9 +528,9 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     return;
                 }
                 case MODE_OVAL: {
-                     shape = shapes_list_peek_last(&context->shapes);
-                     
-                     _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
+                    shape = shapes_list_peek_last(&context->shapes);
+                    
+                    _transform_shape_and_redraw(context, shape, x - context->last_x, y - context->last_y);
                     
                     return;
                 }
@@ -556,7 +556,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
                     /* 해당없어요~ */
                     return;
                 }
-
+                    
                 default: {
                     /* 임파서블!! */
                     print_error("_on_canvas_touched(): UNKNOWN DRAW MODE: %d.\n", context->draw_mode);
@@ -617,7 +617,6 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
             return;
         }
             
-            
         /**
          * 여기는 위의 세 가지 경우가 아닌 경우인데,
          * 불가능하다!!!!!!!!!!!!!!!!!!!
@@ -629,7 +628,7 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
         }
             
     } /* end of switch */
-
+    
 }
 
 /*************************  [ 이 소스파일에서만 쓰이는 인라인함수들 (끝)] *************************/
@@ -637,28 +636,28 @@ static inline void _on_canvas_touched(struct paint *context, int x, int y) {
 
 struct paint *paint_create(void) {
     print_info("paint_create()\n");
-
-	PAINT_ALLOC(new_paint);
+    
+    PAINT_ALLOC(new_paint);
     
     _init(new_paint);
-	
-	print_info("paint_create(): initialized.\n");
+    
+    print_info("paint_create(): initialized.\n");
     
     _draw_ui();
     
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_LINE));
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_C7));
     _on_button_clicked(new_paint, ui_find_button_by_id(UI_BTN_PEN));
-
-	print_info("paint_create(): ready.\n");
-
+    
+    print_info("paint_create(): ready.\n");
+    
     return new_paint;
 }
 
 void paint_touch_start(struct paint *context, int x, int y) {
     NULL_CHECK("paint_touch_start()", context);
     print_trace("paint_touch_start(): touch start at (%d, %d)\n", x, y);
-
+    
     context->touch_state = TOUCH_STATE_BEGIN;
     
     /**
@@ -703,7 +702,7 @@ void paint_touch_drag(struct paint *context, int x, int y) {
         print_trace("paint_touch_drag(): ignore drag.\n");
         return;
     }
-
+    
     /**
      * 캔버스에서 해야 할 일은 이 친구에게~
      */
@@ -716,7 +715,7 @@ void paint_touch_drag(struct paint *context, int x, int y) {
 void paint_touch_end(struct paint *context, int x, int y) {
     NULL_CHECK("paint_touch_end()", context);
     print_trace("paint_touch_end(): touch end at (%d, %d)\n", x, y);
-
+    
     context->touch_state = TOUCH_STATE_DONE;
     
     if (!context->touch_started_from_canvas) {
@@ -747,8 +746,8 @@ void paint_test(struct paint *context) {
     
     struct shape *rect = shape_create(ST_RECT_FILL, 140, 110, 50, 50, COLOR(0, 255, 0));
     shapes_list_add(&context->shapes, rect);
-  
-	struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
+    
+    struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
     shape_add_point(fdraw, 100, 100);
     shape_add_point(fdraw, 102, 106);
     shape_add_point(fdraw, 106, 112);
@@ -793,7 +792,7 @@ void paint_test(struct paint *context) {
         
         _transform_shape_and_redraw(context, rect, -2, -1);
     }
-     
+    
     for (int i = 0; i < 120; ++i) {
         usleep(20000);
         

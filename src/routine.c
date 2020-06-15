@@ -10,8 +10,8 @@
 #include <unistd.h>
 
 void do_it(void) {
-	print_info("Starting.\n");
-
+    print_info("Starting.\n");
+    
     int                 ts_fd;      /* 터치스크린 파일 기술자 */
     int                 dp_fd;      /* 디스플레이 파일 기술자 */
     int                 ts_read;    /* 터치 읽은 결과 저장 */

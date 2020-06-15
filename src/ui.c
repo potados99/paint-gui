@@ -347,7 +347,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C0
     },
     {
-       /* color 1 */
+        /* color 1 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C1_LOCATION),
         Y(UI_PALETTE_C1_LOCATION),
@@ -357,7 +357,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C1
     },
     {
-       /* color 2 */
+        /* color 2 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C2_LOCATION),
         Y(UI_PALETTE_C2_LOCATION),
@@ -367,7 +367,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C2
     },
     {
-       /* color 3 */
+        /* color 3 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C3_LOCATION),
         Y(UI_PALETTE_C3_LOCATION),
@@ -377,7 +377,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C3
     },
     {
-       /* color 4 */
+        /* color 4 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C4_LOCATION),
         Y(UI_PALETTE_C4_LOCATION),
@@ -387,7 +387,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C4
     },
     {
-       /* color 5 */
+        /* color 5 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C5_LOCATION),
         Y(UI_PALETTE_C5_LOCATION),
@@ -397,7 +397,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C5
     },
     {
-       /* color 6 */
+        /* color 6 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C6_LOCATION),
         Y(UI_PALETTE_C6_LOCATION),
@@ -407,7 +407,7 @@ const struct button ui_buttons[17] = {
         UI_BTN_C6
     },
     {
-       /* color 7 */
+        /* color 7 */
         BT_MARKABLE | BT_COLORABLE,
         X(UI_PALETTE_C7_LOCATION),
         Y(UI_PALETTE_C7_LOCATION),
@@ -428,17 +428,17 @@ const struct button *ui_find_button_by_coordinate(int x, int y) {
     }
     
     print_info("ui_find_button_by_coordinate(): no button found at (%d, %d).\n", x, y);
-
+    
     return NULL;
 }
 
 const struct button *ui_find_button_by_id(int id) {
-for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
-    if (ui_buttons[i].id == id) {
-        return (ui_buttons + i);
+    for (int i = 0; i < UI_NUMBER_OF_BUTTONS; ++i) {
+        if (ui_buttons[i].id == id) {
+            return (ui_buttons + i);
+        }
     }
-}
-
+    
     print_error("ui_find_button_by_id(): no button found mathing id %d.\n", id);
     
     return NULL;

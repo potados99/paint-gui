@@ -56,16 +56,17 @@ int draw_read_test() {
     shapes_list_add(&shapes_head, rect);
     
     struct shape *fdraw = shape_create(ST_FREEP, 0, 0, 0, 0, COLOR(0, 0, 255));
+    
     shape_add_point(fdraw, 100, 100);
-	shape_add_point(fdraw, 102, 106);
-	shape_add_point(fdraw, 106, 112);
-	shape_add_point(fdraw, 112, 119);
-	shape_add_point(fdraw, 120, 125);
-	shape_add_point(fdraw, 130, 131);
+    shape_add_point(fdraw, 102, 106);
+    shape_add_point(fdraw, 106, 112);
+    shape_add_point(fdraw, 112, 119);
+    shape_add_point(fdraw, 120, 125);
+    shape_add_point(fdraw, 130, 131);
     shape_add_point(fdraw, 142, 137);
-	shape_add_point(fdraw, 156, 142);
-	shape_add_point(fdraw, 172, 150);
-	shapes_list_add(&shapes_head, fdraw);
+    shape_add_point(fdraw, 156, 142);
+    shape_add_point(fdraw, 172, 150);
+    shapes_list_add(&shapes_head, fdraw);
     
     /**
      * 만든 도형들을 그려줍니다.
@@ -79,21 +80,21 @@ int draw_read_test() {
     
     for (int i = 0; i < 100; ++i) {
         usleep(20000);
- 
-		/**
-		 * 해당 구역을 지워줍니다.
-		 */
-		disp_draw_rectp_fill(fdraw->value[0] + fdraw->offset[0], 
-							 fdraw->value[1] + fdraw->offset[1], 
-							 fdraw->value[2] + fdraw->offset[0], 
-							 fdraw->value[3] + fdraw->offset[1], 
-							 COLOR(255, 255, 255));
         
-		/**
-		 * 도형에 offset을 추가하고 싹다 새로 그립니다.
-		 */
-		fdraw->offset[0]++;
- 
+        /**
+         * 해당 구역을 지워줍니다.
+         */
+        disp_draw_rectp_fill(fdraw->value[0] + fdraw->offset[0],
+                             fdraw->value[1] + fdraw->offset[1],
+                             fdraw->value[2] + fdraw->offset[0],
+                             fdraw->value[3] + fdraw->offset[1],
+                             COLOR(255, 255, 255));
+        
+        /**
+         * 도형에 offset을 추가하고 싹다 새로 그립니다.
+         */
+        fdraw->offset[0]++;
+        
         list_for_each_entry(cur, &shapes_head, list) {
             disp_draw_2d_shape(cur);
         }
@@ -181,11 +182,11 @@ int list_test() {
     list_for_each_entry(cur, &points_head, list) {
         printf("point(%d, %d)\n", cur->x, cur->y);
     }
-
+    
     points_free(&points_head);
     
     printf("list_test() done.\n\n");
-
+    
     return 0;
 }
 
@@ -299,16 +300,16 @@ int paint_usecase_test() {
 
 int area_test(void) {
     /*
-    struct shape *s = shape_create(ST_RECT, 6, 6, -5, -5, 0);
-    printf("Created shape with value[4] = { 6, 6, -5, -5 }.\n\n");
-    */
+     struct shape *s = shape_create(ST_RECT, 6, 6, -5, -5, 0);
+     printf("Created shape with value[4] = { 6, 6, -5, -5 }.\n\n");
+     */
     struct shape *s = shape_create(ST_RECT, 5, 5, 0, 0, 0);
     printf("Created shape with value[4] = { 5, 5, 0, 0 }.\n\n");
     
     SHAPE_EXPORT_AREA_TO_TWO_POINTS(s, x0, y0, x1, y1);
     printf("Exportd that area to two points:\n");
     printf("p0(%d, %d) and p1(%d, %d)\n\n", x0, y0, x1, y1);
-
+    
     SHAPE_EXPORT_AREA_TO_POINT_AND_SIZE(s, x, y, width, height);
     printf("Exportd that area to point and size:\n");
     printf("p(%d, %d) and s(%d, %d)\n\n", x, y, width, height);
@@ -342,9 +343,8 @@ int button_test(void) {
      */
     disp_map(dp_fd);
     
-
     struct paint *mypaint = paint_create();
-
+    
     while (1) {
         touch_read(ts_fd, &te);
         

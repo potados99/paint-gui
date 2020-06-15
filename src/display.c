@@ -45,7 +45,7 @@ static inline void _apply(int x, int y, int width, int height) {
          */
         return;
     }
-   
+    
     /**
      * 시작점이 화면 안에 위치하도록 잘라줌니다.
      */
@@ -61,7 +61,7 @@ static inline void _apply(int x, int y, int width, int height) {
     /**
      * 너비와 높이가 화면 밖으로 넘치지 않도록 잘라줍니다.
      */
-   if (x + width >= DP_WIDTH) {
+    if (x + width >= DP_WIDTH) {
         width = DP_WIDTH - x;
     }
     if (y + height >= DP_HEIGHT) {
@@ -70,31 +70,31 @@ static inline void _apply(int x, int y, int width, int height) {
     
     print_trace("_apply(): apply changes at x: %d, y: %d, width: %d, height: %d.\n", x, y, width, height);
     
-	const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
-	register int 	offset = x + (DP_WIDTH * y);
-	register int 	n_line = 0;
-
-	do {
-		if (GET_BIT32(bitmap, offset)) {
-
+    const int	 	offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
+    register int 	offset = x + (DP_WIDTH * y);
+    register int 	n_line = 0;
+    
+    do {
+        if (GET_BIT32(bitmap, offset)) {
+            
             print_trace("_apply(): write to display memory at offset %d. (until %d).\n", offset, offset_max);
-
-			*(dp_mem + offset) = *(dp_buf + offset);
-		
+            
+            *(dp_mem + offset) = *(dp_buf + offset);
+            
             UNSET_BIT32(bitmap, offset);
-		}
-
-
-		if (++n_line >= width) {
-			n_line = 0;
-			offset += (DP_WIDTH - width);
-		} 
-	
-		++offset;
-	
-
-	} while (offset <= offset_max);
-
+        }
+        
+        
+        if (++n_line >= width) {
+            n_line = 0;
+            offset += (DP_WIDTH - width);
+        }
+        
+        ++offset;
+        
+        
+    } while (offset <= offset_max);
+    
 }
 
 /**
@@ -104,9 +104,9 @@ static inline void _apply(int x, int y, int width, int height) {
 static inline void _modify(int offset,  unsigned short color) {
     ASSERTDO(IN_RANGE(offset, 0, DP_MEM_SIZE - 1), print_trace("_modify(): offset{%d} out of range.\n", offset); return);
     ASSERTDO(dp_mem != NULL, print_error("_modify(): dp_mem is null. call disp_map before use!\n"); return);
-
+    
     print_trace("_modify(): modify pixel at offset %d to %d.\n", offset, color);
-
+    
     if (direct) {
         *(dp_mem + offset) = color;
     }
@@ -335,12 +335,12 @@ static inline void _oval(int a, int b, int center_x, int center_y, bool fill, un
 
 
 void disp_map(int fd) {
-	dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    dp_mem = (unsigned short *)mmap(NULL, DP_MEM_SIZEB, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     ASSERTDO(dp_mem != MAP_FAILED, print_error("disp_map(): mmap() failed.\n"); return);
 }
 
 void disp_unmap() {
-	munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);   
+    munmap(dp_mem, DP_WIDTH * DP_HEIGHT * PIXEL_SIZE);
 }
 
 void disp_set_direct(bool value) {
@@ -349,29 +349,29 @@ void disp_set_direct(bool value) {
 
 void disp_draw_point(int x, int y, unsigned short color) {
     print_trace("disp_draw_point(): draw point at (%d, %d).\n", x, y);
-
-	_modify(x + (y * DP_WIDTH), color);
+    
+    _modify(x + (y * DP_WIDTH), color);
 }
 
 void disp_draw_linep(int x0, int y0 , int x1, int y1, unsigned short color) {
     print_trace("disp_draw_line(): draw line between p0(%d, %d) and p1(%d, %d).\n", x0, y0 , x1, y1);
-
-	if (ABS(y1 - y0) < ABS(x1 - x0)) {
-		if (x0 > x1) {
+    
+    if (ABS(y1 - y0) < ABS(x1 - x0)) {
+        if (x0 > x1) {
             _line_low(x1, y1, x0, y0, color);
-		}
-		else {
+        }
+        else {
             _line_low(x0, y0, x1, y1, color);
-		}
-	}
-	else {
-		if (y0 > y1) {
+        }
+    }
+    else {
+        if (y0 > y1) {
             _line_high(x1, y1, x0, y0, color);
-		}
-		else {
+        }
+        else {
             _line_high(x0, y0, x1, y1, color);
-		}
-	}
+        }
+    }
 }
 
 void disp_draw_rect(int x, int y, int width, int height, unsigned short color) {
@@ -386,22 +386,22 @@ void disp_draw_rect_fill(int x, int y, int width, int height, unsigned short col
     print_trace("disp_draw_rect_fill(): draw rect at point(%d, %d) with size(%d, %d).\n", x, y, width, height);
     
     ENSURE_SIZE_POSITIVE(x, y, width, height);
-
-	const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
-	register int 	offset = x + (DP_WIDTH * y);
-	register int 	n_line = 0;
-
-	do {
-		_modify(offset, color);
-	
-		if (++n_line >= width) {
-			n_line = 0;
-			offset += (DP_WIDTH - width);
-		} 
-		
-		++offset;
-		
-	} while (offset < offset_max + 1);
+    
+    const int 	    offset_max = (x + width - 1) + (DP_WIDTH * (y + height - 1));
+    register int 	offset = x + (DP_WIDTH * y);
+    register int 	n_line = 0;
+    
+    do {
+        _modify(offset, color);
+        
+        if (++n_line >= width) {
+            n_line = 0;
+            offset += (DP_WIDTH - width);
+        }
+        
+        ++offset;
+        
+    } while (offset < offset_max + 1);
 }
 
 void disp_draw_rectp(int x0, int y0, int x1, int y1, unsigned short color) {
@@ -419,7 +419,7 @@ void disp_draw_rectp_fill(int x0, int y0, int x1, int y1, unsigned short color) 
     print_trace("disp_draw_rectp_fill(): draw rect from point(%d, %d) to (%d, %d).\n", x0, y0, x1, y1);
     
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
-
+    
     disp_draw_rect_fill(x0, y0, x1 - x0 + 1, y1 - y0 + 1, color);
 }
 
@@ -443,70 +443,8 @@ void disp_draw_ovalp(int x0, int y0, int x1, int y1, unsigned short color) {
 
 void disp_draw_ovalp_fill(int x0, int y0, int x1, int y1, unsigned short color) {
     ENSURE_POINTS_ORDERED(x0, y0, x1, y1);
-
+    
     _oval((x1 - x0)/2, (y1 - y0)/2, x0 + ((x1 - x0)/2), y0 + ((y1 - y0)/2), true, color);
-    
-    /*
-    return;
-    
-    int i, j;
-    float tmp, ttmp;
-    float centerX, centerY;
-    float  A, B, a = 0.1, b = 2;
-    float tmpX, tmpY;
-    short bufX = 0, bufY = 0;
-    int xxx;
-    int rowChk;
-    int colChk[2]={0,};
-    
-    if (x0 > x1) {
-        tmp = x0;
-        x0 = x1;
-        x1 = tmp;
-    }
-    if (y0 > y1) {
-        tmp = y0;
-        y0 = y1;
-        y1 = tmp;
-    }
-    
-    centerX = (x0 + x1) / 2;
-    centerY = (y0 + y1) / 2;
-    A = x1 - centerX;
-    B = y1 - centerY;
-    
-    
-    a = (MIN(A, B) / MAX(A, B))*(0.495) + 0.005;
-    xxx = (x1 - x0 + y1 - y0)*a + b;
-    
-    for (i = y0; i < y1; i++) {
-        
-        for (j = x0; j < x1; j++) {
-            xxx = (x1 - x0 +  y1 - y0)*a+b;
-            tmpX = (j - centerX)*(j - centerX);
-            tmp = (A*A)*(1 - (((i - centerY)*(i - centerY)) / (B*B)));
-            tmpY = (i - centerY)*(i - centerY);
-            ttmp = (B*B)*(1 - (((j - centerX)*(j - centerX)) / (A*A)));
-            
-            if (tmpX - tmp >= -xxx && tmpX - tmp <= xxx || tmpY - ttmp >= -xxx && tmpY - ttmp <= xxx ) {
-                
-                rowChk=i;
-                if(colChk[0]==0){
-                    colChk[0]=1;
-                    colChk[1]=j-x0;
-                }
-                _modify(i * 320 + j, color);
-
-            }
-            
-            if(rowChk==i && j<=x1-colChk[1]){
-                _modify(i * 320 + j, color);
-
-            }
-        }
-        colChk[0]=0;
-    }
-*/
 }
 
 void disp_draw_whole(unsigned short color) {
@@ -557,7 +495,7 @@ void disp_draw_2d_shape(struct shape *shape) {
         SHAPE_EXPORT_AREA_TO_TWO_POINTS(shape, x, y, width, height);
         draw_function(x, y, width, height, shape->color);
     }
-
+    
     return;
     
 free_draw:
@@ -575,7 +513,7 @@ free_draw:
     int                 last_y = cur->y + shape->offset[1];
     
     list_for_each_entry_continue(cur, &shape->fdraw_points, list) {
-       disp_draw_linep(last_x, last_y, cur->x + shape->offset[0], cur->y + shape->offset[1], shape->color);
+        disp_draw_linep(last_x, last_y, cur->x + shape->offset[0], cur->y + shape->offset[1], shape->color);
         
         last_x = cur->x + shape->offset[0];
         last_y = cur->y + shape->offset[1];
@@ -586,7 +524,7 @@ free_draw:
 
 void disp_commit() {
     print_trace("disp_commit(): commit all changes.\n");
-
+    
     _apply(0, 0, DP_WIDTH, DP_HEIGHT);
 }
 
@@ -600,7 +538,7 @@ void disp_commit_partialp(int x0, int y0, int x1, int y1) {
     ENSURE_RIGHT_BIGGER(x0, x1);
     ENSURE_RIGHT_BIGGER(y0, y1);
     
-	disp_commit_partial(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+    disp_commit_partial(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
 }
 
 void disp_cancel() {
@@ -611,8 +549,8 @@ void disp_cancel() {
 
 void disp_clear() {
     print_trace("disp_clear(): clear screen to black.\n");
-
+    
     memset(dp_mem, 0, DP_MEM_SIZEB);
-	memset(dp_buf, 0, DP_MEM_SIZEB);
-	memset(bitmap, 0, DP_BITMAP_SIZEB);
+    memset(dp_buf, 0, DP_MEM_SIZEB);
+    memset(bitmap, 0, DP_BITMAP_SIZEB);
 }
